@@ -1,0 +1,83 @@
+:root {
+  /* ---- Paleta Gestión y Servicios ---- */
+  --blue: #073b82;
+  --blue-600: #06458f;
+  --blue-700: #0a4f9e;
+  --blue-bright: #1769e8;
+  --blue-050: #eaf3ff;
+  --red: #e51d2a;
+  --red-accent: #ef233c;
+  --red-050: #fff0f1;
+  --white: #ffffff;
+  --bg: #f7f9fc;
+  --ink: #102a56;
+  --ink-soft: #64748b;
+  --line: #e5eaf1;
+
+  /* ---- Métrica ---- */
+  --sidebar-w: 176px;
+  --shell-pad: 32px;
+
+  --r-xs: 10px;
+  --r-sm: 12px;
+  --r-md: 16px;
+  --r-lg: 20px;
+  --r-xl: 24px;
+
+  --shadow-xs: 0 1px 2px rgba(16, 42, 86, 0.05);
+  --shadow-sm: 0 1px 2px rgba(16, 42, 86, 0.05), 0 4px 12px rgba(16, 42, 86, 0.05);
+  --shadow-md: 0 2px 6px rgba(16, 42, 86, 0.06), 0 14px 34px rgba(16, 42, 86, 0.08);
+
+  --sans: "Segoe UI", system-ui, Roboto, -apple-system, "Helvetica Neue", sans-serif;
+
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.22;
+  font-weight: 700;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+::placeholder {
+  color: var(--ink-soft);
+}

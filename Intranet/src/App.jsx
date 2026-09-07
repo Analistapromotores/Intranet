@@ -7,6 +7,8 @@ import ProjectsSection from './components/ProjectsSection.jsx'
 import NewsCard from './components/NewsCard.jsx'
 import CorporateCalendar from './components/CorporateCalendar.jsx'
 import HelpCard from './components/HelpCard.jsx'
+import Login from './components/Login.jsx'
+import { AuthProvider, useAuth } from './auth.jsx'
 import './App.css'
 
 const STORAGE_KEY = 'gys-nav-layout'
@@ -20,7 +22,7 @@ function readLayout() {
   }
 }
 
-function App() {
+function Intranet() {
   const [navLayout, setNavLayout] = useState(readLayout)
 
   useEffect(() => {
@@ -59,4 +61,15 @@ function App() {
   )
 }
 
-export default App
+function Gate() {
+  const { user } = useAuth()
+  return user ? <Intranet /> : <Login />
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Gate />
+    </AuthProvider>
+  )
+}

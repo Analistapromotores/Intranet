@@ -53,6 +53,14 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# Los fallos previstos se muestran como un mensaje limpio, sin volcado de PowerShell.
+trap {
+    Write-Host ""
+    Write-Host "  X  $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host ""
+    exit 1
+}
+
 # ---------------------------------------------------------------- utilidades
 function Write-Step { param([string]$Text) Write-Host "`n==> $Text" -ForegroundColor Cyan }
 function Write-Ok   { param([string]$Text) Write-Host "    OK  $Text" -ForegroundColor Green }

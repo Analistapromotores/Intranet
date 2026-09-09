@@ -1,0 +1,25 @@
+# --- Configuración local de agentes / IA: nunca se versiona ---
+.claude/
+.cursor/
+.windsurf/
+.codeium/
+.continue/
+.aider*
+.copilot/
+.gemini/
+.roo/
+.cline/
+
+# --- Entorno / secretos ---
+.env
+.env.*
+!.env.example
+
+# --- Sistema operativo ---
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# --- Node (por si se instala algo en la raíz) ---
+node_modules/

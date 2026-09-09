@@ -47,11 +47,11 @@ export default function ProjectsSection() {
             <p className="proj__desc">{p.desc}</p>
 
             <div className="proj__actions">
-              <a className="btn btn--primary" href={`#${p.id}`}>
+              <a className="btn btn--primary" href={p.href || `#${p.id}`}>
                 Ver proyecto
                 <IconArrowRight width={16} height={16} />
               </a>
-              <a className="btn btn--ghost" href={`#${p.id}-formatos`}>
+              <a className="btn btn--ghost" href={p.docsHref || `#${p.id}-formatos`}>
                 <IconDownload width={16} height={16} />
                 Descargar formatos
               </a>

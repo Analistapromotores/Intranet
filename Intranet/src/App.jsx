@@ -7,9 +7,7 @@ import ProjectsSection from './components/ProjectsSection.jsx'
 import NewsCard from './components/NewsCard.jsx'
 import CorporateCalendar from './components/CorporateCalendar.jsx'
 import HelpCard from './components/HelpCard.jsx'
-import Login from './components/Login.jsx'
 import CorpoquindioPage from './pages/corpoquindio/CorpoquindioPage.jsx'
-import { AuthProvider, useAuth } from './auth.jsx'
 import './App.css'
 
 const STORAGE_KEY = 'gys-nav-layout'
@@ -73,22 +71,11 @@ function Intranet() {
   )
 }
 
-function Gate() {
-  const { user } = useAuth()
+export default function App() {
   const hash = useHashRoute()
-
-  if (!user) return <Login />
 
   if (hash === 'corpoquindio' || hash.startsWith('corpoquindio-')) {
     return <CorpoquindioPage />
   }
   return <Intranet />
-}
-
-export default function App() {
-  return (
-    <AuthProvider>
-      <Gate />
-    </AuthProvider>
-  )
 }

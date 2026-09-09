@@ -301,16 +301,6 @@ export function IconMountain(props) {
   )
 }
 
-export function IconLogout(props) {
-  return (
-    <svg {...base} {...props}>
-      <path d="M15 4h3a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-3" />
-      <path d="M10 8 6 12l4 4" />
-      <path d="M6 12h12" />
-    </svg>
-  )
-}
-
 export function IconHeadset(props) {
   return (
     <svg {...base} {...props}>

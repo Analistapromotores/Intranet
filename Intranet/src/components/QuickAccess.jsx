@@ -2,7 +2,9 @@ import { navItems } from '../data/navItems.js'
 import SectionTitle from './SectionTitle.jsx'
 import { IconGrid } from './Icons.jsx'
 
-const shortcuts = navItems.filter((item) => item.id !== 'inicio')
+const shortcuts = navItems.filter(
+  (item) => item.id !== 'inicio' && item.quickAccess !== false,
+)
 
 export default function QuickAccess() {
   return (

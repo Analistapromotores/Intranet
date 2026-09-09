@@ -290,6 +290,17 @@ export function IconExternal(props) {
   )
 }
 
+export function IconMountain(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3 19.5h18" />
+      <path d="M4.5 19.5 10 8.6l3.7 7" />
+      <path d="M12.2 13.4 15.6 7.5l4.4 12" />
+      <path d="M8.3 11.9h3.2" opacity=".55" />
+    </svg>
+  )
+}
+
 export function IconLogout(props) {
   return (
     <svg {...base} {...props}>

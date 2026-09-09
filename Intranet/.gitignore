@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Fuentes de diseño pesadas de CORPOQUINDIO (no se necesitan para el build).
+# Los PDFs de la convocatoria viven en public/docs/corpoquindio/
+src/assets/CORPOQUINDIO/*.pdf
+src/assets/CORPOQUINDIO/*.ai

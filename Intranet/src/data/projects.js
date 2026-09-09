@@ -5,14 +5,24 @@ import gestores from '../assets/gestores_024.png'
 import pasaportes from '../assets/logo_pasaportes.png'
 import valleinn from '../assets/valleINN.png'
 import promotores from '../assets/promotores.png'
+import quindioEmprendedor from '../assets/CORPOQUINDIO/quindio_emprendedor.png'
 
-/* Las iniciativas corporativas. `logo` con la marca; si no, `monogram` + `color`. */
+/* Las iniciativas corporativas. `logo` con la marca; si no, `monogram` + `color`.
+   `href` / `docsHref` permiten enlazar a una vista interna del proyecto. */
 export const projects = [
   {
     id: 'gys',
     name: 'Gestión y Servicios',
     logo: gys,
     desc: 'Apoyo integral en talento humano para la operación y los proyectos del grupo.',
+  },
+  {
+    id: 'corpoquindio',
+    name: 'Quindío Emprendedor',
+    logo: quindioEmprendedor,
+    desc: 'UT Corpo Quindío: fortalecimiento de 600 unidades productivas en los 12 municipios del Quindío.',
+    href: '#corpoquindio',
+    docsHref: '#corpoquindio-documentos',
   },
   {
     id: 'corpopais',

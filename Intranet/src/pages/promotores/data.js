@@ -21,18 +21,18 @@ export const FICHA = [
 ]
 
 export const OBJETIVO_GENERAL =
-  'Recuperar la gobernanza a través de la atención integral de los espacios públicos con acciones de pedagogía, prevención y control en el manejo adecuado de residuos sólidos en la ciudad de Santiago de Cali.'
+  'Nuestro propósito es recuperar la gobernanza del espacio público en Santiago de Cali. Lo hacemos atendiendo la ciudad de manera integral, con acciones de pedagogía, prevención y control en el manejo adecuado de los residuos sólidos.'
 
 export const OBJETIVOS = [
   {
     n: '01',
     title: 'Cultura ciudadana',
-    text: 'Fomentar la cultura ciudadana hacia el manejo adecuado de los residuos sólidos y el reciclaje.',
+    text: 'Queremos que separar y reciclar sea parte del día a día de las y los caleños. Por eso llevamos pedagogía a calles, barrios y espacios públicos sobre el manejo adecuado de los residuos.',
   },
   {
     n: '02',
     title: 'Comunidad empoderada',
-    text: 'Empoderar a la comunidad para la conservación de los espacios libres de residuos mediante estrategias pedagógicas, de recuperación y de embellecimiento.',
+    text: 'Buscamos que cada comunidad cuide lo suyo. Acompañamos a los barrios con estrategias pedagógicas, de recuperación y de embellecimiento para que sus espacios se mantengan libres de residuos.',
   },
 ]
 
@@ -40,22 +40,22 @@ export const LINEAS = [
   {
     id: 'pedagogia',
     title: 'Pedagogía ciudadana',
-    text: 'Despliegue de la estrategia de educación en el manejo adecuado de residuos y cultura de reciclaje.',
+    text: 'Salimos a territorio a enseñar cómo separar en la fuente y por qué el reciclaje cambia la ciudad.',
   },
   {
     id: 'cualificacion',
     title: 'Cualificación del equipo',
-    text: 'Jornadas de formación presenciales y virtuales para el equipo de promotores.',
+    text: 'Formamos a cada promotor con jornadas presenciales y virtuales antes de salir a la calle.',
   },
   {
     id: 'difusion',
     title: 'Difusión y sensibilización',
-    text: 'Campañas con medios digitales y material POP para las zonas identificadas como prioritarias.',
+    text: 'Llegamos a más gente con campañas digitales y material impreso en las zonas priorizadas.',
   },
   {
     id: 'intervencion',
     title: 'Intervención de zonas',
-    text: 'Recuperación y embellecimiento de los puntos críticos priorizados de la ciudad.',
+    text: 'Recuperamos y embellecemos los puntos críticos, y los devolvemos a la ciudad transformados.',
   },
 ]
 
@@ -71,7 +71,7 @@ export const RECURSOS = [
   {
     id: 'membrete',
     title: 'Plantilla de membrete',
-    desc: 'Papelería corporativa para comunicaciones internas y externas. Tipografía Poppins.',
+    desc: 'Úsala para tus comunicaciones internas y externas. Ya trae la marca aplicada y la tipografía Poppins.',
     tipo: 'Google Docs',
     url: 'https://docs.google.com/document/d/1nts6SiRfBZO4y551qb7L6Z_MBg_5EA9_/edit',
     externo: true,
@@ -79,7 +79,7 @@ export const RECURSOS = [
   {
     id: 'presentacion',
     title: 'Plantilla de presentaciones',
-    desc: 'Aplicación de la marca en PowerPoint para comunicaciones internas y externas.',
+    desc: 'Arma tus presentaciones sobre esta base: la marca y la tipografía ya están aplicadas.',
     tipo: 'Google Slides',
     url: 'https://docs.google.com/presentation/d/1CE-U5D-UKM1Avyw01b3VIN-i7o7MV02Z/edit',
     externo: true,
@@ -87,7 +87,7 @@ export const RECURSOS = [
   {
     id: 'logos',
     title: 'Logos en PNG',
-    desc: 'Versión principal, transparente y en blanco y negro para distintos formatos.',
+    desc: 'Descarga la versión que necesites: principal, transparente o en blanco y negro.',
     tipo: 'Google Drive',
     url: 'https://drive.google.com/drive/folders/1XdO3OXDlc-tMDk-MXa43Gpjm9mMBG001',
     externo: true,
@@ -95,21 +95,21 @@ export const RECURSOS = [
   {
     id: 'manual',
     title: 'Manual de marca',
-    desc: 'Logosímbolo, colorimetría, tipografía, mascota, usos correctos e incorrectos.',
+    desc: 'Consúltalo antes de diseñar cualquier pieza: logosímbolo, colores, tipografía, mascota y usos correctos.',
     tipo: 'PDF · 2,9 MB',
     url: `${DOCS}manual-de-marca.pdf`,
   },
   {
     id: 'plan',
     title: 'Plan de trabajo',
-    desc: 'Objetivos, obligaciones, componente operativo y matriz de verificables del contrato.',
+    desc: 'Aquí está el detalle del contrato: objetivos, obligaciones, componente operativo y verificables.',
     tipo: 'PDF · 407 KB',
     url: `${DOCS}plan-de-trabajo.pdf`,
   },
   {
     id: 'cualificacion',
     title: 'Cualificación virtual',
-    desc: 'Gestión integral de residuos sólidos: material de formación para el equipo.',
+    desc: 'Material con el que formamos al equipo en gestión integral de residuos sólidos.',
     tipo: 'PPTX · 18 MB',
     url: `${DOCS}cualificacion-virtual-gestion-residuos.pptx`,
   },

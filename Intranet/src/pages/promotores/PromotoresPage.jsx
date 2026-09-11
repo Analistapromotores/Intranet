@@ -75,9 +75,10 @@ export default function PromotoresPage() {
 
               <p className="mcb-hero__lema">{PROJECT.lema}</p>
               <p className="mcb-hero__desc">
-                Estrategia de pedagogía, prevención y control en el manejo de residuos
-                sólidos para Santiago de Cali. Un proyecto de la UAESPM y la Alcaldía de
-                Santiago de Cali, operado por Gestión y Servicios.
+                Somos la estrategia con la que Santiago de Cali recupera sus espacios
+                públicos: pedagogía, prevención y control en el manejo de los residuos
+                sólidos. Un proyecto de la UAESPM y la Alcaldía de Santiago de Cali que
+                operamos desde Gestión y Servicios.
               </p>
 
               <div className="mcb-hero__cta">
@@ -195,8 +196,9 @@ export default function PromotoresPage() {
               Identidad <em>visual</em>
             </SecTitle>
             <p className="mcb-lead mcb-lead--center" data-reveal>
-              Las gamas de verde evocan la frescura y vitalidad de la naturaleza, y la energía
-              de la comunidad: armonía entre el medio ambiente y la vida urbana.
+              Elegimos el verde porque evoca la frescura y la vitalidad de la naturaleza, y
+              también la energía de la comunidad. Cada pieza que hacemos busca transmitir esa
+              armonía entre el medio ambiente y la vida urbana.
             </p>
 
             <div className="mcb-marca">
@@ -220,11 +222,11 @@ export default function PromotoresPage() {
                 <h3 className="mcb-card__title">Tipografía</h3>
                 <p className="mcb-tipo">Mohr Rounded</p>
                 <p className="mcb-tipo__note">
-                  Familia del logosímbolo y las piezas gráficas.
+                  La usamos en el logosímbolo y en las piezas gráficas del proyecto.
                 </p>
                 <p className="mcb-tipo mcb-tipo--alt">Poppins</p>
                 <p className="mcb-tipo__note">
-                  Familia para papelería, membretes y presentaciones.
+                  La usamos en papelería, membretes y presentaciones corporativas.
                 </p>
                 <ul className="mcb-checks">
                   <li>
@@ -242,7 +244,8 @@ export default function PromotoresPage() {
               <article className="mcb-card" data-reveal style={{ '--d': '180ms' }}>
                 <h3 className="mcb-card__title">Dotación del equipo</h3>
                 <p className="mcb-card__lead">
-                  Elementos de identificación para cada promotor en territorio.
+                  Cada promotor sale a territorio plenamente identificado. Esto es lo que
+                  recibe al integrarse al equipo.
                 </p>
                 <ul className="mcb-dot">
                   {DOTACION.map((d) => (
@@ -261,8 +264,8 @@ export default function PromotoresPage() {
               Recursos y <em>plantillas</em>
             </SecTitle>
             <p className="mcb-lead mcb-lead--center" data-reveal>
-              El manual de marca es una herramienta viva: guía las aplicaciones de la marca
-              sin restringir la creatividad del equipo.
+              Aquí encuentras todo lo que necesitas para aplicar la marca. El manual es una
+              herramienta viva: te guía, sin restringir la creatividad del equipo.
             </p>
 
             <ul className="mcb-recursos">
@@ -302,8 +305,8 @@ export default function PromotoresPage() {
                 Una ciudad que evoluciona es una ciudad <em>limpia</em>.
               </h2>
               <p>
-                Separa en la fuente, saca los residuos en el horario indicado y súmate al
-                Sistema de Gestión Integral de Residuos Sólidos.
+                Tú también haces parte. Separa en la fuente, saca los residuos en el horario
+                indicado y súmate al Sistema de Gestión Integral de Residuos Sólidos.
               </p>
             </div>
           </div>

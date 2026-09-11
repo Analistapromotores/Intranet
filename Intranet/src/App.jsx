@@ -8,6 +8,7 @@ import NewsCard from './components/NewsCard.jsx'
 import CorporateCalendar from './components/CorporateCalendar.jsx'
 import HelpCard from './components/HelpCard.jsx'
 import CorpoquindioPage from './pages/corpoquindio/CorpoquindioPage.jsx'
+import PromotoresPage from './pages/promotores/PromotoresPage.jsx'
 import './App.css'
 
 const STORAGE_KEY = 'gys-nav-layout'
@@ -32,7 +33,33 @@ function readLayout() {
   }
 }
 
-function Intranet() {
+function Home() {
+  return (
+    <>
+      <Header />
+
+      <main className="main" id="inicio">
+        <Hero />
+        <QuickAccess />
+        <ProjectsSection />
+
+        <div className="board">
+          <NewsCard />
+          <CorporateCalendar />
+          <HelpCard />
+        </div>
+      </main>
+
+      <footer className="foot">
+        <span>Gestión y Servicios · Apoyo en talento humano</span>
+        <span>Intranet corporativa · {new Date().getFullYear()}</span>
+      </footer>
+    </>
+  )
+}
+
+export default function App() {
+  const hash = useHashRoute()
   const [navLayout, setNavLayout] = useState(readLayout)
 
   useEffect(() => {
@@ -43,39 +70,21 @@ function Intranet() {
     }
   }, [navLayout])
 
+  /* Vistas de proyecto con ruta propia (#id o #id-seccion). */
+  const route = ['corpoquindio', 'promotores'].find(
+    (r) => hash === r || hash.startsWith(r + '-'),
+  )
+  const activeId = route || hash || 'inicio'
+
   return (
     <div className={`app app--nav-${navLayout}`}>
-      <Sidebar layout={navLayout} onLayoutChange={setNavLayout} />
+      <Sidebar layout={navLayout} onLayoutChange={setNavLayout} activeId={activeId} />
 
       <div className="shell">
-        <Header />
-
-        <main className="main" id="inicio">
-          <Hero />
-          <QuickAccess />
-          <ProjectsSection />
-
-          <div className="board">
-            <NewsCard />
-            <CorporateCalendar />
-            <HelpCard />
-          </div>
-        </main>
-
-        <footer className="foot">
-          <span>Gestión y Servicios · Apoyo en talento humano</span>
-          <span>Intranet corporativa · {new Date().getFullYear()}</span>
-        </footer>
+        {route === 'corpoquindio' && <CorpoquindioPage />}
+        {route === 'promotores' && <PromotoresPage />}
+        {!route && <Home />}
       </div>
     </div>
   )
-}
-
-export default function App() {
-  const hash = useHashRoute()
-
-  if (hash === 'corpoquindio' || hash.startsWith('corpoquindio-')) {
-    return <CorpoquindioPage />
-  }
-  return <Intranet />
 }

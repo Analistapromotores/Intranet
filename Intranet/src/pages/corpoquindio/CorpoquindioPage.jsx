@@ -1,40 +1,32 @@
 import { useEffect } from 'react'
 import {
   IconArrowRight,
-  IconChevronLeft,
   IconCheck,
   IconDownload,
   IconExternal,
+  IconWhatsapp,
 } from '../../components/Icons.jsx'
 import { Cenefa, GlyphMark } from './glyphs.jsx'
 import QuindioMap from './QuindioMap.jsx'
-import { useReveal } from './useReveal.js'
+import { useReveal } from '../../lib/useReveal.js'
 import {
   DOCUMENTOS,
   MUNICIPIOS,
   PASOS,
   PROJECT,
-  SECCIONES,
+  REDES,
   SECTORES,
   STATS,
-  WHATSAPP,
   WHATSAPP_URL,
 } from './data.js'
 
+import gysLogo from '../../assets/gys_logo.png'
 import logoQE from '../../assets/CORPOQUINDIO/quindio_emprendedor.png'
 import logoCorpo from '../../assets/CORPOQUINDIO/logo_corpo_quindio.png'
 import aliados from '../../assets/CORPOQUINDIO/marcas_aliadas.png'
 import personajeSaluda from '../../assets/CORPOQUINDIO/persona_publicitario.png'
 import personajeSenala from '../../assets/CORPOQUINDIO/personaje_publicitario2.png'
 import './corpoquindio.css'
-
-function IconWhatsapp(props) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" {...props}>
-      <path d="M12.04 2C6.6 2 2.18 6.42 2.18 11.86c0 1.9.5 3.68 1.37 5.22L2 22l5.06-1.5a9.8 9.8 0 0 0 4.98 1.35h.01c5.43 0 9.85-4.42 9.85-9.86 0-2.63-1.02-5.1-2.88-6.96A9.78 9.78 0 0 0 12.04 2Zm0 1.86c2.13 0 4.14.83 5.65 2.34a7.94 7.94 0 0 1 2.34 5.66c0 4.41-3.58 7.99-8 7.99a8 8 0 0 1-4.07-1.11l-.29-.17-3 .79.8-2.93-.19-.3a7.94 7.94 0 0 1-1.22-4.27c0-4.41 3.59-8 8-8Zm-2.6 4.3c-.14 0-.36.05-.55.26-.19.2-.72.7-.72 1.72 0 1.01.74 1.99.84 2.12.1.14 1.44 2.28 3.55 3.11 1.75.69 2.11.55 2.49.51.38-.03 1.22-.49 1.4-.97.17-.48.17-.89.12-.98-.05-.08-.19-.14-.4-.24-.21-.11-1.22-.6-1.41-.67-.19-.07-.33-.1-.47.1-.14.21-.54.68-.66.82-.12.14-.24.16-.45.05-.21-.1-.88-.32-1.68-1.03-.62-.55-1.04-1.24-1.16-1.44-.12-.21-.01-.32.09-.42.09-.1.21-.24.31-.36.1-.12.14-.21.21-.35.07-.14.03-.26-.02-.36-.05-.1-.46-1.12-.63-1.53-.17-.4-.34-.35-.47-.35Z" />
-    </svg>
-  )
-}
 
 export default function CorpoquindioPage() {
   useReveal()
@@ -48,25 +40,6 @@ export default function CorpoquindioPage() {
 
   return (
     <div className="qe">
-      {/* ---------- Barra de sección ---------- */}
-      <header className="qe-bar">
-        <div className="qe-bar__inner">
-          <a className="qe-bar__back" href="#inicio">
-            <IconChevronLeft width={16} height={16} />
-            Intranet
-          </a>
-          <span className="qe-bar__sep" aria-hidden="true" />
-          <img className="qe-bar__logo" src={logoQE} alt="Quindío Emprendedor" />
-          <span className="qe-bar__tag">Fortalecimiento Integral</span>
-
-          <nav className="qe-bar__nav" aria-label="Secciones del proyecto">
-            {SECCIONES.map((s) => (
-              <a key={s.id} href={`#corpoquindio-${s.id}`}>{s.label}</a>
-            ))}
-          </nav>
-        </div>
-      </header>
-
       <main className="qe-main">
         {/* ---------- Hero ---------- */}
         <section className="qe-hero" id="corpoquindio-proyecto">
@@ -78,6 +51,10 @@ export default function CorpoquindioPage() {
 
           <div className="qe-hero__inner">
             <div className="qe-hero__text" data-reveal>
+              <a className="qe-hero__cobrand" href="#inicio" aria-label="Ir a la intranet de Gestión y Servicios">
+                <img src={gysLogo} alt="Gestión y Servicios" />
+              </a>
+
               <span className="qe-badge">
                 <GlyphMark width={14} height={14} />
                 {PROJECT.convocatoria}
@@ -156,13 +133,19 @@ export default function CorpoquindioPage() {
               </ul>
             </div>
 
-            <aside className="qe-glifos" data-reveal aria-label="Glifos por sector productivo">
-              <p className="qe-glifos__title">Sistema de glifos</p>
+            <aside className="qe-redes" data-reveal aria-label="Redes sociales del proyecto">
+              <p className="qe-redes__title">Síguenos</p>
               <ul>
-                {SECTORES.slice(0, 6).map(({ id, label, Glyph, tone }) => (
+                {REDES.map(({ id, label, handle, url, Icon }) => (
                   <li key={id}>
-                    <span className={`qe-glifo qe-glifo--${tone}`}><Glyph width={30} height={30} /></span>
-                    <span>{label}</span>
+                    <a href={url} target="_blank" rel="noreferrer" className={`qe-red qe-red--${id}`}>
+                      <span className="qe-red__icon"><Icon width={20} height={20} /></span>
+                      <span className="qe-red__text">
+                        <strong>{label}</strong>
+                        <em>{handle}</em>
+                      </span>
+                      <IconArrowRight className="qe-red__go" width={16} height={16} />
+                    </a>
                   </li>
                 ))}
               </ul>
@@ -325,22 +308,6 @@ export default function CorpoquindioPage() {
           <Cenefa className="qe-cenefa qe-cenefa--cta" tone="rgba(255,255,255,.35)" />
         </section>
 
-        {/* ---------- Contacto ---------- */}
-        <section className="qe-sec qe-sec--contacto">
-          <div className="qe-wrap qe-contacto" data-reveal>
-            <SecTitle eyebrow="Contacto" center>
-              ¿Tienes dudas sobre la <em>postulación</em>?
-            </SecTitle>
-            <p className="qe-sec__lead">
-              Escríbenos por WhatsApp y con gusto te acompañamos en el proceso.
-            </p>
-            <a className="qe-btn qe-btn--wa qe-btn--lg" href={WHATSAPP_URL} target="_blank" rel="noreferrer">
-              <IconWhatsapp width={20} height={20} />
-              {WHATSAPP}
-            </a>
-          </div>
-        </section>
-
         {/* ---------- Aliados ---------- */}
         <section className="qe-aliados" aria-label="Marcas aliadas del proyecto">
           <div className="qe-wrap">
@@ -356,10 +323,6 @@ export default function CorpoquindioPage() {
           <p className="qe-foot__legal">
             {PROJECT.nombreLargo}. BPIN {PROJECT.bpin}.
           </p>
-          <a className="qe-foot__back" href="#inicio">
-            <IconChevronLeft width={14} height={14} />
-            Volver a la intranet
-          </a>
         </div>
       </footer>
     </div>

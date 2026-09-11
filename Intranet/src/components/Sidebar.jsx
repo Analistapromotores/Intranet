@@ -9,9 +9,8 @@ import {
 } from './Icons.jsx'
 import { GLPI_URL } from '../config.js'
 
-export default function Sidebar({ layout, onLayoutChange }) {
+export default function Sidebar({ layout, onLayoutChange, activeId = 'inicio' }) {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [active, setActive] = useState('inicio')
 
   const isSide = layout === 'side'
 
@@ -50,12 +49,9 @@ export default function Sidebar({ layout, onLayoutChange }) {
                 <li key={id}>
                   <a
                     href={href}
-                    className={`side__link ${active === id ? 'is-active' : ''}`}
-                    aria-current={active === id ? 'page' : undefined}
-                    onClick={() => {
-                      setActive(id)
-                      setMobileOpen(false)
-                    }}
+                    className={`side__link ${activeId === id ? 'is-active' : ''}`}
+                    aria-current={activeId === id ? 'page' : undefined}
+                    onClick={() => setMobileOpen(false)}
                   >
                     <Icon className="side__icon" width={19} height={19} />
                     <span className="side__label">{label}</span>

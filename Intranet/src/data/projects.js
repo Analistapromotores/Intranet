@@ -58,6 +58,8 @@ export const projects = [
     id: 'promotores',
     name: 'Promotores Mi Cali Bella',
     logo: promotores,
-    desc: 'Promotores ambientales del programa Residuos Cero en la ciudad de Cali.',
+    desc: 'Residuos Cero: pedagogía, prevención y control en el manejo de residuos sólidos en Santiago de Cali.',
+    href: '#promotores',
+    docsHref: '#promotores-recursos',
   },
 ]

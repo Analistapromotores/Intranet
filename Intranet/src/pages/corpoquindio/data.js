@@ -8,6 +8,12 @@ import {
   GlyphPapeleria,
   GlyphTecnologia,
 } from './glyphs.jsx'
+import {
+  IconFacebook,
+  IconInstagram,
+  IconWhatsapp,
+  IconExternal,
+} from '../../components/Icons.jsx'
 
 const DOCS = `${import.meta.env.BASE_URL}docs/corpoquindio/`
 
@@ -125,22 +131,7 @@ export const DOCUMENTOS = [
   },
 ]
 
-/* Los 12 municipios. `x`/`y` son coordenadas del mapa estilizado (viewBox 320x420),
-   derivadas de la posición relativa real de cada cabecera municipal. */
-export const MUNICIPIOS = [
-  { name: 'Filandia', x: 173, y: 70 },
-  { name: 'Salento', x: 225, y: 94 },
-  { name: 'Quimbaya', x: 109, y: 103 },
-  { name: 'Circasia', x: 186, y: 106 },
-  { name: 'Montenegro', x: 119, y: 139 },
-  { name: 'Armenia', x: 159, y: 160, capital: true },
-  { name: 'Calarcá', x: 181, y: 167 },
-  { name: 'La Tebaida', x: 97, y: 212 },
-  { name: 'Córdoba', x: 156, y: 250 },
-  { name: 'Buenavista', x: 124, y: 272 },
-  { name: 'Pijao', x: 145, y: 287 },
-  { name: 'Génova', x: 98, y: 362 },
-]
+export { QUINDIO_MUNICIPIOS as MUNICIPIOS } from './quindioGeo.js'
 
 export const SECCIONES = [
   { id: 'proyecto', label: 'Conoce el proyecto' },
@@ -148,4 +139,36 @@ export const SECCIONES = [
   { id: 'proceso', label: 'Proceso de fortalecimiento' },
   { id: 'territorio', label: 'Cobertura' },
   { id: 'documentos', label: 'Recursos y documentos' },
+]
+
+/* Redes del proyecto. Reemplaza las URLs por las cuentas oficiales. */
+export const REDES = [
+  {
+    id: 'whatsapp',
+    label: 'WhatsApp',
+    handle: WHATSAPP,
+    url: WHATSAPP_URL,
+    Icon: IconWhatsapp,
+  },
+  {
+    id: 'instagram',
+    label: 'Instagram',
+    handle: '@quindioemprendedor',
+    url: 'https://www.instagram.com/quindioemprendedor/',
+    Icon: IconInstagram,
+  },
+  {
+    id: 'facebook',
+    label: 'Facebook',
+    handle: 'Quindío Emprendedor',
+    url: 'https://www.facebook.com/GobernacionQuindio',
+    Icon: IconFacebook,
+  },
+  {
+    id: 'web',
+    label: 'Sitio oficial',
+    handle: 'quindio.gov.co',
+    url: 'https://www.quindio.gov.co/',
+    Icon: IconExternal,
+  },
 ]

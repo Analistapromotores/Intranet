@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel de Control · Flota de Impresión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy:#0F1B33;
+    --navy-2:#16233F;
+    --bg:#F5F6F9;
+    --panel:#FFFFFF;
+    --border:#E4E7EE;
+    --text:#1B2233;
+    --muted:#5B6478;
+    --bn:#3B5C88;
+    --bn-soft:#DCE5F0;
+    --ink:#B0245B;
+    --ink-soft:#F6DCE7;
+    --amber:#B9782B;
+    --amber-soft:#F6E9D6;
+    --red:#A6362F;
+    --red-soft:#F5DEDC;
+    --teal:#1E7A63;
+    --teal-soft:#DCEEE8;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px; line-height:1.55;
+  }
+  h1,h2,h3,h4{ font-family:'Sora', sans-serif; margin:0; color:var(--navy); }
+  p{margin:0 0 0.6em 0;}
+  a{color:inherit;}
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 28px; }
+
+  /* ---------- HEADER ---------- */
+  header{ background:linear-gradient(160deg,var(--navy) 0%, var(--navy-2) 100%); color:#EDEFF5; padding:34px 0 0 0; }
+  .header-top{ display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:18px; margin-bottom:26px;}
+  .eyebrow{ font-size:12.5px; letter-spacing:.01em; color:#9AA6C4; font-weight:500; margin-bottom:6px;}
+  header h1{ color:#fff; font-size:29px; font-weight:700; max-width:640px; }
+  header .lede{ color:#B9C1D9; max-width:480px; font-size:14px; margin-top:10px;}
+  nav.tabs{ display:flex; gap:4px; flex-wrap:wrap; }
+  nav.tabs a{ text-decoration:none; color:#C4CBE0; font-size:13.5px; font-weight:500; padding:8px 14px; border-radius:20px; border:1px solid rgba(255,255,255,0.14); }
+  nav.tabs a:hover{ background:rgba(255,255,255,0.08); color:#fff; }
+
+  .kpi-row{ display:grid; grid-template-columns:repeat(5,1fr); border-top:1px solid rgba(255,255,255,0.12); }
+  .kpi{ padding:20px 22px 24px; border-right:1px solid rgba(255,255,255,0.1); }
+  .kpi:last-child{ border-right:none; }
+  .kpi .label{ font-size:12px; color:#96A0C0; margin-bottom:8px; font-weight:500;}
+  .kpi .value{ font-family:'Sora',sans-serif; font-size:24px; font-weight:700; color:#fff; }
+  .kpi .sub{ font-size:12px; color:#8892B4; margin-top:5px;}
+  .kpi .sub.flag{ color:#E4B278; }
+
+  /* ---------- SECTIONS ---------- */
+  section{ padding:52px 0; border-bottom:1px solid var(--border); }
+  section:last-of-type{ border-bottom:none; }
+  .sec-head{ display:flex; align-items:baseline; gap:14px; margin-bottom:6px; }
+  .sec-num{ font-family:'Sora',sans-serif; font-size:13px; color:var(--muted); border:1px solid var(--border); border-radius:5px; padding:2px 8px; }
+  .sec-head h2{ font-size:22px; }
+  .sec-intro{ color:var(--muted); max-width:720px; margin:12px 0 30px; font-size:14.5px;}
+
+  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:22px 24px; }
+  .grid-2{ display:grid; grid-template-columns:1.15fr .85fr; gap:20px; }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  @media (max-width: 900px){ .grid-2, .grid-3{ grid-template-columns:1fr; } .kpi-row{grid-template-columns:repeat(2,1fr);} }
+
+  .chart-box{ position:relative; height:280px; margin-top:14px; }
+  .chart-box.tall{ height:340px; }
+  .chart-box.short{ height:220px; }
+
+  .insight{ margin-top:16px; padding:13px 16px; background:#F3F4F8; border-left:3px solid var(--bn); border-radius:0 6px 6px 0; font-size:13.6px; color:#3A4257; }
+  .insight strong{ color:var(--text); }
+  .insight.ink{ border-left-color:var(--ink); }
+  .insight.amber{ border-left-color:var(--amber); }
+  .insight.teal{ border-left-color:var(--teal); }
+
+  .panel-title{ font-size:15px; font-weight:600; color:var(--navy); margin-bottom:2px; }
+  .panel-sub{ font-size:12.5px; color:var(--muted); }
+
+  /* filters */
+  .filterbar{ display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-bottom:22px; background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:14px 18px; }
+  .filterbar .f{ display:flex; flex-direction:column; gap:5px; }
+  .filterbar label{ font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:600;}
+  .filterbar select{ font-family:'IBM Plex Sans',sans-serif; font-size:14px; padding:8px 12px; border-radius:6px; border:1px solid var(--border); background:#fff; color:var(--text); min-width:200px; }
+  .filterbar .note{ font-size:12.5px; color:var(--muted); margin-left:auto; }
+
+  .stat-mini-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:20px; }
+  .stat-mini{ background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
+  .stat-mini .l{ font-size:12px; color:var(--muted); margin-bottom:6px;}
+  .stat-mini .v{ font-family:'Sora',sans-serif; font-weight:700; font-size:21px; color:var(--navy); }
+  .stat-mini .v.warn{ color:var(--amber); }
+  .stat-mini .v.crit{ color:var(--red); }
+  @media (max-width:900px){ .stat-mini-row{grid-template-columns:repeat(2,1fr);} }
+
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; margin-top:6px;}
+  th{ text-align:left; font-size:11.5px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); font-weight:600; padding:9px 10px; border-bottom:1px solid var(--border);}
+  td{ padding:9px 10px; border-bottom:1px solid #EEF0F4; }
+  tr:last-child td{border-bottom:none;}
+  td.num, th.num{ text-align:right; font-variant-numeric:tabular-nums; }
+  .badge{ display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; }
+  .badge.over{ background:var(--red-soft); color:var(--red); }
+  .badge.near{ background:var(--amber-soft); color:var(--amber); }
+  .badge.ok{ background:var(--teal-soft); color:var(--teal); }
+
+  .callout{ display:flex; gap:20px; align-items:stretch; background:linear-gradient(120deg,#FCEFF4,#FBF6EC); border:1px solid #F0DCE4; border-radius:10px; padding:20px 22px; }
+  .callout .txt{ flex:1.2; }
+  .callout .chart-box{ flex:1; margin-top:0; height:190px; }
+  .callout h4{ color:var(--ink); font-size:15.5px; margin-bottom:8px;}
+  .callout .tag{ display:inline-block; background:var(--ink); color:#fff; font-size:11px; font-weight:700; letter-spacing:.03em; padding:3px 9px; border-radius:4px; margin-bottom:10px; }
+
+  /* Recommendations */
+  .reco-list{ display:flex; flex-direction:column; gap:0; }
+  .reco{ display:grid; grid-template-columns:100px 1fr; gap:20px; padding:20px 0; border-bottom:1px solid var(--border); }
+  .reco:last-child{ border-bottom:none; }
+  .reco .pr{ font-size:11px; font-weight:700; letter-spacing:.03em; padding:4px 0; height:22px; text-align:center; border-radius:5px; }
+  .reco .pr.alta{ background:var(--red-soft); color:var(--red); }
+  .reco .pr.media{ background:var(--amber-soft); color:var(--amber); }
+  .reco .pr.baja{ background:var(--teal-soft); color:var(--teal); }
+  .reco h4{ font-size:15px; margin-bottom:6px; }
+  .reco p{ color:var(--muted); font-size:13.8px; }
+  .reco p b{ color:var(--text); }
+
+  footer{ padding:26px 0 40px; text-align:center; color:var(--muted); font-size:12.5px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="header-top">
+      <div>
+        <div class="eyebrow">GESTIÓN Y SERVICIOS · CONTROL DE IMPRESIÓN</div>
+        <h1>Panel de control de la flota de impresión</h1>
+        <p class="lede">Consumo y costo de 6 equipos multifuncionales en 6 sedes, junio–agosto. Cruce de contadores por equipo, consumo por usuario y tarifario del contrato de arrendamiento.</p>
+      </div>
+      <nav class="tabs">
+        <a href="#detalle">Vista por sede/mes</a>
+        <a href="#tendencia">Tendencia</a>
+        <a href="#sedes">Sedes</a>
+        <a href="#usuarios">Usuarios</a>
+        <a href="#recomendaciones">Recomendaciones</a>
+      </nav>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi"><div class="label">Impresiones totales (3 meses)</div><div class="value">116.301</div><div class="sub">84.807 B/N · 31.494 color</div></div>
+      <div class="kpi"><div class="label">Costo total (3 meses)</div><div class="value">$13.732.528</div><div class="sub">Canon + excedentes + color + IVA</div></div>
+      <div class="kpi"><div class="label">Participación del color en el costo</div><div class="value">62,8%</div><div class="sub flag">con solo 27,1% del volumen</div></div>
+      <div class="kpi"><div class="label">Costo promedio por página</div><div class="value">$118,1</div><div class="sub">blended B/N + color</div></div>
+      <div class="kpi"><div class="label">Sedes que superaron el cupo B/N</div><div class="value">4 de 6</div><div class="sub flag">en al menos un mes</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ SECCIÓN 1: VISTA FILTRABLE (equivalente mejorado del reporte original) ============ -->
+  <section id="detalle">
+    <div class="sec-head"><span class="sec-num">01</span><h2>Vista por sede y mes</h2></div>
+    <p class="sec-intro">Esta es la vista que ya tenías en Power BI —consumo, excedente y costo por sede y mes— con el mismo cálculo, pero con las cuatro cifras que en el original quedaban sueltas ahora explicadas y los dos rankings de usuarios recalculados en vivo según el filtro.</p>
+
+    <div class="filterbar">
+      <div class="f"><label>Sede</label>
+        <select id="fSede"></select>
+      </div>
+      <div class="f"><label>Mes</label>
+        <select id="fMes">
+          <option value="jun">Junio</option>
+          <option value="jul">Julio</option>
+          <option value="ago" selected>Agosto</option>
+        </select>
+      </div>
+      <div class="note" id="fNote"></div>
+    </div>
+
+    <div class="stat-mini-row">
+      <div class="stat-mini"><div class="l">Impresiones B/N</div><div class="v" id="kBn">–</div></div>
+      <div class="stat-mini"><div class="l">Impresiones color</div><div class="v" id="kColor">–</div></div>
+      <div class="stat-mini"><div class="l">Excedente sobre cupo (5.000)</div><div class="v" id="kExtra">–</div></div>
+      <div class="stat-mini"><div class="l">Costo del mes (canon+extra+color+IVA)</div><div class="v" id="kTotal">–</div></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-title">Consumo B/N frente al cupo contratado</div>
+        <div class="panel-sub">Cupo mensual incluido en el canon: 5.000 copias B/N</div>
+        <div class="chart-box"><canvas id="chartCupo"></canvas></div>
+        <div class="insight" id="insCupo">—</div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Composición del costo del mes</div>
+        <div class="panel-sub">Canon fijo, excedente B/N, color e IVA (19% sobre canon+excedente)</div>
+        <div class="chart-box"><canvas id="chartCostoMes"></canvas></div>
+        <div class="insight ink" id="insCostoMes">—</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:20px;">
+      <div class="panel">
+        <div class="panel-title">Usuarios por encima de la media — B/N</div>
+        <div class="panel-sub" id="subMediaBn">—</div>
+        <div class="chart-box short"><canvas id="chartUsersBn"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Usuarios por encima de la media — Color</div>
+        <div class="panel-sub" id="subMediaColor">—</div>
+        <div class="chart-box short"><canvas id="chartUsersColor"></canvas></div>
+      </div>
+    </div>
+    <div class="insight amber" style="margin-top:16px;" id="insMedia">—</div>
+  </section>
+
+  <!-- ============ SECCIÓN 2: TENDENCIA ============ -->
+  <section id="tendencia">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Tendencia mensual (toda la compañía)</h2></div>
+    <p class="sec-intro">Esto no existía en el reporte original: ver los tres meses juntos es lo que revela que el problema no es el volumen de páginas, sino <b>qué tipo</b> de página se está imprimiendo.</p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-title">Impresiones mensuales, B/N vs. color</div>
+        <div class="chart-box"><canvas id="chartTrendVol"></canvas></div>
+        <div class="insight">
+          <strong>Qué mide:</strong> el total de páginas impresas por mes en toda la flota, separando blanco/negro de color.<br>
+          <strong>Qué dice:</strong> el volumen B/N se mantiene estable (28.500–32.700 páginas/mes), pero el color se dispara de 1.237 a 23.719 páginas entre junio y agosto — un crecimiento de más de 19 veces en dos meses, muy por fuera de cualquier variación normal de operación.
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Composición del costo mensual</div>
+        <div class="chart-box"><canvas id="chartTrendCost"></canvas></div>
+        <div class="insight ink">
+          <strong>Qué mide:</strong> de qué está hecho el gasto cada mes: canon fijo, excedente B/N, color e IVA.<br>
+          <strong>Qué dice:</strong> el canon (costo fijo de arrendamiento) apenas se mueve, pero la barra de color pasa de ser casi invisible en junio a ser el 80% del gasto de agosto. El costo total del trimestre casi se cuadruplicó (de $2,06M a $8,08M) sin que haya cambiado la cantidad de equipos ni de sedes.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECCIÓN 3: SEDES ============ -->
+  <section id="sedes">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Costo y cumplimiento de cupo por sede</h2></div>
+    <p class="sec-intro">Cada sede paga el mismo canon fijo, pero no todas usan el cupo de la misma forma. Compararlas lado a lado muestra dónde sobra capacidad y dónde se paga excedente todos los meses.</p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-title">Costo total por sede — junio a agosto</div>
+        <div class="chart-box tall"><canvas id="chartSedes"></canvas></div>
+        <div class="insight">
+          <strong>Qué mide:</strong> la suma de canon, excedente B/N, color e IVA de cada sede en los tres meses.<br>
+          <strong>Qué dice:</strong> Piso 2 - Proyectos y Piso 4 - COM encabezan el gasto, pero no por exceso de B/N — sus equipos B/N están muy por debajo del cupo. Su costo es casi 100% color, concentrado en agosto.
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Composición del gasto trimestral</div>
+        <div class="chart-box tall"><canvas id="chartDona"></canvas></div>
+        <div class="insight ink">
+          <strong>Qué mide:</strong> cómo se reparte el gasto total de la compañía entre canon fijo, excedente B/N, color e IVA.<br>
+          <strong>Qué dice:</strong> el color concentra el 62,8% del gasto ($8,63M de $13,73M) con solo 27,1% de las páginas impresas. El excedente B/N, que suele preocupar más en estos reportes, es apenas el 4,4% del gasto ($598.380).
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:20px;">
+      <div class="panel-title">Detalle mes a mes por sede</div>
+      <table>
+        <thead><tr>
+          <th>Sede</th><th class="num">B/N</th><th>Cupo</th><th class="num">Color</th><th class="num">Costo del mes</th>
+        </tr></thead>
+        <tbody id="tblDetalle"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ SECCIÓN 4: USUARIOS ============ -->
+  <section id="usuarios">
+    <div class="sec-head"><span class="sec-num">04</span><h2>Quién está imprimiendo</h2></div>
+    <p class="sec-intro">73 cuentas de usuario están registradas en los cinco equipos con conteo individual (Piso 1 - Psicología no tiene trazabilidad por usuario — ver recomendaciones).</p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-title">Top 10 usuarios por volumen total (B/N + color)</div>
+        <div class="chart-box tall"><canvas id="chartTopUsers"></canvas></div>
+        <div class="insight">
+          <strong>Qué mide:</strong> las 10 cuentas con más páginas impresas en el trimestre, separando B/N de color.<br>
+          <strong>Qué dice:</strong> las dos primeras cuentas (Valeria Hernández y Camila López) tienen un consumo de color desproporcionado frente a su B/N — señal de un uso puntual y masivo, no de un hábito de impresión regular.
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Top usuarios de impresión a color y su costo estimado</div>
+        <div class="chart-box tall"><canvas id="chartTopColor"></canvas></div>
+        <div class="insight ink">
+          <strong>Qué mide:</strong> páginas a color por usuario multiplicadas por $274, el costo real de cada copia a color.<br>
+          <strong>Qué dice:</strong> 4 personas explican cerca del 91% del gasto en color del trimestre. Es un problema concentrado y fácil de intervenir, no un patrón repartido entre toda la planta.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:20px;">
+      <div class="txt">
+        <span class="tag">CASO A REVISAR</span>
+        <h4>Valeria Hernández — Piso 2 · Proyectos</h4>
+        <p>Su impresión a color pasó de 6 páginas en junio, a 70 en julio, a <b>13.356 en agosto</b>. Ese solo mes cuesta aproximadamente <b>$3.659.544</b> en color y equivale al 42,6% de todo el gasto en color de la compañía en el trimestre. Antes de tomar una medida disciplinaria o de política, vale la pena confirmar qué se imprimió — puede ser un trabajo legítimo y puntual (ej. material impreso para un evento) o un error de asignación de usuario en el equipo.</p>
+      </div>
+      <div class="chart-box"><canvas id="chartValeria"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ============ SECCIÓN 5: RECOMENDACIONES ============ -->
+  <section id="recomendaciones">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Decisiones recomendadas</h2></div>
+    <p class="sec-intro">En orden de impacto sobre el costo, a partir de lo que muestran los datos.</p>
+
+    <div class="reco-list">
+      <div class="reco">
+        <div class="pr alta">ALTA</div>
+        <div><h4>Confirmar y frenar el pico de color de agosto</h4>
+        <p>Antes de cualquier ajuste de política, validar con Valeria Hernández y con Camila López qué se imprimió en agosto (<b>13.356</b> y <b>7.755</b> páginas a color respectivamente en un solo mes). Entre las dos explican cerca del 78% del gasto en color del trimestre. Si no hay una justificación operativa, ese gasto es recuperable el próximo mes.</p></div>
+      </div>
+      <div class="reco">
+        <div class="pr alta">ALTA</div>
+        <div><h4>Poner un tope o aprobación a la impresión a color</h4>
+        <p>Hoy cada copia a color cuesta <b>$274</b> sin ningún cupo libre (a diferencia del B/N, que tiene 5.000 copias incluidas). Con esa tarifa, el color ya es el <b>62,8%</b> del gasto total con solo el 27,1% del volumen. Una alerta automática o una aprobación para trabajos grandes a color evitaría que un uso puntual se traduzca en millones de sobrecosto, como pasó en agosto.</p></div>
+      </div>
+      <div class="reco">
+        <div class="pr media">MEDIA</div>
+        <div><h4>Redistribuir el cupo B/N entre sedes en vez de fijarlo por equipo</h4>
+        <p>Piso 1 - Operaciones, Piso 1 - Psicología y Piso 3 - Promotores superaron el cupo de 5.000 copias en <b>los tres meses</b> (hasta 131% de exceso en Promotores en julio), mientras Piso 2 - Proyectos y Piso 4 - COM usan menos del 30% de su cupo todos los meses. Negociar una bolsa compartida o trasladar equipos evitaría buena parte de los $598.380 pagados en excedente B/N en el trimestre.</p></div>
+      </div>
+      <div class="reco">
+        <div class="pr media">MEDIA</div>
+        <div><h4>Auditar las cuentas sin actividad</h4>
+        <p>12 de las 73 cuentas registradas (16%) no muestran ni una sola página impresa en los tres meses. Vale la pena confirmar si son personas que ya no están, cuentas genéricas mal usadas, o simplemente no imprimen — y limpiar el padrón antes del próximo corte.</p></div>
+      </div>
+      <div class="reco">
+        <div class="pr media">MEDIA</div>
+        <div><h4>Activar el conteo por usuario en Piso 1 - Psicología</h4>
+        <p>Es la única sede sin desglose individual de consumo (equipo Kyocera M3655). Con un excedente B/N recurrente ($155.610 pagados en el trimestre), no hay forma de saber hoy quién lo está generando ni de aplicarle las mismas medidas que al resto de sedes.</p></div>
+      </div>
+      <div class="reco">
+        <div class="pr baja">BAJA</div>
+        <div><h4>Automatizar una alerta de cupo al 80%</h4>
+        <p>Con el patrón mensual ya visible, una alerta a mitad de mes cuando una sede llegue al 80% de su cupo B/N (o a un umbral de páginas de color) permitiría actuar antes de cerrar el mes, en vez de descubrir el sobrecosto en el reporte del mes siguiente.</p></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Panel construido a partir de contadores_imp.xlsx (hojas contadores, cont_usuario, extras_costos) · Junio–Agosto</footer>
+
+<script>
+const CANON_BN = 205000, RATE_EXTRA = 30, RATE_COLOR = 274, IVA = 0.19, QUOTA = 5000;
+const MESES = {jun:"Junio", jul:"Julio", ago:"Agosto"};
+const MESES_ORDER = ["jun","jul","ago"];
+
+const siteData = {"Piso 1 - OPERACIONES": {"jun": {"bn": 8212, "color": 0, "extra_bn": 3212, "costo_extra": 96360, "costo_color": 0, "canon_extra": 301360, "iva": 57258.4, "total": 358618.4}, "jul": {"bn": 5885, "color": 0, "extra_bn": 885, "costo_extra": 26550, "costo_color": 0, "canon_extra": 231550, "iva": 43994.5, "total": 275544.5}, "ago": {"bn": 5381, "color": 0, "extra_bn": 381, "costo_extra": 11430, "costo_color": 0, "canon_extra": 216430, "iva": 41121.7, "total": 257551.7}}, "Piso 1 - PSICOLOGIA": {"jun": {"bn": 8545, "color": 0, "extra_bn": 3545, "costo_extra": 106350, "costo_color": 0, "canon_extra": 311350, "iva": 59156.5, "total": 370506.5}, "jul": {"bn": 5895, "color": 0, "extra_bn": 895, "costo_extra": 26850, "costo_color": 0, "canon_extra": 231850, "iva": 44051.5, "total": 275901.5}, "ago": {"bn": 5747, "color": 0, "extra_bn": 747, "costo_extra": 22410, "costo_color": 0, "canon_extra": 227410, "iva": 43207.9, "total": 270617.9}}, "Piso 2 - CONT": {"jun": {"bn": 4617, "color": 0, "extra_bn": 0, "costo_extra": 0, "costo_color": 0, "canon_extra": 205000, "iva": 38950.0, "total": 243950.0}, "jul": {"bn": 6023, "color": 0, "extra_bn": 1023, "costo_extra": 30690, "costo_color": 0, "canon_extra": 235690, "iva": 44781.1, "total": 280471.1}, "ago": {"bn": 4657, "color": 0, "extra_bn": 0, "costo_extra": 0, "costo_color": 0, "canon_extra": 205000, "iva": 38950.0, "total": 243950.0}}, "Piso 2 - PROYECTOS": {"jun": {"bn": 1674, "color": 557, "extra_bn": 0, "costo_extra": 0, "costo_color": 152618, "canon_extra": 205000, "iva": 38950.0, "total": 396568.0}, "jul": {"bn": 1897, "color": 201, "extra_bn": 0, "costo_extra": 0, "costo_color": 55074, "canon_extra": 205000, "iva": 38950.0, "total": 299024.0}, "ago": {"bn": 327, "color": 13446, "extra_bn": 0, "costo_extra": 0, "costo_color": 3684204, "canon_extra": 205000, "iva": 38950.0, "total": 3928154.0}}, "Piso 3 - PROMOTORES": {"jun": {"bn": 5380, "color": 478, "extra_bn": 380, "costo_extra": 11400, "costo_color": 130972, "canon_extra": 216400, "iva": 41116.0, "total": 388488.0}, "jul": {"bn": 11583, "color": 4420, "extra_bn": 6583, "costo_extra": 197490, "costo_color": 1211080, "canon_extra": 402490, "iva": 76473.1, "total": 1690043.1}, "ago": {"bn": 7295, "color": 2202, "extra_bn": 2295, "costo_extra": 68850, "costo_color": 603348, "canon_extra": 273850, "iva": 52031.5, "total": 929229.5}}, "Piso 4 - COM": {"jun": {"bn": 108, "color": 202, "extra_bn": 0, "costo_extra": 0, "costo_color": 55348, "canon_extra": 205000, "iva": 38950.0, "total": 299298.0}, "jul": {"bn": 1407, "color": 1917, "extra_bn": 0, "costo_extra": 0, "costo_color": 525258, "canon_extra": 205000, "iva": 38950.0, "total": 769208.0}, "ago": {"bn": 174, "color": 8071, "extra_bn": 0, "costo_extra": 0, "costo_color": 2211454, "canon_extra": 205000, "iva": 38950.0, "total": 2455404.0}}};
+const companyMonth = {"jun": {"bn": 28536, "color": 1237, "costo_extra": 214110, "costo_color": 338938, "canon_extra": 1444110, "iva": 274380.9, "total": 2057428.9, "extra_bn": 7137}, "jul": {"bn": 32690, "color": 6538, "costo_extra": 281580, "costo_color": 1791412, "canon_extra": 1511580, "iva": 287200.2, "total": 3590192.2, "extra_bn": 9386}, "ago": {"bn": 23581, "color": 23719, "costo_extra": 102690, "costo_color": 6499006, "canon_extra": 1332690, "iva": 253211.1, "total": 8084907.1, "extra_bn": 3423}};
+const users = [{"n": "ISABELA ALDANA", "sn": 60310, "site": "Piso 4 - COM", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "NATALIA RENGIFO", "sn": 60310, "site": "Piso 4 - COM", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "LUCIA JARAMILLO", "sn": 60310, "site": "Piso 4 - COM", "jb": 0, "jc": 8, "lb": 74, "lc": 231, "ab": 0.0, "ac": 4.0}, {"n": "NATALIA RAMIREZ", "sn": 60310, "site": "Piso 4 - COM", "jb": 13, "jc": 125, "lb": 55, "lc": 595, "ab": 0.0, "ac": 183.0}, {"n": "CAMILA LOPEZ", "sn": 60310, "site": "Piso 4 - COM", "jb": 47, "jc": 41, "lb": 1079, "lc": 937, "ab": 157.0, "ac": 7755.0}, {"n": "DIANA OROZCO", "sn": 60310, "site": "Piso 4 - COM", "jb": 7, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "MARIA PAULA", "sn": 60310, "site": "Piso 4 - COM", "jb": 17, "jc": 1, "lb": 12, "lc": 4, "ab": 8.0, "ac": 6.0}, {"n": "CATALINA LASSO", "sn": 60310, "site": "Piso 4 - COM", "jb": 16, "jc": 0, "lb": 15, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "JUAN CARLOS OCAMPO", "sn": 60310, "site": "Piso 4 - COM", "jb": 6, "jc": 27, "lb": 10, "lc": 307, "ab": 6.0, "ac": 122.0}, {"n": "VALENTINA MOLANO", "sn": 60310, "site": "Piso 4 - COM", "jb": 0, "jc": 0, "lb": 3, "lc": 0, "ab": 1.0, "ac": 1.0}, {"n": "RICARDO PACHON", "sn": 227, "site": "Piso 1 - OPERACIONES", "jb": 249, "jc": 0, "lb": 228, "lc": 0, "ab": 46.0, "ac": 0.0}, {"n": "HAROLD ARRIAGA", "sn": 227, "site": "Piso 1 - OPERACIONES", "jb": 1394, "jc": 0, "lb": 1331, "lc": 0, "ab": 2620.0, "ac": 0.0}, {"n": "RRHH PROMOTORES", "sn": 227, "site": "Piso 1 - OPERACIONES", "jb": 1778, "jc": 0, "lb": 2722, "lc": 0, "ab": 1168.0, "ac": 0.0}, {"n": "FIDEL CASTRO", "sn": 227, "site": "Piso 1 - OPERACIONES", "jb": 929, "jc": 0, "lb": 262, "lc": 0, "ab": 511.0, "ac": 0.0}, {"n": "RRHH MEDIADORES", "sn": 227, "site": "Piso 1 - OPERACIONES", "jb": 1177, "jc": 0, "lb": 401, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "MONICA ESCOBAR", "sn": 227, "site": "Piso 1 - OPERACIONES", "jb": 95, "jc": 0, "lb": 40, "lc": 0, "ab": 128.0, "ac": 0.0}, {"n": "ISABELLA VELASQUEZ", "sn": 227, "site": "Piso 1 - OPERACIONES", "jb": 0, "jc": 0, "lb": 108, "lc": 0, "ab": 176.0, "ac": 0.0}, {"n": "SOLEY CHACON", "sn": 227, "site": "Piso 1 - OPERACIONES", "jb": 699, "jc": 0, "lb": 385, "lc": 0, "ab": 676.0, "ac": 0.0}, {"n": "GESTION DOCUMENTAL", "sn": 227, "site": "Piso 1 - OPERACIONES", "jb": 227, "jc": 0, "lb": 39, "lc": 0, "ab": 54.0, "ac": 0.0}, {"n": "RRHH INFRAESTRUCTURA", "sn": 227, "site": "Piso 1 - OPERACIONES", "jb": 1664, "jc": 0, "lb": 368, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "LEIDY MOLANO", "sn": 10089, "site": "Piso 2 - PROYECTOS", "jb": 114, "jc": 317, "lb": 16, "lc": 85, "ab": 20.0, "ac": 20.0}, {"n": "PISO2", "sn": 10089, "site": "Piso 2 - PROYECTOS", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "STEPHANY", "sn": 10089, "site": "Piso 2 - PROYECTOS", "jb": 0, "jc": 2, "lb": 0, "lc": 3, "ab": 0.0, "ac": 0.0}, {"n": "ANA QUINTERO", "sn": 10089, "site": "Piso 2 - PROYECTOS", "jb": 0, "jc": 0, "lb": 8, "lc": 1, "ab": 5.0, "ac": 0.0}, {"n": "ALEJANDRO MARQUEZ", "sn": 10089, "site": "Piso 2 - PROYECTOS", "jb": 418, "jc": 209, "lb": 295, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "ESNEYDER", "sn": 10089, "site": "Piso 2 - PROYECTOS", "jb": 0, "jc": 0, "lb": 2, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "KTInfraes", "sn": 10089, "site": "Piso 2 - PROYECTOS", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "NKpromo", "sn": 10089, "site": "Piso 2 - PROYECTOS", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "CIELO CASTILLO", "sn": 10089, "site": "Piso 2 - PROYECTOS", "jb": 345, "jc": 2, "lb": 151, "lc": 33, "ab": 157.0, "ac": 48.0}, {"n": "KELLY GOMEZ", "sn": 10089, "site": "Piso 2 - PROYECTOS", "jb": 29, "jc": 21, "lb": 25, "lc": 12, "ab": 6.0, "ac": 22.0}, {"n": "VALERIA HERNANDEZ", "sn": 10089, "site": "Piso 2 - PROYECTOS", "jb": 761, "jc": 6, "lb": 1395, "lc": 70, "ab": 108.0, "ac": 13356.0}, {"n": "MAURICIO ROSALES", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 0, "jc": 3, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "MILTON", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 155, "jc": 0, "lb": 203, "lc": 0, "ab": 5.0, "ac": 0.0}, {"n": "ISABEL HERNANDEZ", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 418, "jc": 0, "lb": 269, "lc": 0, "ab": 2129.0, "ac": 0.0}, {"n": "JARDANY VILLANUEVA", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "CAROLINA CARDENAS", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 321, "jc": 18, "lb": 817, "lc": 1, "ab": 17.0, "ac": 0.0}, {"n": "ALEJANDRO MARQUEZ", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 0, "jc": 0, "lb": 2, "lc": 0, "ab": 228.0, "ac": 56.0}, {"n": "JUAN DIEGO", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 489, "jc": 0, "lb": 118, "lc": 0, "ab": 10.0, "ac": 0.0}, {"n": "EMILIO BLANDON", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 31, "jc": 0, "lb": 12, "lc": 0, "ab": 2.0, "ac": 0.0}, {"n": "CLAUDIA VALDES", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 103, "jc": 0, "lb": 45, "lc": 0, "ab": 149.0, "ac": 0.0}, {"n": "PAOLA BLANCO", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 226, "jc": 0, "lb": 217, "lc": 0, "ab": 115.0, "ac": 0.0}, {"n": "VALENTINA", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "LUCIAJ", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 2.0, "ac": 1.0}, {"n": "JCARTAGE", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 0, "jc": 4, "lb": 9, "lc": 113, "ab": 0.0, "ac": 10.0}, {"n": "DANIEL FAJARDO", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 1, "jc": 4, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "ALEXANDER RODRIGUEZ", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 163, "jc": 0, "lb": 375, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "WILMAN MONTOYA", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "LEYDI SALCEDO", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 338, "jc": 0, "lb": 85, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "DARIO GAMBOA", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 527, "jc": 0, "lb": 1614, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "JAMES BARRERA", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 1861, "jc": 0, "lb": 946, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "PEDRO NUÑEZ", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 60, "jc": 0, "lb": 30, "lc": 0, "ab": 0.0, "ac": 3425.0}, {"n": "JUAN ARENAS", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "NICOLAS GALVEZ", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 0, "jc": 0, "lb": 757, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "NICOLE ENCARNACION", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 40, "jc": 8, "lb": 454, "lc": 143, "ab": 168.0, "ac": 16.0}, {"n": "PAULA SALAZAR", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 11, "jc": 0, "lb": 0, "lc": 12, "ab": 0.0, "ac": 0.0}, {"n": "JUAN SARASTI", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 8, "jc": 2, "lb": 7, "lc": 2, "ab": 2.0, "ac": 8.0}, {"n": "KATHERINE SIERRA", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 210, "jc": 442, "lb": 104, "lc": 843, "ab": 2111.0, "ac": 260.0}, {"n": "SANDRA DICTTO", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 407, "jc": 0, "lb": 5455, "lc": 3318, "ab": 0.0, "ac": 0.0}, {"n": "BEATRIZ ROJAS", "sn": 60686, "site": "Piso 3 - PROMOTORES", "jb": 3, "jc": 0, "lb": 47, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "Harold", "sn": 84, "site": "Piso 2 - CONT", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 1149.0, "ac": 0.0}, {"n": "PAOLAH", "sn": 84, "site": "Piso 2 - CONT", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "JOHN EIDER", "sn": 84, "site": "Piso 2 - CONT", "jb": 0, "jc": 0, "lb": 1647, "lc": 0, "ab": 1856.0, "ac": 0.0}, {"n": "ANDRES VILLARREAL", "sn": 84, "site": "Piso 2 - CONT", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "DANIEL M", "sn": 84, "site": "Piso 2 - CONT", "jb": 128, "jc": 0, "lb": 131, "lc": 0, "ab": 87.0, "ac": 0.0}, {"n": "LUIS FV", "sn": 84, "site": "Piso 2 - CONT", "jb": 46, "jc": 0, "lb": 43, "lc": 0, "ab": 50.0, "ac": 0.0}, {"n": "Esneyder", "sn": 84, "site": "Piso 2 - CONT", "jb": 0, "jc": 0, "lb": 12, "lc": 0, "ab": 22.0, "ac": 0.0}, {"n": "LUZ STELLA VALENCIA", "sn": 84, "site": "Piso 2 - CONT", "jb": 46, "jc": 0, "lb": 99, "lc": 0, "ab": 142.0, "ac": 0.0}, {"n": "KAROL", "sn": 84, "site": "Piso 2 - CONT", "jb": 996, "jc": 0, "lb": 976, "lc": 0, "ab": 828.0, "ac": 0.0}, {"n": "SCAN INFRA", "sn": 84, "site": "Piso 2 - CONT", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "ARTURO MURILLAS", "sn": 84, "site": "Piso 2 - CONT", "jb": 168, "jc": 0, "lb": 369, "lc": 0, "ab": 150.0, "ac": 0.0}, {"n": "LAURA", "sn": 84, "site": "Piso 2 - CONT", "jb": 2566, "jc": 0, "lb": 2161, "lc": 0, "ab": 0.0, "ac": 0.0}, {"n": "CONTABILIDAD", "sn": 84, "site": "Piso 2 - CONT", "jb": 0, "jc": 0, "lb": 0, "lc": 0, "ab": 2.0, "ac": 0.0}, {"n": "STEPHANY PALACIO", "sn": 84, "site": "Piso 2 - CONT", "jb": 667, "jc": 0, "lb": 585, "lc": 0, "ab": 372.0, "ac": 0.0}];
+
+const sites = Object.keys(siteData);
+const siteHasColor = {
+  "Piso 1 - OPERACIONES": false, "Piso 1 - PSICOLOGIA": false, "Piso 2 - CONT": false,
+  "Piso 2 - PROYECTOS": true, "Piso 3 - PROMOTORES": true, "Piso 4 - COM": true
+};
+const siteToSn = {
+  "Piso 4 - COM": 60310, "Piso 1 - OPERACIONES": 227, "Piso 2 - PROYECTOS": 10089,
+  "Piso 3 - PROMOTORES": 60686, "Piso 2 - CONT": 84
+};
+
+const money = n => "$" + Math.round(n).toLocaleString("es-CO");
+const num = n => Math.round(n).toLocaleString("es-CO");
+
+// ---------------- palette shared ----------------
+Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+Chart.defaults.color = "#5B6478";
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+const COL_BN = "#3B5C88", COL_BN_SOFT="#9FB4CE";
+const COL_INK = "#B0245B", COL_INK_SOFT="#E9A6C1";
+const COL_CANON = "#8C93A6";
+const COL_IVA = "#C9A24B";
+const COL_AMBER = "#B9782B";
+const COL_RED = "#A6362F";
+const COL_TEAL = "#1E7A63";
+
+// ================= FILTER BAR =================
+const fSede = document.getElementById("fSede");
+sites.forEach(s=>{ const o=document.createElement("option"); o.value=s; o.textContent=s; fSede.appendChild(o); });
+fSede.value = "Piso 2 - PROYECTOS";
+const fMes = document.getElementById("fMes");
+
+let chartCupo, chartCostoMes, chartUsersBn, chartUsersColor;
+
+function usersForSite(site){
+  const sn = siteToSn[site];
+  if(!sn) return [];
+  return users.filter(u=>u.sn===sn);
+}
+
+function renderDetalle(){
+  const site = fSede.value, mes = fMes.value;
+  const d = siteData[site][mes];
+  document.getElementById("kBn").textContent = num(d.bn);
+  document.getElementById("kColor").textContent = siteHasColor[site] ? num(d.color) : "N/A";
+  document.getElementById("kExtra").textContent = d.extra_bn>0 ? num(d.extra_bn)+" pág." : "0 (dentro de cupo)";
+  document.getElementById("kTotal").textContent = money(d.total);
+  document.getElementById("fNote").textContent = site + " · " + MESES[mes];
+
+  // cupo chart
+  const pct = Math.round((d.bn/QUOTA)*100);
+  if(chartCupo) chartCupo.destroy();
+  chartCupo = new Chart(document.getElementById("chartCupo"), {
+    type:"bar",
+    data:{ labels:["Consumo B/N", "Cupo contratado"],
+      datasets:[{ data:[d.bn, QUOTA], backgroundColor:[d.bn>QUOTA?COL_RED:COL_BN, "#D8DCE6"], borderRadius:4, barThickness:46 }]},
+    options:{ indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{grid:{color:"#EEF0F4"}}, y:{grid:{display:false}}} }
+  });
+  const insCupo = document.getElementById("insCupo");
+  if(d.bn>QUOTA){
+    insCupo.className="insight amber";
+    insCupo.innerHTML = `<strong>Qué mide:</strong> páginas B/N del mes frente al cupo de 5.000 incluido en el canon.<br><strong>Qué dice:</strong> esta sede superó el cupo en <b>${num(d.extra_bn)}</b> páginas (${pct}% del cupo usado), generando <b>${money(d.costo_extra)}</b> de excedente a $30/página.`;
+  } else {
+    insCupo.className="insight teal";
+    insCupo.innerHTML = `<strong>Qué mide:</strong> páginas B/N del mes frente al cupo de 5.000 incluido en el canon.<br><strong>Qué dice:</strong> la sede usó ${pct}% del cupo contratado y no generó excedente este mes.`;
+  }
+
+  // costo mes chart
+  if(chartCostoMes) chartCostoMes.destroy();
+  chartCostoMes = new Chart(document.getElementById("chartCostoMes"), {
+    type:"bar",
+    data:{ labels:["Canon fijo","Excedente B/N","Color","IVA (19%)"],
+      datasets:[{ data:[CANON_BN, d.costo_extra, d.costo_color, d.iva],
+        backgroundColor:[COL_CANON, COL_AMBER, COL_INK, COL_IVA], borderRadius:5 }]},
+    options:{ plugins:{legend:{display:false}}, scales:{y:{grid:{color:"#EEF0F4"}, ticks:{callback:v=>"$"+(v/1000)+"k"}}, x:{grid:{display:false}}} }
+  });
+  document.getElementById("insCostoMes").innerHTML = `<strong>Qué mide:</strong> los cuatro componentes que suman el costo del mes en esta sede.<br><strong>Qué dice:</strong> el color representa ${Math.round((d.costo_color/d.total)*100)}% del costo total del mes en esta sede (${money(d.costo_color)} de ${money(d.total)}).`;
+
+  // usuarios por encima de la media
+  const uSite = usersForSite(site);
+  const bnKey = {jun:"jb", jul:"lb", ago:"ab"}[mes];
+  const cKey = {jun:"jc", jul:"lc", ago:"ac"}[mes];
+  document.getElementById("subMediaBn").textContent = uSite.length ? `${uSite.length} usuarios asignados a esta impresora` : "Sin conteo individual disponible para esta sede";
+  document.getElementById("subMediaColor").textContent = uSite.length && siteHasColor[site] ? `${uSite.length} usuarios asignados a esta impresora` : (siteHasColor[site] ? "Sin conteo individual disponible" : "Esta sede no tiene equipo a color");
+
+  function buildAbove(key){
+    if(!uSite.length) return {mean:0, above:[]};
+    const vals = uSite.map(u=>({n:u.n, v:Number(u[key])||0}));
+    const mean = vals.reduce((a,b)=>a+b.v,0)/vals.length;
+    const above = vals.filter(v=>v.v>mean).sort((a,b)=>b.v-a.v).slice(0,6);
+    return {mean, above};
+  }
+  const bnStat = buildAbove(bnKey);
+  const cStat = siteHasColor[site] ? buildAbove(cKey) : {mean:0, above:[]};
+
+  if(chartUsersBn) chartUsersBn.destroy();
+  chartUsersBn = new Chart(document.getElementById("chartUsersBn"), {
+    type:"bar",
+    data:{ labels:bnStat.above.map(a=>a.n), datasets:[{ data:bnStat.above.map(a=>a.v), backgroundColor:COL_BN, borderRadius:4 }]},
+    options:{ indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{grid:{color:"#EEF0F4"}}, y:{grid:{display:false}}} }
+  });
+  if(chartUsersColor) chartUsersColor.destroy();
+  chartUsersColor = new Chart(document.getElementById("chartUsersColor"), {
+    type:"bar",
+    data:{ labels:cStat.above.map(a=>a.n), datasets:[{ data:cStat.above.map(a=>a.v), backgroundColor:COL_INK, borderRadius:4 }]},
+    options:{ indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{grid:{color:"#EEF0F4"}}, y:{grid:{display:false}}} }
+  });
+
+  const insMedia = document.getElementById("insMedia");
+  if(uSite.length){
+    insMedia.innerHTML = `<strong>Qué miden estos dos gráficos:</strong> el promedio de páginas por usuario asignado a esta impresora (B/N: ${bnStat.mean.toFixed(2)} · Color: ${cStat.mean?cStat.mean.toFixed(2):"N/A"}) y quiénes lo superan.<br><strong>Qué dicen:</strong> son las personas que más están empujando el consumo de esta sede — un buen punto de partida para conversar sobre hábitos de impresión antes de tocar el cupo contratado.`;
+  } else {
+    insMedia.innerHTML = `<strong>Sin datos:</strong> esta sede no tiene registro de consumo por usuario en el archivo fuente (ver recomendación sobre Piso 1 - Psicología).`;
+  }
+}
+fSede.addEventListener("change", renderDetalle);
+fMes.addEventListener("change", renderDetalle);
+renderDetalle();
+
+// ================= TENDENCIA =================
+new Chart(document.getElementById("chartTrendVol"), {
+  type:"line",
+  data:{ labels: MESES_ORDER.map(m=>MESES[m]),
+    datasets:[
+      {label:"B/N", data:MESES_ORDER.map(m=>companyMonth[m].bn), borderColor:COL_BN, backgroundColor:COL_BN, tension:.35, pointRadius:4, borderWidth:2.5},
+      {label:"Color", data:MESES_ORDER.map(m=>companyMonth[m].color), borderColor:COL_INK, backgroundColor:COL_INK, tension:.35, pointRadius:4, borderWidth:2.5}
+    ]},
+  options:{ plugins:{legend:{position:"top", align:"end"}}, scales:{y:{grid:{color:"#EEF0F4"}, ticks:{callback:v=>num(v)}}, x:{grid:{display:false}}} }
+});
+
+new Chart(document.getElementById("chartTrendCost"), {
+  type:"bar",
+  data:{ labels: MESES_ORDER.map(m=>MESES[m]),
+    datasets:[
+      {label:"Canon fijo", data:MESES_ORDER.map(m=>companyMonth[m].canon_extra - companyMonth[m].costo_extra), backgroundColor:COL_CANON, stack:"s"},
+      {label:"Excedente B/N", data:MESES_ORDER.map(m=>companyMonth[m].costo_extra), backgroundColor:COL_AMBER, stack:"s"},
+      {label:"Color", data:MESES_ORDER.map(m=>companyMonth[m].costo_color), backgroundColor:COL_INK, stack:"s"},
+      {label:"IVA", data:MESES_ORDER.map(m=>companyMonth[m].iva), backgroundColor:COL_IVA, stack:"s"}
+    ]},
+  options:{ plugins:{legend:{position:"top", align:"end"}}, scales:{y:{stacked:true, grid:{color:"#EEF0F4"}, ticks:{callback:v=>"$"+(v/1e6).toFixed(1)+"M"}}, x:{stacked:true, grid:{display:false}}} }
+});
+
+// ================= SEDES =================
+const siteTotals = sites.map(s=>({s, total: MESES_ORDER.reduce((a,m)=>a+siteData[s][m].total,0)})).sort((a,b)=>b.total-a.total);
+new Chart(document.getElementById("chartSedes"), {
+  type:"bar",
+  data:{ labels: siteTotals.map(x=>x.s), datasets:[{ data:siteTotals.map(x=>x.total), backgroundColor: siteTotals.map(x=>siteHasColor[x.s]?COL_INK:COL_BN), borderRadius:5 }]},
+  options:{ indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{grid:{color:"#EEF0F4"}, ticks:{callback:v=>"$"+(v/1e6).toFixed(1)+"M"}}, y:{grid:{display:false}}} }
+});
+
+const totCanon = sites.reduce((a,s)=>a+MESES_ORDER.reduce((b,m)=>b+CANON_BN,0),0);
+const totExtra = sites.reduce((a,s)=>a+MESES_ORDER.reduce((b,m)=>b+siteData[s][m].costo_extra,0),0);
+const totColor = sites.reduce((a,s)=>a+MESES_ORDER.reduce((b,m)=>b+siteData[s][m].costo_color,0),0);
+const totIva = sites.reduce((a,s)=>a+MESES_ORDER.reduce((b,m)=>b+siteData[s][m].iva,0),0);
+new Chart(document.getElementById("chartDona"), {
+  type:"doughnut",
+  data:{ labels:["Canon fijo","Excedente B/N","Color","IVA"], datasets:[{ data:[totCanon,totExtra,totColor,totIva], backgroundColor:[COL_CANON,COL_AMBER,COL_INK,COL_IVA], borderWidth:0 }]},
+  options:{ plugins:{legend:{position:"bottom"}}, cutout:"62%" }
+});
+
+// tabla detalle
+const tbl = document.getElementById("tblDetalle");
+let rows = "";
+sites.forEach(s=>{
+  MESES_ORDER.forEach(m=>{
+    const d = siteData[s][m];
+    const pct = d.bn/QUOTA;
+    let badge = pct>1 ? `<span class="badge over">+${Math.round((pct-1)*100)}%</span>` : (pct>0.8 ? `<span class="badge near">${Math.round(pct*100)}%</span>` : `<span class="badge ok">${Math.round(pct*100)}%</span>`);
+    rows += `<tr><td>${s} · ${MESES[m]}</td><td class="num">${num(d.bn)}</td><td>${badge}</td><td class="num">${siteHasColor[s]?num(d.color):"—"}</td><td class="num">${money(d.total)}</td></tr>`;
+  });
+});
+tbl.innerHTML = rows;
+
+// ================= USUARIOS =================
+function totalsFor(u){
+  return { bn: (u.jb||0)+(u.lb||0)+(u.ab||0), c: (u.jc||0)+(u.lc||0)+(u.ac||0) };
+}
+const userTotals = users.map(u=>{ const t = totalsFor(u); return {n:u.n, site:u.site, bn:t.bn, c:t.c, total:t.bn+t.c}; });
+const top10 = [...userTotals].sort((a,b)=>b.total-a.total).slice(0,10);
+new Chart(document.getElementById("chartTopUsers"), {
+  type:"bar",
+  data:{ labels: top10.map(u=>u.n), datasets:[
+    {label:"B/N", data:top10.map(u=>u.bn), backgroundColor:COL_BN, stack:"s", borderRadius:3},
+    {label:"Color", data:top10.map(u=>u.c), backgroundColor:COL_INK, stack:"s", borderRadius:3}
+  ]},
+  options:{ indexAxis:'y', plugins:{legend:{position:"top", align:"end"}}, scales:{x:{stacked:true, grid:{color:"#EEF0F4"}}, y:{stacked:true, grid:{display:false}}} }
+});
+
+const topColor = [...userTotals].filter(u=>u.c>0).sort((a,b)=>b.c-a.c).slice(0,8);
+new Chart(document.getElementById("chartTopColor"), {
+  type:"bar",
+  data:{ labels: topColor.map(u=>u.n+" — "+u.site.replace("Piso ","P")), datasets:[
+    {data:topColor.map(u=>u.c*RATE_COLOR), backgroundColor:COL_INK, borderRadius:4}
+  ]},
+  options:{ indexAxis:'y', plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>money(c.raw)}}}, scales:{x:{grid:{color:"#EEF0F4"}, ticks:{callback:v=>"$"+(v/1e6).toFixed(1)+"M"}}, y:{grid:{display:false}}} }
+});
+
+// Valeria mini chart
+const valeria = users.find(u=>u.n==="VALERIA HERNANDEZ");
+new Chart(document.getElementById("chartValeria"), {
+  type:"bar",
+  data:{ labels:["Junio","Julio","Agosto"], datasets:[{ data:[valeria.jc, valeria.lc, valeria.ac], backgroundColor:[COL_INK_SOFT,COL_INK_SOFT,COL_INK], borderRadius:5 }]},
+  options:{ plugins:{legend:{display:false}}, scales:{y:{grid:{color:"#EEF0F4"}}, x:{grid:{display:false}}} }
+});
+</script>
+</body>
+</html>

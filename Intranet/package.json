@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "colombian-holidays": "^7.1.2",
+    "railway": "^3.11.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "serve": "^14.2.6"

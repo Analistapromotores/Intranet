@@ -14,6 +14,8 @@ export const projects = [
     id: 'gys',
     name: 'Gestión y Servicios',
     logo: gys,
+    href: '#gys',
+    docsHref: '#gys-formatos',
     desc: 'Apoyo integral en talento humano para la operación y los proyectos del grupo.',
   },
   {

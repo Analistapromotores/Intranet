@@ -1,0 +1,5 @@
+node_modules
+dist
+.git
+.railway
+npm-debug.log*

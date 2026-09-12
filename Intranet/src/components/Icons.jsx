@@ -221,6 +221,15 @@ export function IconCheck(props) {
   )
 }
 
+export function IconShield(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 3.2 19 6v5.4c0 4.4-2.7 7.7-7 9.4-4.3-1.7-7-5-7-9.4V6Z" />
+      <path d="m8.5 12 2.2 2.2 4.8-5" />
+    </svg>
+  )
+}
+
 export function IconChecklist(props) {
   return (
     <svg {...base} {...props}>

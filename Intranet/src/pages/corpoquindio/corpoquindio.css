@@ -209,6 +209,9 @@
   line-height: 1.65;
   color: var(--qe-muted);
 }
+.qe-title.is-center + .qe-sec__lead {
+  margin-top: 16px;
+}
 .qe-sec__lead--left {
   margin-left: 0;
   text-align: left;

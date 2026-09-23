@@ -1,7 +1,7 @@
 import gys from '../assets/gys_logo.png'
 import corpopais from '../assets/corpopais.png'
 import corpores from '../assets/corpores.png'
-import gestores from '../assets/gestores_024.png'
+import mediadores from '../assets/mediadores/IMAGENES/MEDIADORES DE CONVIVENCIA LOGO_Horizontal.png'
 import pasaportes from '../assets/logo_pasaportes.png'
 import valleinn from '../assets/valleINN.png'
 import promotores from '../assets/promotores.png'
@@ -39,9 +39,11 @@ export const projects = [
     desc: 'Corporación Enlaces Sociales: gestión comunitaria y acompañamiento social.',
   },
   {
-    id: 'gestores',
-    name: 'UT Gestores 2024',
-    logo: gestores,
+    id: 'mediadores',
+    name: 'Mediadores de Convivencia',
+    logo: mediadores,
+    href: '#mediadores',
+    docsHref: '#mediadores-recursos',
     desc: 'Unión temporal para la gestión operativa de convenios y contratos 2024.',
   },
   {

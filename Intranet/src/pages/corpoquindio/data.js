@@ -23,7 +23,6 @@ export const WHATSAPP_URL = `https://wa.me/57${WHATSAPP}?text=${encodeURICompone
 )}`
 
 export const PROJECT = {
-  bpin: '2025003630005',
   convocatoria: 'Convocatoria 2026 · Gobernación del Quindío',
   nombreLargo:
     'Fortalecimiento integral de las capacidades del ecosistema de emprendimiento a través de asesoría técnica especializada y provisión de activos productivos en el departamento del Quindío',

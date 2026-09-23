@@ -14,9 +14,14 @@ export default function QuickAccess() {
       </SectionTitle>
 
       <ul className="quick__row">
-        {shortcuts.map(({ id, label, href, Icon, accent }) => (
+        {shortcuts.map(({ id, label, href, Icon, accent, external }) => (
           <li key={id}>
-            <a href={href} className="quick__card">
+            <a
+              href={href}
+              className="quick__card"
+              target={external ? '_blank' : undefined}
+              rel={external ? 'noreferrer' : undefined}
+            >
               <span className={`quick__icon quick__icon--${accent}`}>
                 <Icon width={24} height={24} />
               </span>

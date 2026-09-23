@@ -45,12 +45,14 @@ export default function Sidebar({ layout, onLayoutChange, activeId = 'inicio' })
 
           <nav className="side__nav">
             <ul className="side__list">
-              {navItems.map(({ id, label, href, Icon }) => (
+              {navItems.filter((item) => item.menu !== false).map(({ id, label, href, Icon, external }) => (
                 <li key={id}>
                   <a
                     href={href}
                     className={`side__link ${activeId === id ? 'is-active' : ''}`}
                     aria-current={activeId === id ? 'page' : undefined}
+                    target={external ? '_blank' : undefined}
+                    rel={external ? 'noreferrer' : undefined}
                     onClick={() => setMobileOpen(false)}
                   >
                     <Icon className="side__icon" width={19} height={19} />

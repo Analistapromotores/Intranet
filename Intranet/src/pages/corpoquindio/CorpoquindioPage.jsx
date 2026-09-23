@@ -82,8 +82,6 @@ export default function CorpoquindioPage() {
                   <IconDownload width={18} height={18} />
                 </a>
               </div>
-
-              <p className="qe-hero__bpin">BPIN {PROJECT.bpin}</p>
             </div>
 
             <div className="qe-hero__art" data-reveal>
@@ -320,9 +318,7 @@ export default function CorpoquindioPage() {
       <footer className="qe-foot">
         <div className="qe-wrap qe-foot__inner">
           <img className="qe-foot__logo" src={logoCorpo} alt="UT Corpo Quindío" />
-          <p className="qe-foot__legal">
-            {PROJECT.nombreLargo}. BPIN {PROJECT.bpin}.
-          </p>
+          <p className="qe-foot__legal">{PROJECT.nombreLargo}.</p>
         </div>
       </footer>
     </div>

@@ -1315,7 +1315,7 @@ button.cal__day {
    exactamente el radio de la curva. El contenido no se mueve. */
 :root { --side-r: 22px; }
 @media (min-width: 961px) {
-  .app--nav-side :is(.sv-head, .inf-hero, .cb-hero, .cb-bar, .gy-hero, .gy-contact, .mcb-hero, .qe-hero, .med-hero) {
+  .app--nav-side :is(.sv-head, .ps-hero, .inf-hero, .cb-hero, .cb-bar, .gy-hero, .gy-contact, .mcb-hero, .qe-hero, .med-hero) {
     margin-left: calc(-1 * var(--side-r));
     padding-left: var(--side-r);
   }

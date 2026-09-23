@@ -1,0 +1,88 @@
+/* UT Gestión Pasaportes: rojo del chaleco institucional, azul marino y turquesa de las piezas de la oficina. */
+.ps {
+  --ps-red: #d91f2c;
+  --ps-red-soft: #fdecee;
+  --ps-navy: #0f2d57;
+  --ps-teal: #0a97a8;
+  --ps-teal-soft: #e4f5f7;
+  --ps-ink: #172238;
+  --ps-muted: #5b6678;
+  --ps-line: #e5e9ef;
+  background: #fff;
+  color: var(--ps-ink);
+}
+.ps h1, .ps h2, .ps h3 { font-family: Poppins, var(--sans); color: var(--ps-ink); }
+.ps-wrap { width: min(1120px, 100%); margin-inline: auto; padding-inline: 28px; }
+.ps :focus-visible { outline: 3px solid var(--ps-teal); outline-offset: 2px; }
+.ps-eyebrow { margin: 0; color: var(--ps-red); font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
+.ps h2 { margin: 8px 0 0; font-size: clamp(26px, 3vw, 36px); line-height: 1.15; letter-spacing: -.5px; }
+.ps-text { margin: 12px 0 0; color: var(--ps-muted); font-size: 16px; line-height: 1.75; }
+
+.ps-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 12px 22px; border-radius: 12px; background: var(--ps-red); color: #fff; font-size: 15px; font-weight: 700; text-decoration: none; transition: background .2s, transform .2s, box-shadow .2s; }
+.ps-btn:hover { background: #b3161f; transform: translateY(-2px); box-shadow: 0 10px 22px rgba(217, 31, 44, .25); }
+.ps-btn--light { min-height: 42px; padding: 8px 16px; background: #fff; color: var(--ps-navy); }
+.ps-btn--light:hover { background: var(--ps-teal-soft); box-shadow: none; }
+
+/* Encabezado */
+.ps-hero { background: #eaf2fc; }
+.ps-hero__img { display: block; width: 100%; max-height: 340px; object-fit: cover; object-position: left center; }
+.ps-hero__bar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; padding-block: 14px; }
+.ps-hero::after { content: ''; display: block; height: 5px; background: linear-gradient(90deg, var(--ps-red) 0 40%, var(--ps-teal) 40% 70%, var(--ps-navy) 70%); }
+.ps-hero__bar { background: var(--ps-navy); max-width: none; width: 100%; padding-inline: max(28px, calc((100% - 1064px) / 2)); }
+.ps-hero__logo { width: 58px; height: 58px; padding: 6px; border-radius: 12px; background: #fff; object-fit: contain; }
+.ps-hero__bar p { flex: 1; min-width: 220px; margin: 0; color: #fff; font-weight: 600; }
+
+/* Secciones */
+.ps-sec { padding: clamp(56px, 7vw, 84px) 0; }
+.ps-sec--soft { background: #f6f8fb; }
+.ps-sec--tight { padding-block: 24px 56px; }
+.ps-split { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; align-items: center; }
+.ps-place { display: flex; gap: 12px; align-items: flex-start; margin: 22px 0 0; padding: 16px 18px; border-radius: 16px; background: var(--ps-teal-soft); color: var(--ps-teal); }
+.ps-place svg { flex: none; margin-top: 2px; }
+.ps-place span { display: grid; color: var(--ps-muted); font-size: 14px; line-height: 1.5; }
+.ps-place b { color: var(--ps-ink); font-size: 15.5px; }
+.ps-gob { margin: 0; display: grid; gap: 10px; justify-items: center; padding: 28px; border: 1px solid var(--ps-line); border-radius: 22px; background: #fff; box-shadow: 0 16px 36px rgba(15, 45, 87, .08); }
+.ps-gob img { width: 100%; max-width: 380px; }
+.ps-gob figcaption { color: var(--ps-muted); font-size: 13px; }
+
+/* Etapas */
+.ps-steps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin: 26px 0 0; padding: 0; list-style: none; }
+.ps-steps li { position: relative; display: grid; gap: 6px; justify-items: start; padding: 20px 16px; border: 1px solid var(--ps-line); border-radius: 18px; background: #fff; animation: ps-in .45s ease both; animation-delay: calc(var(--i) * 60ms); transition: transform .25s, box-shadow .25s, border-color .25s; }
+.ps-steps li:hover { transform: translateY(-4px); border-color: #9fd9e0; box-shadow: 0 14px 28px rgba(10, 151, 168, .12); }
+.ps-steps__icon { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 14px; background: var(--ps-teal-soft); color: var(--ps-teal); }
+.ps-steps small { margin-top: 6px; color: var(--ps-red); font-weight: 800; font-size: 12px; }
+.ps-steps b { font-size: 14.5px; line-height: 1.35; }
+
+/* Aportes de G&S */
+.ps-head { max-width: 760px; }
+.ps-aportes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }
+.ps-aporte { position: relative; overflow: hidden; padding: 28px 24px; border-radius: 22px; background: #fff; border: 1px solid var(--ps-line); animation: ps-in .45s ease both; animation-delay: calc(var(--i) * 80ms); transition: transform .3s, box-shadow .3s; }
+.ps-aporte::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 5px; background: var(--ps-red); }
+.ps-aporte:hover { transform: translateY(-5px); box-shadow: 0 18px 36px rgba(15, 45, 87, .12); }
+.ps-aporte__icon { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 18px; background: var(--ps-red-soft); color: var(--ps-red); }
+.ps-aporte h3 { margin: 18px 0 0; font-size: 20px; }
+.ps-aporte p { margin: 8px 0 0; color: var(--ps-muted); line-height: 1.65; }
+
+.ps-aviso { display: block; width: 100%; border-radius: 20px; }
+
+/* Llamado al portal */
+.ps-cta { padding: 44px 0; background: linear-gradient(120deg, var(--ps-navy), #16427e); }
+.ps-cta__inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; }
+.ps-cta h2 { margin: 0; color: #fff; font-size: clamp(22px, 2.6vw, 28px); }
+.ps-cta p { margin: 6px 0 0; color: #cfdcf1; }
+
+@keyframes ps-in { from { opacity: 0; transform: translateY(12px); } }
+
+@media (max-width: 960px) {
+  .ps-hero { padding-top: 64px; }
+  .ps-split { grid-template-columns: 1fr; }
+  .ps-steps { grid-template-columns: repeat(3, 1fr); }
+  .ps-aportes { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .ps-wrap { padding-inline: 16px; }
+  .ps-steps { grid-template-columns: 1fr 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ps * { animation: none !important; transition: none !important; }
+}

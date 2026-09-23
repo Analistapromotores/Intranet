@@ -6,6 +6,7 @@ import {
   IconFileText,
   IconMountain,
   IconCone,
+  IconPassport,
   IconCake,
   IconPhone,
   IconHeadset,
@@ -28,6 +29,7 @@ export const navItems = [
   { id: 'promotores', label: 'Promotores', href: '#promotores', Icon: IconMegaphone, accent: 'red', quickAccess: false },
   { id: 'corpoquindio', label: 'Corpoquindío', href: '#corpoquindio', Icon: IconMountain, accent: 'red', quickAccess: false },
   { id: 'mediadores', label: 'Mediadores', href: '#mediadores', Icon: IconUser, accent: 'blue', quickAccess: false },
+  { id: 'pasaportes', label: 'Pasaportes', href: '#pasaportes', Icon: IconPassport, accent: 'blue', quickAccess: false },
   { id: 'infraestructura', label: 'Infraestructura', href: '#infraestructura', Icon: IconCone, accent: 'blue', quickAccess: false },
 
   /* Directorio: siempre de último en el menú. */

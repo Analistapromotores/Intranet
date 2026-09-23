@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { IconClock, IconExternal } from './Icons.jsx'
 import { IG_TOKEN } from '../config.js'
 import portada from '../assets/portada.png'
-import pasaportes from '../assets/pasaportes_portad.png'
+import pasaportes from '../assets/pasaportes/pasaportes_portad.png'
 
 const FIELDS = 'id,caption,media_type,media_url,permalink,thumbnail_url,timestamp'
 const ENDPOINT = `https://graph.instagram.com/me/media?fields=${FIELDS}&limit=3`

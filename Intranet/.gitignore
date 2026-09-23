@@ -29,4 +29,4 @@ src/assets/CORPOQUINDIO/*.pdf
 src/assets/CORPOQUINDIO/*.ai
 
 # Datos del módulo de cumpleaños (personas, usuarios y fotos)
-data/
+/data/

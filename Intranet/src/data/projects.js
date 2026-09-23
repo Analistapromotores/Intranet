@@ -2,7 +2,7 @@ import gys from '../assets/gys_logo.png'
 import corpopais from '../assets/corpopais.png'
 import corpores from '../assets/corpores.png'
 import mediadores from '../assets/mediadores/IMAGENES/MEDIADORES DE CONVIVENCIA LOGO_Horizontal.png'
-import pasaportes from '../assets/logo_pasaportes.png'
+import pasaportes from '../assets/pasaportes/logo_pasaportes.png'
 import valleinn from '../assets/valleINN.png'
 import promotores from '../assets/promotores.png'
 import quindioEmprendedor from '../assets/CORPOQUINDIO/quindio_emprendedor.png'
@@ -50,6 +50,7 @@ export const projects = [
     id: 'pasaportes',
     name: 'UT Gestión Pasaportes',
     logo: pasaportes,
+    href: '#pasaportes',
     desc: 'Operación de las oficinas de expedición de pasaportes y atención al ciudadano.',
   },
   {

@@ -17,6 +17,7 @@ import SolicitudesPage from './pages/solicitudes/SolicitudesPage.jsx'
 import ExtensionesPage from './pages/extensiones/ExtensionesPage.jsx'
 import InfraestructuraPage from './pages/infraestructura/InfraestructuraPage.jsx'
 import AdminPage from './pages/admin/AdminPage.jsx'
+import PasaportesPage from './pages/pasaportes/PasaportesPage.jsx'
 import './App.css'
 
 const STORAGE_KEY = 'gys-nav-layout'
@@ -79,7 +80,7 @@ export default function App() {
   }, [navLayout])
 
   /* Vistas de proyecto con ruta propia (#id o #id-seccion). */
-  const route = ['corpoquindio', 'promotores', 'gys', 'mediadores', 'cumpleanos', 'solicitudes', 'extensiones', 'infraestructura', 'admin'].find(
+  const route = ['corpoquindio', 'promotores', 'gys', 'mediadores', 'cumpleanos', 'solicitudes', 'extensiones', 'infraestructura', 'admin', 'pasaportes'].find(
     (r) => hash === r || hash.startsWith(r + '-'),
   )
   const activeId = route || hash || 'inicio'
@@ -96,6 +97,7 @@ export default function App() {
         {route === 'solicitudes' && <SolicitudesPage hash={hash} />}
         {route === 'infraestructura' && <InfraestructuraPage />}
         {route === 'admin' && <AdminPage />}
+        {route === 'pasaportes' && <PasaportesPage />}
         {route === 'extensiones' && <ExtensionesPage key={hash} hash={hash} />}
         {route === 'cumpleanos' && (hash === 'cumpleanos-gestor' ? <GestorPage /> : <CumpleanosPage />)}
         {!route && <Home />}

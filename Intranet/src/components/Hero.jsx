@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { IconArrowRight, IconChevronLeft, IconChevronRight } from './Icons.jsx'
 import portada from '../assets/portada.png'
-import pasaportes from '../assets/pasaportes_portad.png'
+import pasaportes from '../assets/pasaportes/pasaportes_portad.png'
 
 const slides = [
   {

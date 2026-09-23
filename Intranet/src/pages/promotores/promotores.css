@@ -137,7 +137,7 @@
   position: relative;
   overflow: hidden;
   padding: clamp(40px, 5vw, 70px) 0 clamp(56px, 6vw, 90px);
-  background: linear-gradient(168deg, #fbfdf7 0%, #eef6e2 55%, #e3f0d2 100%);
+  background: linear-gradient(168deg, #f7fbeF 0%, #dceec9 52%, #c4e0a8 100%);
 }
 .mcb-hero__blob {
   position: absolute;
@@ -276,8 +276,15 @@
 }
 .mcb-ficha__grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
+}
+.mcb-ficha__nota {
+  margin: 14px auto 0;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.2px;
+  color: var(--mcb-muted, #667);
 }
 .mcb-stat {
   padding: 24px 22px;
@@ -356,7 +363,7 @@
   padding: 0;
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 .mcb-lineas li {
@@ -575,6 +582,27 @@
   color: var(--mcb-dark);
 }
 
+/* ---------- Sistema visual ---------- */
+.mcb-visual { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
+.mcb-visual li { padding-left: 14px; border-left: 3px solid var(--mcb-lime); display: grid; gap: 2px; }
+.mcb-visual strong { font-size: 13px; color: var(--mcb-dark); }
+.mcb-visual span { font-size: 12.5px; line-height: 1.5; color: var(--mcb-muted); }
+
+/* ---------- Cobertura territorial ---------- */
+.mcb-sec--territorio { background: #fff; }
+.mcb-ejes-intro { margin: 30px 0 -2px; font-size: 14px; font-weight: 700; color: var(--mcb-dark); }
+.mcb-map { margin-top: 34px; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(300px, .9fr); gap: clamp(24px, 4vw, 52px); align-items: center; }
+.mcb-map__shape { position: relative; min-height: 390px; border: 1px solid var(--mcb-border); border-radius: 42% 49% 43% 47% / 39% 43% 51% 48%; background: #eef6e4; overflow: hidden; box-shadow: var(--mcb-shadow-sm); }
+.mcb-map__shape::before, .mcb-map__shape::after { content: ''; position: absolute; border: 1px dashed rgba(33, 92, 83, .18); border-radius: 50%; }
+.mcb-map__shape::before { inset: 11% 15%; }.mcb-map__shape::after { inset: 25% 7%; }
+.mcb-map__river { position: absolute; z-index: 1; width: 85%; height: 29px; left: 3%; top: 51%; border-radius: 100%; background: #c5e4e5; transform: rotate(-24deg); }
+.mcb-map__area { position: absolute; z-index: 2; display: grid; place-items: center; width: 118px; aspect-ratio: 1; padding: 12px; text-align: center; border-radius: 48% 52% 47% 53%; background: #fff; box-shadow: 0 8px 18px rgba(33, 92, 83, .12); color: var(--mcb-dark); }
+.mcb-map__area strong { font-size: 14px; }.mcb-map__area span { margin-top: 4px; font-size: 11px; font-weight: 700; color: var(--mcb-forest); }
+.mcb-map__area--north { top: 10%; left: 38%; background: #dcefc4; }.mcb-map__area--west { top: 34%; left: 9%; background: #f6fbe9; }.mcb-map__area--center { top: 37%; left: 40%; background: #b9dd87; }.mcb-map__area--east { top: 29%; right: 8%; background: #d8eabd; }.mcb-map__area--south { bottom: 8%; left: 40%; background: #f4f8eb; }
+.mcb-map__summary { display: grid; gap: 12px; }.mcb-map__eyebrow { margin: 0 0 4px; color: var(--mcb-lime); font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
+.mcb-map__summary article { display: flex; align-items: flex-start; gap: 13px; padding: 16px; border-radius: 15px; background: var(--mcb-bg-soft); border: 1px solid var(--mcb-border); }.mcb-map__summary strong { display: block; font-size: 14px; color: var(--mcb-dark); }.mcb-map__summary p:not(.mcb-map__eyebrow) { margin: 4px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--mcb-muted); }
+.mcb-map__dot { width: 11px; height: 11px; margin-top: 5px; flex: none; border-radius: 50%; }.mcb-map__dot--rep { background: var(--mcb-forest); }.mcb-map__dot--care { background: var(--mcb-lime); }.mcb-map__dot--ped { background: var(--mcb-dark); }
+
 /* ---------- Recursos ---------- */
 .mcb-recursos {
   list-style: none;
@@ -751,6 +779,8 @@
   .mcb-lineas {
     grid-template-columns: repeat(2, 1fr);
   }
+  .mcb-ficha__grid { grid-template-columns: repeat(2, 1fr); }
+  .mcb-map { grid-template-columns: 1fr; }
   .mcb-cta__inner {
     grid-template-columns: 1fr;
     text-align: center;
@@ -769,6 +799,8 @@
   .mcb-aliados__inner {
     grid-template-columns: 1fr;
   }
+  .mcb-map__shape { min-height: 340px; }
+  .mcb-map__area { width: 96px; }
   .mcb-poses {
     grid-template-columns: repeat(3, 1fr);
   }

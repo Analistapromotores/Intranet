@@ -105,6 +105,120 @@
   font-size: 14px;
   color: var(--ink);
 }
+.search__input::-webkit-search-cancel-button {
+  display: none;
+}
+.search__clear {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.search__clear:hover {
+  color: var(--ink);
+}
+
+/* ---------- Resultados de la búsqueda ---------- */
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.search-box .search {
+  max-width: none;
+  margin: 0;
+}
+.search-res {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  max-height: min(64vh, 460px);
+  overflow-y: auto;
+  padding: 6px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  box-shadow: 0 18px 40px rgba(16, 32, 52, 0.16);
+}
+.search-res__empty {
+  margin: 0;
+  padding: 14px 12px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.search-res__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.search-res__item.is-active {
+  background: var(--blue-050);
+}
+.search-res__tag {
+  flex-shrink: 0;
+  margin-top: 2px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--blue-bright);
+}
+.search-res__tag--documento,
+.search-res__tag--plantilla {
+  background: #b3261e;
+}
+.search-res__tag--seccion {
+  background: #6b7280;
+}
+.search-res__tag--contacto {
+  background: #0f6b5a;
+}
+.search-res__text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.search-res__text strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.search-res__text em {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.search-res__text small {
+  font-size: 11px;
+  color: var(--ink-soft);
+  opacity: 0.8;
+}
+.search-res__go {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--ink-soft);
+}
 
 /* ---------- Sidebar / menú ---------- */
 .side {

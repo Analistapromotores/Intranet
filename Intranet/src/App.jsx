@@ -10,6 +10,7 @@ import HelpCard from './components/HelpCard.jsx'
 import CorpoquindioPage from './pages/corpoquindio/CorpoquindioPage.jsx'
 import PromotoresPage from './pages/promotores/PromotoresPage.jsx'
 import GysPage from './pages/gys/GysPage.jsx'
+import MediadoresPage from './pages/mediadores/MediadoresPage.jsx'
 import './App.css'
 
 const STORAGE_KEY = 'gys-nav-layout'
@@ -72,7 +73,7 @@ export default function App() {
   }, [navLayout])
 
   /* Vistas de proyecto con ruta propia (#id o #id-seccion). */
-  const route = ['corpoquindio', 'promotores', 'gys'].find(
+  const route = ['corpoquindio', 'promotores', 'gys', 'mediadores'].find(
     (r) => hash === r || hash.startsWith(r + '-'),
   )
   const activeId = route || hash || 'inicio'
@@ -85,6 +86,7 @@ export default function App() {
         {route === 'corpoquindio' && <CorpoquindioPage />}
         {route === 'promotores' && <PromotoresPage />}
         {route === 'gys' && <GysPage />}
+        {route === 'mediadores' && <MediadoresPage />}
         {!route && <Home />}
       </div>
     </div>

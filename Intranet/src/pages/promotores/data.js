@@ -13,11 +13,43 @@ export const PROJECT = {
   direccion: 'Calle 13 Nro. 64-30, B/ Limonar',
 }
 
-/* Cifras tomadas del plan de trabajo del contrato. */
-export const FICHA = [
-  { value: '$3.000', unit: 'millones', label: 'Valor del contrato', tone: 'dark' },
-  { value: '2', unit: 'específicos', label: 'Objetivos del contrato', tone: 'lime' },
-  { value: '2025', unit: '10 sep – 5 nov', label: 'Plazo de ejecución', tone: 'mid' },
+/* Resultados de la operación, tomados de las cordatas de los tres ejes y de la
+   matriz de puntos intervenidos (mayo de 2025 a septiembre de 2026). */
+export const CIFRAS_PERIODO = 'Mayo 2025 – septiembre 2026'
+
+export const CIFRAS = [
+  { value: '40.829+', unit: 'jornadas en territorio', label: 'Actividades realizadas', tone: 'dark' },
+  { value: '514.708+', unit: 'metros cuadrados', label: 'Espacio público recuperado en Cali', tone: 'lime' },
+  { value: '173.369+', unit: 'personas', label: 'Sensibilizadas en pedagogía', tone: 'mid' },
+  { value: '169.546+', unit: 'personas', label: 'Sensibilizadas por cuidadores', tone: 'dark' },
+  { value: '95+', unit: 'con 5.028 participantes', label: 'Talleres de pedagogía', tone: 'lime' },
+  { value: '22/22', unit: '377 barrios y sectores', label: 'Comunas de Cali con presencia', tone: 'mid' },
+]
+
+/* Resumen ejecutivo: cuatro indicadores para la lectura inicial. */
+export const CIFRAS_RESUMEN = [
+  { value: '514.708+', unit: 'metros cuadrados', label: 'Espacio público recuperado', tone: 'lime' },
+  { value: '173.369+', unit: 'personas', label: 'Sensibilizadas en pedagogía', tone: 'mid' },
+  { value: '169.546+', unit: 'personas', label: 'Sensibilizadas por cuidadores', tone: 'dark' },
+  { value: '22/22', unit: '377 barrios y sectores', label: 'Comunas de Cali con presencia', tone: 'mid' },
+]
+
+export const EJES = [
+  {
+    id: 'rep',
+    title: 'Recuperación del espacio público',
+    text: 'Intervenimos puntos críticos con limpieza, recuperación y embellecimiento para devolverlos a la comunidad.',
+  },
+  {
+    id: 'cuidadores',
+    title: 'Cuidadores',
+    text: 'Acompañamos los espacios recuperados y a sus comunidades para promover su cuidado continuo y prevenir nuevos puntos críticos.',
+  },
+  {
+    id: 'pedagogia',
+    title: 'Pedagogía',
+    text: 'Conversamos y enseñamos en territorio sobre separación en la fuente y manejo responsable de residuos.',
+  },
 ]
 
 export const OBJETIVO_GENERAL =

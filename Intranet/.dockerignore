@@ -3,3 +3,4 @@ dist
 .git
 .railway
 npm-debug.log*
+data

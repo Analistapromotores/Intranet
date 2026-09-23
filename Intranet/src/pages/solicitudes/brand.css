@@ -1,0 +1,119 @@
+/* Capa de marca del centro de servicios: fotografía del equipo, monograma GS y el corte
+   diagonal rojo del banner institucional de Gestión y Servicios. */
+
+/* ---------- Encabezado con foto ---------- */
+.sv-head { isolation: isolate; }
+.sv-head__mark { position: absolute; z-index: 0; left: -40px; bottom: -70px; width: 260px; opacity: .08; filter: brightness(0) invert(1); pointer-events: none; }
+.sv-head .sv-wrap { position: relative; z-index: 2; }
+.sv-head::before { content: ''; position: absolute; z-index: 1; left: 0; right: 0; bottom: 0; height: 5px; background: linear-gradient(90deg, var(--sv-red) 0 34%, #fff 34% 35%, var(--sv-bright) 35%); opacity: .9; }
+.sv-head.has-photo { min-height: 240px; }
+.sv-head.has-photo .sv-head__text { flex-basis: 360px; max-width: 560px; }
+.sv-head__photo { position: absolute; z-index: 1; top: 0; right: 0; bottom: 0; width: 46%; clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 100%); }
+.sv-head__photo img { width: 100%; height: 100%; object-fit: cover; }
+.sv-head__photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7, 59, 130, .55) 0%, rgba(7, 59, 130, 0) 45%); }
+.sv-head--violet .sv-head__photo::after { background: linear-gradient(90deg, rgba(42, 29, 122, .6) 0%, rgba(42, 29, 122, 0) 45%); }
+.sv-head--teal .sv-head__photo::after { background: linear-gradient(90deg, rgba(6, 75, 88, .6) 0%, rgba(6, 75, 88, 0) 45%); }
+/* franja roja diagonal, como en el banner institucional */
+.sv-head__slash { position: absolute; z-index: 2; top: 0; bottom: 0; left: 0; width: 26%; background: linear-gradient(115deg, #b3121c 0%, var(--sv-red) 55%, #ff4b55 100%); clip-path: polygon(84% 0, 100% 0, 16% 100%, 0 100%); opacity: .95; }
+.sv-head.has-photo .sv-head__aside { position: relative; z-index: 3; }
+
+/* ---------- Tarjetas de servicio con foto ---------- */
+.sv-service { overflow: hidden; padding-top: 0; }
+.sv-service::before { z-index: 2; }
+.sv-service__media { position: relative; display: block; height: 150px; margin: 0 -24px 0; overflow: hidden; background: var(--c-soft); }
+.sv-service__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s var(--sv-ease); }
+.sv-service__media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7, 32, 80, 0) 40%, rgba(7, 32, 80, .35) 100%); }
+.sv-service:hover .sv-service__media img { transform: scale(1.06); }
+.sv-service__icon { position: relative; z-index: 1; margin-top: -30px; border: 4px solid #fff; box-shadow: 0 8px 18px rgba(16, 42, 86, .15); background: #fff; }
+.sv-service__icon::before { content: ''; position: absolute; inset: 0; border-radius: 12px; background: var(--c-soft); z-index: -1; }
+.sv-service .sv-chip { top: 12px; right: 12px; z-index: 2; box-shadow: 0 4px 10px rgba(0, 0, 0, .12); }
+.sv-chip--ok { background: #e7f6ee; }
+
+/* ---------- Franja de respaldo ---------- */
+.sv-trust { display: grid; grid-template-columns: auto 1fr; gap: 28px; align-items: center; margin-top: 32px; padding: 22px 28px; border-radius: 22px; background: #fff; border: 1px solid var(--sv-line); box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+.sv-trust::after { content: ''; position: absolute; right: -40px; top: 0; bottom: 0; width: 120px; background: linear-gradient(115deg, transparent 0 40%, rgba(229, 29, 42, .1) 40% 55%, transparent 55% 65%, rgba(23, 105, 232, .08) 65% 80%, transparent 80%); pointer-events: none; }
+.sv-trust__logo { width: 110px; }
+.sv-trust ul { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin: 0; padding: 0 0 0 28px; border-left: 1px solid var(--sv-line); list-style: none; }
+.sv-trust li { display: flex; gap: 12px; align-items: flex-start; color: var(--sv-muted); font-size: 13.5px; line-height: 1.5; }
+.sv-trust li svg { flex: none; padding: 8px; width: 40px; height: 40px; border-radius: 12px; background: #eaf2ff; color: var(--sv-blue); }
+.sv-trust li:nth-child(2) svg { background: #fff0f1; color: var(--sv-red); }
+.sv-trust li b { display: block; color: var(--sv-ink); font-size: 14.5px; }
+
+/* ---------- Sección del equipo ---------- */
+.sv-team { display: grid; grid-template-columns: 1.05fr 1fr; gap: 36px; align-items: center; margin-top: 48px; padding: 18px; border-radius: 26px; background: linear-gradient(120deg, #fff 55%, #eef4ff); border: 1px solid var(--sv-line); }
+.sv-team__photo { position: relative; margin: 0; }
+.sv-team__photo > img:first-child { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: 50% 30%; border-radius: 20px; }
+.sv-team__photo::before { content: ''; position: absolute; z-index: -1; left: -8px; bottom: -8px; width: 55%; height: 60%; border-radius: 20px; background: linear-gradient(115deg, var(--sv-red), #ff4b55); }
+.sv-team__photo { isolation: isolate; }
+.sv-team__badge { position: absolute; right: -14px; bottom: -14px; width: 84px; height: 84px; padding: 12px; border-radius: 22px; background: #fff; box-shadow: 0 12px 26px rgba(16, 42, 86, .18); object-fit: contain; }
+.sv-team__text { padding: 12px 18px 12px 0; }
+.sv-team__text > p:not(.sv-eyebrow) { margin: 12px 0 0; color: #3e4f6b; font-size: 15.5px; line-height: 1.7; }
+.sv-team__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+
+/* ---------- Formularios con panel lateral ---------- */
+.sv-wizard__layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 22px; align-items: start; }
+.sv-aside { position: sticky; top: 20px; display: grid; gap: 14px; }
+.sv-aside > * { border-radius: 20px; background: #fff; border: 1px solid var(--sv-line); }
+.sv-aside__brand { display: grid; justify-items: center; gap: 10px; padding: 20px 18px 16px; position: relative; overflow: hidden; }
+.sv-aside__brand::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: linear-gradient(90deg, var(--sv-red) 0 40%, var(--sv-bright) 40%); }
+.sv-aside__brand img { width: 170px; }
+.sv-aside__code { padding: 4px 10px; border-radius: 999px; background: #eef2f8; color: #3d4f6e; font-size: 12px; font-weight: 700; }
+.sv-aside__block { padding: 18px; }
+.sv-aside__block h2 { margin: 0 0 10px; font-size: 15px; }
+.sv-aside__block ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.sv-aside__block li { display: flex; gap: 8px; align-items: flex-start; color: #3e4f6b; font-size: 13.5px; line-height: 1.45; }
+.sv-aside__block li svg { flex: none; margin-top: 1px; padding: 2px; border-radius: 50%; background: #e7f6ee; color: var(--sv-ok); }
+.sv-aside__photo { margin: 0; overflow: hidden; }
+.sv-aside__photo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.sv-aside__photo figcaption { padding: 12px 16px 14px; color: var(--sv-muted); font-size: 13px; line-height: 1.5; }
+
+/* ---------- Ticket de éxito con marca ---------- */
+.sv-ticket__brand { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 20px; background: #fff; border-bottom: 1px solid #eef2f7; }
+.sv-ticket__brand img { width: 130px; }
+.sv-ticket__brand span { color: var(--sv-muted); font-size: 12.5px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+
+/* ---------- Soporte IT ---------- */
+.sv-tool__top { display: flex; justify-content: space-between; align-items: center; }
+.sv-tool__logo { width: 56px; height: 56px; border-radius: 16px; object-fit: cover; box-shadow: 0 6px 14px rgba(16, 42, 86, .14); }
+.sv-tool { transition: transform .25s var(--sv-ease), box-shadow .25s; }
+.sv-tool:hover { transform: translateY(-3px); box-shadow: 0 14px 28px rgba(16, 42, 86, .1); }
+.sv-quote { position: relative; overflow: hidden; isolation: isolate; }
+.sv-quote__mark { position: absolute; z-index: -1; right: -30px; bottom: -60px; width: 280px; opacity: .1; filter: brightness(0) invert(1); pointer-events: none; }
+.sv-glpi { position: relative; overflow: hidden; }
+.sv-glpi::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background: linear-gradient(180deg, var(--sv-violet), var(--sv-red)); }
+
+@media (max-width: 1100px) {
+  .sv-wizard__layout { grid-template-columns: 1fr; }
+  .sv-aside { position: static; grid-template-columns: 1fr 1fr; }
+  .sv-aside__photo { display: none; }
+}
+@media (max-width: 900px) {
+  .sv-head.has-photo { padding-top: 0; }
+  .sv-head__photo { position: relative; width: 100%; height: 170px; clip-path: polygon(0 0, 100% 0, 100% 78%, 0 100%); }
+  .sv-head__photo::after { background: linear-gradient(180deg, rgba(7, 59, 130, 0) 40%, rgba(7, 59, 130, .5)); }
+  .sv-head__slash { top: auto; height: 28px; width: 100%; clip-path: polygon(0 60%, 100% 0, 100% 30%, 0 100%); }
+  .sv-head.has-photo .sv-wrap { padding-top: 18px; }
+  .sv-team { grid-template-columns: 1fr; }
+  .sv-team__text { padding: 8px; }
+  .sv-trust { grid-template-columns: 1fr; justify-items: center; }
+  .sv-trust ul { grid-template-columns: 1fr; padding: 18px 0 0; border-left: 0; border-top: 1px solid var(--sv-line); }
+}
+@media (max-width: 720px) {
+  .sv-aside { grid-template-columns: 1fr; }
+}
+
+/* Con foto, las acciones del encabezado van debajo del texto (no sobre la imagen). */
+.sv-head.has-photo .sv-head__row { max-width: 60%; }
+.sv-head.has-photo .sv-head__aside { flex-basis: 100%; padding-left: 82px; }
+@media (max-width: 900px) {
+  .sv-head.has-photo .sv-head__row { max-width: none; }
+  .sv-head.has-photo .sv-head__aside { padding-left: 0; }
+}
+
+/* Infografía "¿Qué cambia cuando usas GLPI?": toda la imagen lleva a GLPI. */
+.sv-compare-img { position: relative; display: block; overflow: hidden; border-radius: 24px; border: 1px solid var(--sv-line); background: #eef3f8; box-shadow: var(--shadow-sm); transition: transform .3s var(--sv-ease), box-shadow .3s; }
+.sv-compare-img img { display: block; width: 100%; height: auto; }
+.sv-compare-img:hover { transform: translateY(-4px); box-shadow: 0 22px 44px rgba(16, 42, 86, .16); }
+.sv-compare-img__cta { position: absolute; right: 18px; top: 18px; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: var(--sv-blue); color: #fff; font-size: 14px; font-weight: 700; box-shadow: 0 8px 18px rgba(7, 59, 130, .3); opacity: 0; transform: translateY(-6px); transition: opacity .25s, transform .25s; }
+.sv-compare-img:hover .sv-compare-img__cta, .sv-compare-img:focus-visible .sv-compare-img__cta { opacity: 1; transform: none; }
+@media (hover: none) { .sv-compare-img__cta { opacity: 1; transform: none; } }

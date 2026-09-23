@@ -1,0 +1,124 @@
+/* =========================================================
+   Publicación de cumpleaños (estilo polaroid + fiesta)
+   ========================================================= */
+.cb { --cb-script: 'Dancing Script', cursive; }
+
+/* ---------- Polaroid ---------- */
+.cb-polaroid { position: relative; display: inline-block; margin: 0; padding: 14px 14px 18px; background: #fff; box-shadow: 0 2px 4px rgba(3, 20, 55, .08), 0 20px 44px rgba(3, 20, 55, .22); transform: rotate(var(--tilt, 0deg)); transition: transform .35s var(--cb-pop), box-shadow .35s; }
+.cb-polaroid__photo { display: grid; place-items: center; width: var(--pw, 220px); aspect-ratio: 1 / 1.05; overflow: hidden; background: var(--fondo); color: #fff; font-family: Poppins, var(--sans); font-size: 64px; font-weight: 800; }
+.cb-polaroid__photo img { width: 100%; height: 100%; object-fit: cover; }
+.cb-polaroid__tape { position: absolute; top: -13px; left: 50%; z-index: 2; width: 96px; height: 28px; background: rgba(255, 236, 170, .78); box-shadow: 0 1px 3px rgba(0, 0, 0, .1); transform: translateX(-50%) rotate(-4deg); clip-path: polygon(3% 0, 97% 4%, 100% 50%, 96% 100%, 2% 96%, 0 50%); }
+.cb-polaroid figcaption { display: grid; justify-items: center; gap: 2px; padding-top: 14px; text-align: center; }
+.cb-polaroid figcaption b { color: #0b1f5c; font-family: Poppins, var(--sans); font-size: 20px; font-style: italic; font-weight: 800; line-height: 1.2; }
+.cb-polaroid figcaption span { color: var(--cb-red); font-family: var(--cb-script); font-size: 22px; font-weight: 700; }
+.cb-polaroid__sticker { position: absolute; top: -18px; right: -22px; z-index: 3; display: grid; place-items: center; min-width: 74px; height: 74px; padding: 0 10px; border-radius: 50%; background: var(--cb-red); color: #fff; font-family: Poppins, var(--sans); font-size: 15px; font-weight: 800; text-align: center; line-height: 1.05; box-shadow: 0 10px 20px rgba(229, 29, 42, .4); transform: rotate(12deg); animation: cb-wobble 2.6s ease-in-out infinite; }
+@keyframes cb-wobble { 0%, 100% { transform: rotate(12deg) scale(1); } 50% { transform: rotate(4deg) scale(1.08); } }
+.cb-polaroid--xl { --pw: clamp(240px, 30vw, 390px); padding: 18px 18px 60px; }
+.cb-polaroid--xl .cb-polaroid__photo { font-size: 110px; }
+.cb-polaroid--lg { --pw: 230px; }
+.cb-polaroid--md { --pw: 100%; display: block; }
+
+/* ---------- Hero con publicaciones ---------- */
+.cb-hero.is-party { padding-bottom: 80px; }
+.cb-posts { position: relative; z-index: 2; display: grid; gap: 48px; margin-top: 44px; text-align: left; }
+.cb-post { position: relative; display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: clamp(28px, 4vw, 56px); align-items: center; padding: clamp(28px, 4vw, 52px); border-radius: 34px; background: #fff; color: var(--cb-ink); box-shadow: 0 40px 90px rgba(2, 16, 46, .45); animation: cb-in .7s var(--cb-pop) both; animation-delay: calc(.3s + var(--i, 0) * .15s); }
+.cb-post.cb-skeleton { min-height: 420px; margin-top: 40px; width: 100%; background-color: rgba(255, 255, 255, .08); }
+.cb-post::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: radial-gradient(circle at 0 0, rgba(255, 176, 32, .16), transparent 40%), radial-gradient(circle at 100% 100%, rgba(23, 105, 232, .1), transparent 45%); pointer-events: none; }
+.cb-post--reverse .cb-post__media { order: 2; }
+.cb-post__media { position: relative; display: grid; place-items: center; padding: 20px 0; }
+.cb-post__glow { position: absolute; width: 88%; aspect-ratio: 1; border-radius: 50%; background: conic-gradient(from 20deg, #ffb020, #e51d2a, #7c5cff, #1769e8, #23b5d3, #ffb020); filter: blur(46px); opacity: .32; animation: cb-spin 14s linear infinite; }
+.cb-post__media .cb-polaroid:hover { transform: rotate(0deg) scale(1.02); }
+.cb-post__body { position: relative; }
+.cb-post__kicker { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 7px 14px; border-radius: 999px; background: #fff4de; color: #8a5200; font-size: 13px; font-weight: 700; }
+.cb-post__title { margin-top: 16px; color: #0b1f5c; font-size: clamp(34px, 4.2vw, 54px); font-style: italic; font-weight: 800; line-height: 1.02; letter-spacing: -1.2px; }
+.cb-post__title span { display: block; margin-top: 4px; color: var(--cb-red); font-family: var(--cb-script); font-size: 1.35em; font-style: normal; font-weight: 700; letter-spacing: 0; }
+.cb-post__who { margin: 14px 0 0; color: var(--cb-muted); font-size: 15px; }
+.cb-post__who b { color: var(--cb-ink); }
+.cb-post__wish { margin: 20px 0 0; padding: 4px 0 4px 18px; border-left: 4px solid var(--cb-sun); color: #33466b; font-size: 17px; line-height: 1.7; }
+
+/* ---------- Botón "Toca para felicitar" ---------- */
+.cb-wish { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px; margin-top: 28px; }
+.cb-wish__btn { position: relative; display: inline-flex; align-items: center; gap: 14px; min-height: 72px; padding: 12px 26px 12px 12px; border: 0; border-radius: 999px; background: linear-gradient(135deg, #d8141f, #ef4a2c 70%, #f06a1c); color: #fff; font: inherit; text-align: left; cursor: pointer; box-shadow: 0 16px 34px rgba(229, 29, 42, .38); transition: transform .2s var(--cb-pop), box-shadow .2s; -webkit-tap-highlight-color: transparent; }
+.cb-wish__btn::before { content: ''; position: absolute; inset: -6px; border-radius: inherit; border: 3px solid rgba(255, 122, 69, .55); animation: cb-ring 1.8s ease-out infinite; pointer-events: none; }
+.cb-wish__btn:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 22px 40px rgba(229, 29, 42, .45); }
+.cb-wish__btn:active { transform: scale(.95); }
+.cb-wish__btn.is-sent { background: linear-gradient(135deg, #073b82, #1769e8); box-shadow: 0 16px 34px rgba(23, 105, 232, .35); }
+.cb-wish__btn.is-sent::before { border-color: rgba(23, 105, 232, .4); }
+.cb-wish__icon { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border-radius: 50%; background: rgba(255, 255, 255, .22); animation: cb-beat 1.2s ease-in-out infinite; }
+.cb-wish__btn.is-sent .cb-wish__icon { animation: none; }
+.cb-wish__label { display: grid; font-size: 17px; font-weight: 800; line-height: 1.2; }
+.cb-wish__label small { font-size: 12.5px; font-weight: 600; opacity: .9; }
+.cb-wish__count { display: inline-flex; align-items: center; gap: 7px; margin: 0; color: #c8111c; font-size: 15px; font-weight: 700; animation: cb-pop-in .45s var(--cb-pop); }
+@keyframes cb-ring { 0% { opacity: .9; transform: scale(.96); } 100% { opacity: 0; transform: scale(1.14); } }
+@keyframes cb-beat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } 45% { transform: scale(1.12); } }
+@keyframes cb-pop-in { from { transform: scale(.6); opacity: 0; } }
+
+/* Ráfaga que sale del botón */
+.cb-burst { position: absolute; top: 50%; left: 36px; width: 0; height: 0; pointer-events: none; z-index: 5; }
+.cb-burst__p { position: absolute; top: -5px; left: -4px; width: 8px; height: 12px; border-radius: 2px; background: var(--c); opacity: 0; animation: cb-burst var(--t) cubic-bezier(.1, .7, .3, 1) forwards; }
+.cb-burst__p--heart, .cb-burst__p--star { width: auto; height: auto; background: none; color: var(--c); font-size: 18px; line-height: 1; font-style: normal; }
+.cb-burst__p--heart::before { content: '\2665'; }
+.cb-burst__p--star::before { content: '\2605'; }
+.cb-burst__plus { position: absolute; top: -40px; left: -14px; color: var(--cb-red); font-family: Poppins, var(--sans); font-size: 22px; font-weight: 800; animation: cb-plus 1.1s ease-out forwards; }
+.cb-wish__btn.is-sent .cb-burst__plus { color: var(--cb-blue); }
+@keyframes cb-burst {
+  0% { opacity: 1; transform: rotate(var(--a)) translateX(0) scale(.4); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--d)) rotate(var(--r)) scale(1); }
+}
+@keyframes cb-plus { 0% { opacity: 0; transform: translateY(10px) scale(.6); } 25% { opacity: 1; transform: translateY(-6px) scale(1.15); } 100% { opacity: 0; transform: translateY(-46px) scale(1); } }
+
+/* ---------- Mensaje al muro ---------- */
+.cb-sign { margin-top: 22px; padding: 16px; border: 1px dashed #f3b9a0; border-radius: 18px; background: #fff8f3; animation: cb-in .4s var(--cb-ease) both; }
+.cb-sign__title { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; color: var(--cb-ink); font-size: 14px; font-weight: 700; }
+.cb-sign__title small { color: var(--cb-muted); font-weight: 500; }
+.cb-sign__row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr) auto; gap: 8px; }
+.cb-sign__done { display: inline-flex; align-items: center; gap: 8px; margin: 18px 0 0; color: #16613a; font-size: 14px; font-weight: 700; }
+
+/* ---------- Muro de felicitaciones ---------- */
+.cb-wall { grid-column: 1 / -1; padding-top: 8px; border-top: 1px dashed var(--cb-line); }
+.cb-wall__title { margin: 16px 0 0; color: var(--cb-muted); font-size: 12px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; }
+.cb-wall ul { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin: 14px 0 0; padding: 0; list-style: none; }
+.cb-wall li { padding: 16px 16px 12px; background: var(--nota); box-shadow: 0 8px 16px rgba(3, 20, 55, .1); transform: rotate(var(--rot)); animation: cb-in .4s var(--cb-pop) both; animation-delay: calc(var(--i) * 50ms); transition: transform .25s var(--cb-pop); }
+.cb-wall li:hover { transform: rotate(0) scale(1.04); }
+.cb-wall li p { margin: 0; color: #22324f; font-family: var(--cb-script); font-size: 21px; font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+.cb-wall li span { display: block; margin-top: 8px; color: var(--cb-muted); font-size: 12.5px; font-weight: 600; }
+
+/* ---------- Sin cumpleaños hoy: el próximo ---------- */
+.cb-next { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 30px 44px; margin-top: 42px; }
+.cb-next__text { display: grid; gap: 4px; text-align: left; }
+.cb-next__eyebrow { margin: 0; color: #ffd27a; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
+.cb-next__name { margin: 0; color: #fff; font-family: Poppins, var(--sans); font-size: clamp(24px, 3vw, 34px); font-style: italic; font-weight: 800; }
+.cb-next__when { margin: 0; color: #d3e2fb; font-family: var(--cb-script); font-size: 26px; }
+
+/* ---------- Calendario del mes: tablero de polaroids ---------- */
+.cb-board { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 40px 28px; margin: 34px 0 0; padding: 0; list-style: none; }
+.cb-board li { display: grid; justify-items: center; animation: cb-in .45s var(--cb-ease) both; animation-delay: calc(var(--i) * 50ms); }
+.cb-board .cb-polaroid { width: 100%; max-width: 250px; }
+.cb-board li:hover .cb-polaroid { transform: rotate(0) translateY(-6px); box-shadow: 0 2px 4px rgba(3, 20, 55, .08), 0 28px 50px rgba(3, 20, 55, .25); }
+.cb-board .cb-polaroid figcaption b { font-size: 17px; }
+.cb-board .cb-polaroid figcaption span { font-size: 20px; }
+.cb-board .cb-polaroid__sticker { min-width: 58px; height: 58px; font-size: 13px; }
+.cb-board__role { margin: 12px 0 0; color: var(--cb-muted); font-size: 13px; text-align: center; }
+.cb-board li.is-today .cb-polaroid { outline: 4px solid var(--cb-red); outline-offset: 4px; }
+
+@media (max-width: 860px) {
+  .cb-post, .cb-post--reverse { grid-template-columns: 1fr; }
+  .cb-post--reverse .cb-post__media { order: 0; }
+  .cb-post__body { text-align: center; }
+  .cb-post__wish { border-left: 0; padding-left: 0; }
+  .cb-wish { justify-content: center; }
+  .cb-sign__row { grid-template-columns: 1fr; }
+  .cb-sign__title { justify-content: center; }
+  .cb-polaroid--xl { --pw: min(68vw, 330px); padding: 14px 14px 46px; }
+}
+@media (max-width: 480px) {
+  .cb-post { padding: 22px 18px 28px; border-radius: 26px; }
+  .cb-wish__btn { width: 100%; }
+  .cb-board { grid-template-columns: repeat(2, 1fr); gap: 28px 16px; }
+  .cb-board .cb-polaroid { padding: 8px 8px 12px; }
+  .cb-board .cb-polaroid figcaption b { font-size: 14px; }
+  .cb-board .cb-polaroid figcaption span { font-size: 17px; }
+  .cb-polaroid__sticker { right: -10px; }
+  .cb-polaroid__photo { font-size: 44px; }
+}

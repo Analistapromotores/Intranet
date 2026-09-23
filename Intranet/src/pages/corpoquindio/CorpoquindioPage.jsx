@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import PlatformSection from '../../components/PlatformSection.jsx'
 import {
   IconArrowRight,
   IconCheck,
@@ -211,6 +212,15 @@ export default function CorpoquindioPage() {
             </div>
           </div>
         </section>
+
+        {/* ---------- Plataforma del proyecto ---------- */}
+        <PlatformSection
+          id="corpoquindio-plataforma"
+          title="Conoce nuestra plataforma"
+          text="Quindío Connect Hub reúne en un solo lugar la gestión digital del proyecto Quindío Emprendedor. Ingresa con tu usuario para acceder."
+          url="https://quindio-connect-hub.vercel.app/login"
+          style={{ '--pf-accent': '#b96f45', '--pf-deep': '#5d3d2e', '--pf-soft': '#f7f1e7', '--pf-ink': '#203139' }}
+        />
 
         {/* ---------- Documentos ---------- */}
         <section className="qe-sec qe-sec--docs" id="corpoquindio-documentos">

@@ -66,4 +66,12 @@ export const projects = [
     href: '#promotores',
     docsHref: '#promotores-recursos',
   },
+  {
+    id: 'infraestructura',
+    name: 'Infraestructura',
+    monogram: 'IN',
+    color: '#c2410c',
+    href: '#infraestructura',
+    desc: 'Talento humano y equipos para el mantenimiento de la malla vial de Santiago de Cali (BP-26005375).',
+  },
 ]

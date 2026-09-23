@@ -5,9 +5,8 @@ import {
   IconClose,
   IconDockLeft,
   IconDockTop,
-  IconHeadset,
 } from './Icons.jsx'
-import { GLPI_URL } from '../config.js'
+import SessionBox from './SessionBox.jsx'
 
 export default function Sidebar({ layout, onLayoutChange, activeId = 'inicio' }) {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -63,21 +62,7 @@ export default function Sidebar({ layout, onLayoutChange, activeId = 'inicio' })
             </ul>
           </nav>
 
-          <div className="side__help">
-            <span className="side__help-icon">
-              <IconHeadset width={18} height={18} />
-            </span>
-            <p className="side__help-title">¿Necesitas ayuda?</p>
-            <p className="side__help-text">Radica tu solicitud en la mesa de ayuda.</p>
-            <a
-              className="side__help-btn"
-              href={GLPI_URL}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Ir al GLPI
-            </a>
-          </div>
+          <SessionBox onNavigate={() => setMobileOpen(false)} />
         </div>
       </aside>
 

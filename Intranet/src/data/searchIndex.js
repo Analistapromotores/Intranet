@@ -12,6 +12,7 @@ import {
   PROJECT as QE,
 } from '../pages/corpoquindio/data.js'
 import { LINKS as GYS_LINKS, FORMATS, QUALITY, SST } from '../pages/gys/data.js'
+import { EXTENSIONES } from './extensiones.js'
 
 /* tipo: acceso | proyecto | seccion | documento | enlace | plantilla | contacto */
 const entradas = []
@@ -26,6 +27,18 @@ function add(entrada) {
 /* --- accesos y menú --- */
 navItems.forEach(({ id, label, href, external }) =>
   add({ id: `nav-${id}`, tipo: 'acceso', titulo: label, contexto: 'Intranet', href, externo: external }),
+)
+
+/* --- extensiones internas --- */
+EXTENSIONES.forEach((e) =>
+  add({
+    id: `ext-${e.ext}`,
+    tipo: 'contacto',
+    titulo: `${e.contacto} · Ext. ${e.ext}`,
+    detalle: e.area,
+    contexto: 'Extensiones internas',
+    href: `#extensiones-${e.ext}`,
+  }),
 )
 
 /* --- proyectos --- */

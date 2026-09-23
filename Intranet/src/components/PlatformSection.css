@@ -1,0 +1,50 @@
+/* Sección "Conoce nuestra plataforma". Hereda la paleta de cada proyecto. */
+.pf {
+  --pf-accent: #1769e8;
+  --pf-deep: #073b82;
+  --pf-soft: #eaf2ff;
+  --pf-ink: #102a56;
+  padding: clamp(56px, 7vw, 90px) 0;
+  background: linear-gradient(135deg, var(--pf-soft) 0%, #fff 70%);
+}
+.pf-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 5vw, 64px); align-items: center; width: min(1120px, 100%); margin-inline: auto; padding-inline: 28px; }
+.pf-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.pf-eyebrow { margin: 0; color: var(--pf-deep); font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; }
+.pf h2 { margin: 8px 0 0; color: var(--pf-ink); font-size: clamp(28px, 3.4vw, 42px); line-height: 1.1; letter-spacing: -.8px; }
+.pf-lead { margin: 14px 0 0; color: color-mix(in srgb, var(--pf-ink) 75%, #fff); font-size: 16px; line-height: 1.7; }
+.pf-features { display: grid; gap: 10px; margin: 18px 0 0; padding: 0; list-style: none; }
+.pf-features li { display: flex; gap: 10px; align-items: flex-start; color: var(--pf-ink); font-size: 15px; line-height: 1.5; }
+.pf-features svg { flex: none; margin-top: 2px; padding: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--pf-accent); color: #fff; }
+.pf-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; margin-top: 26px; }
+.pf-btn { display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 12px 24px; border-radius: 14px; background: var(--pf-deep); color: #fff; font-size: 15px; font-weight: 700; text-decoration: none; box-shadow: 0 12px 26px color-mix(in srgb, var(--pf-deep) 30%, transparent); transition: transform .2s, box-shadow .2s, background .2s; }
+.pf-btn:hover { transform: translateY(-2px); background: var(--pf-accent); color: #fff; }
+.pf-btn:focus-visible { outline: 3px solid var(--pf-accent); outline-offset: 3px; }
+.pf-url { color: color-mix(in srgb, var(--pf-ink) 60%, #fff); font-size: 13px; }
+
+/* Ventana del navegador */
+.pf-mock { display: block; overflow: hidden; border-radius: 18px; background: #fff; border: 1px solid color-mix(in srgb, var(--pf-deep) 15%, #fff); box-shadow: 0 30px 60px color-mix(in srgb, var(--pf-deep) 22%, transparent); text-decoration: none; transform: perspective(1200px) rotateY(-6deg) rotateX(2deg); transition: transform .5s cubic-bezier(.2, .8, .2, 1); }
+.pf-mock:hover { transform: perspective(1200px) rotateY(0) rotateX(0) translateY(-4px); }
+.pf-mock__bar { display: flex; align-items: center; gap: 6px; padding: 10px 14px; background: #f1f3f6; border-bottom: 1px solid #e3e7ec; }
+.pf-mock__bar > i { width: 10px; height: 10px; border-radius: 50%; background: #ff5f57; }
+.pf-mock__bar > i:nth-child(2) { background: #febc2e; }
+.pf-mock__bar > i:nth-child(3) { background: #28c840; }
+.pf-mock__url { display: inline-flex; flex: 1; align-items: center; gap: 6px; min-width: 0; margin-left: 10px; padding: 5px 12px; border-radius: 999px; background: #fff; color: #5b6472; font-size: 12px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.pf-mock__screen { display: grid; place-items: center; min-height: 300px; padding: 30px; background: linear-gradient(135deg, var(--pf-deep), var(--pf-accent)); }
+.pf-mock__card { display: grid; justify-items: center; gap: 12px; width: min(260px, 100%); padding: 24px 20px; border-radius: 16px; background: #fff; box-shadow: 0 16px 34px rgba(0, 0, 0, .2); }
+.pf-mock__avatar { width: 46px; height: 46px; border-radius: 14px; background: var(--pf-soft); border: 2px solid var(--pf-accent); }
+.pf-mock__line { height: 10px; border-radius: 6px; background: #dfe3e9; }
+.pf-mock__line--title { width: 60%; height: 12px; background: color-mix(in srgb, var(--pf-ink) 25%, #fff); }
+.pf-mock__input { width: 100%; height: 34px; border-radius: 9px; border: 1px solid #dfe3e9; background: #fafbfc; }
+.pf-mock__button { display: grid; place-items: center; width: 100%; height: 36px; border-radius: 9px; background: var(--pf-deep); color: #fff; font-size: 13px; font-weight: 700; }
+
+@media (max-width: 860px) {
+  .pf-wrap { grid-template-columns: 1fr; }
+  .pf-mock { transform: none; }
+}
+@media (max-width: 560px) {
+  .pf-wrap { padding-inline: 16px; }
+  .pf-mock__screen { min-height: 240px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf-mock, .pf-btn { transition: none; }
+}

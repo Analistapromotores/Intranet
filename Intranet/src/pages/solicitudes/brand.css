@@ -117,3 +117,9 @@
 .sv-compare-img__cta { position: absolute; right: 18px; top: 18px; display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: var(--sv-blue); color: #fff; font-size: 14px; font-weight: 700; box-shadow: 0 8px 18px rgba(7, 59, 130, .3); opacity: 0; transform: translateY(-6px); transition: opacity .25s, transform .25s; }
 .sv-compare-img:hover .sv-compare-img__cta, .sv-compare-img:focus-visible .sv-compare-img__cta { opacity: 1; transform: none; }
 @media (hover: none) { .sv-compare-img__cta { opacity: 1; transform: none; } }
+
+/* Video tutorial en Recursos de tecnología */
+.sv-howvideo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: center; margin-top: 16px; padding: 18px; border: 1px solid var(--sv-line); border-radius: 20px; background: #fff; }
+.sv-howvideo h3 { margin: 6px 0 0; font-size: 20px; }
+.sv-howvideo p:not(.sv-eyebrow) { margin: 8px 0 0; color: var(--sv-muted); line-height: 1.6; }
+@media (max-width: 760px) { .sv-howvideo { grid-template-columns: 1fr; } }

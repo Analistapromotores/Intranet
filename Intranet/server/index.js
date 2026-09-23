@@ -60,18 +60,27 @@ function setSession(res, value, maxAgeSec) {
   res.setHeader('Set-Cookie', parts.join('; '))
 }
 
-/* Usuario gestor inicial: desde variables de entorno o, solo en desarrollo, uno por defecto. */
+/* Roles: 'gestor' (cumpleaños y solicitudes) y 'admin' (además, la administración).
+   Los usuarios iniciales salen de variables de entorno; en desarrollo hay unos por defecto. */
+const ROLES = ['gestor', 'admin']
+const rolDe = (u) => (ROLES.includes(u?.role) ? u.role : 'gestor')
+const sesion = (u) => ({ username: u.username, name: u.name, role: rolDe(u) })
+
 async function ensureUsers() {
-  const users = await readJson(USERS_FILE, null)
-  if (users && users.length) return
-  const username = process.env.GESTOR_USER || (PROD ? null : 'gestor')
-  const password = process.env.GESTOR_PASSWORD || (PROD ? null : 'cumple2026')
-  if (!username || !password) {
-    console.warn('[cumpleaños] Sin GESTOR_USER/GESTOR_PASSWORD: nadie podrá iniciar sesión hasta definirlos.')
-    return
+  const users = await readJson(USERS_FILE, [])
+  let cambios = false
+  const asegurar = (username, password, name, role) => {
+    if (!username || !password) return false
+    if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) return false
+    users.push({ username, name, role, password: hashPassword(password) })
+    cambios = true
+    if (!PROD) console.log(`[usuarios] ${role} de desarrollo: ${username} / ${password}`)
+    return true
   }
-  await writeJson(USERS_FILE, [{ username, name: 'Gestor de la intranet', password: hashPassword(password) }])
-  if (!PROD) console.log(`[cumpleaños] Usuario de desarrollo: ${username} / ${password}`)
+  asegurar(process.env.GESTOR_USER || (PROD ? null : 'gestor'), process.env.GESTOR_PASSWORD || (PROD ? null : 'cumple2026'), 'Gestor de la intranet', 'gestor')
+  asegurar(process.env.ADMIN_USER || (PROD ? null : 'admin'), process.env.ADMIN_PASSWORD || (PROD ? null : 'admin2026'), 'Administrador de la intranet', 'admin')
+  if (cambios) await writeJson(USERS_FILE, users)
+  if (!users.length) console.warn('[usuarios] Sin GESTOR_USER/GESTOR_PASSWORD ni ADMIN_USER/ADMIN_PASSWORD: nadie podrá iniciar sesión hasta definirlos.')
 }
 
 /* Freno simple a la fuerza bruta: 8 intentos fallidos por IP cada 15 minutos. */
@@ -236,7 +245,7 @@ api.post('/auth/login', async (req, res) => {
   }
   attempts.delete(ip)
   setSession(res, makeToken(user.username), SESSION_HOURS * 3600)
-  res.json({ username: user.username, name: user.name })
+  res.json(sesion(user))
 })
 
 api.post('/auth/logout', (_req, res) => {
@@ -253,7 +262,16 @@ async function requireAuth(req, res, next) {
   next()
 }
 
-api.get('/auth/me', requireAuth, (req, res) => res.json({ username: req.user.username, name: req.user.name }))
+api.get('/auth/me', requireAuth, (req, res) => res.json(sesion(req.user)))
+
+/* Solo administradores. Se usa encadenado después de requireAuth. */
+function requireAdmin(req, res, next) {
+  if (rolDe(req.user) !== 'admin') return res.status(403).json({ error: 'Esta sección es solo para administradores.' })
+  next()
+}
+
+/* Panel de administración: por ahora solo confirma el acceso; aquí irán sus funciones. */
+api.get('/admin/panel', requireAuth, requireAdmin, (req, res) => res.json({ ok: true, user: sesion(req.user), modulos: [] }))
 
 api.put('/auth/password', requireAuth, async (req, res) => {
   const { current, next: nueva } = req.body || {}

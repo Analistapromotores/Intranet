@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { GLPI_URL } from '../../config.js'
 import { api } from './api.js'
 import { PageHeader } from './ui.jsx'
+import LiteYouTube from '../../components/LiteYouTube.jsx'
 import { FOTOS, HERRAMIENTAS_LOGOS, MARCA } from './brand.js'
 import {
   IconBook, IconCheckCircle, IconClock, IconCloud, IconExternal, IconFileText, IconFishing,
@@ -180,6 +181,14 @@ export default function SoportePage() {
                 <span className="sv-resource__go"><IconFileText width={18} height={18} /> Abrir documento</span>
               </a>
             ))}
+          </div>
+          <div className="sv-howvideo">
+            <LiteYouTube id="0u8sEU-Uixg" titulo="Cómo firmar un documento PDF" />
+            <div>
+              <p className="sv-eyebrow">Video tutorial</p>
+              <h3>Cómo firmar un documento PDF</h3>
+              <p>Paso a paso para firmar digitalmente tus documentos en PDF sin imprimirlos.</p>
+            </div>
           </div>
         </section>
       </div>

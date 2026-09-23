@@ -348,3 +348,21 @@ export function IconCake(props) {
     </svg>
   )
 }
+
+export function IconPhone(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M6.6 3.5h2.6l1.5 4-2 1.3a11 11 0 0 0 6.5 6.5l1.3-2 4 1.5v2.6a2 2 0 0 1-2.2 2A16.8 16.8 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z" />
+    </svg>
+  )
+}
+
+export function IconCone(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M10.3 4h3.4l4.8 15H5.5L10.3 4Z" />
+      <path d="M8.4 10h7.2M7.2 14.5h9.6" />
+      <path d="M3.5 19h17" />
+    </svg>
+  )
+}

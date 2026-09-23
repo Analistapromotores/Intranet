@@ -1308,3 +1308,74 @@ button.cal__day {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ---------- Esquinas redondeadas del menú lateral ----------
+   El menú tiene bordes redondeados a la derecha; para que en la curva no se vea
+   el fondo claro, las secciones a todo lo ancho se extienden por debajo del menú
+   exactamente el radio de la curva. El contenido no se mueve. */
+:root { --side-r: 22px; }
+@media (min-width: 961px) {
+  .app--nav-side :is(.sv-head, .inf-hero, .cb-hero, .cb-bar, .gy-hero, .gy-contact, .mcb-hero, .qe-hero, .med-hero) {
+    margin-left: calc(-1 * var(--side-r));
+    padding-left: var(--side-r);
+  }
+  .app--nav-side .cb-login {
+    margin-left: calc(-1 * var(--side-r));
+    padding-left: calc(20px + var(--side-r));
+  }
+}
+
+/* ---------- Sesión de gestores en el menú (reemplaza la tarjeta de ayuda) ---------- */
+.session { position: relative; margin-top: 8px; }
+.session--loading { height: 44px; border-radius: 14px; background: rgba(255, 255, 255, 0.08); }
+.session__login { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; padding: 0 14px; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 14px; background: #fff; color: var(--blue); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.15s, box-shadow 0.2s; }
+.session__login:hover { background: var(--blue-050); box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18); }
+.session__login:active { transform: scale(0.98); }
+.session__user { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 6px 10px 6px 6px; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 14px; background: rgba(255, 255, 255, 0.1); color: #fff; font: inherit; text-align: left; cursor: pointer; transition: background 0.2s; }
+.session__user:hover, .session.is-open .session__user { background: rgba(255, 255, 255, 0.18); }
+.session__avatar { display: grid; place-items: center; width: 34px; height: 34px; flex: none; border-radius: 10px; background: #fff; color: var(--blue); font-size: 13px; font-weight: 800; }
+.session__who { display: grid; min-width: 0; line-height: 1.2; }
+.session__who b { overflow: hidden; font-size: 12.5px; text-overflow: ellipsis; white-space: nowrap; }
+.session__who small { color: rgba(255, 255, 255, 0.72); font-size: 11px; }
+.session__menu { position: absolute; left: 0; right: 0; bottom: calc(100% + 8px); z-index: 70; display: grid; padding: 6px; border-radius: 14px; background: #fff; box-shadow: 0 18px 40px rgba(11, 22, 44, 0.3); animation: session-in 0.18s ease both; }
+.session__menu a, .session__menu button { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 8px 10px; border: 0; border-radius: 10px; background: none; color: var(--ink); font: inherit; font-size: 13px; font-weight: 600; text-align: left; text-decoration: none; cursor: pointer; }
+.session__menu a:hover, .session__menu button:hover { background: var(--blue-050); color: var(--blue); }
+.session__menu svg { flex: none; color: var(--blue-bright); }
+.session__menu button { border-top: 1px solid var(--line); border-radius: 0 0 10px 10px; color: #b3121c; }
+.session__menu button svg { color: #b3121c; }
+@keyframes session-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* Barra superior: el acceso queda a la derecha y el menú se abre hacia abajo. */
+.side--top .session { flex: none; margin: 0 0 0 auto; }
+.side--top .session__login { width: auto; min-height: 38px; border-color: transparent; }
+.side--top .session__user { width: auto; min-height: 40px; padding-right: 12px; }
+.side--top .session__menu { top: calc(100% + 8px); bottom: auto; left: auto; right: 0; min-width: 230px; }
+@media (max-width: 960px) {
+  .side--top .session { margin: 8px 0 0; }
+  .side--top .session__login, .side--top .session__user { width: 100%; }
+  .side--top .session__menu { top: auto; bottom: calc(100% + 8px); left: 0; right: 0; }
+}
+
+/* Diálogo de inicio de sesión */
+.login-dlg { width: min(400px, calc(100% - 32px)); padding: 0; border: 0; border-radius: 22px; background: #fff; color: var(--ink); box-shadow: 0 30px 80px rgba(3, 20, 55, 0.35); }
+.login-dlg[open] { animation: session-in 0.22s ease both; }
+.login-dlg::backdrop { background: rgba(5, 24, 58, 0.55); backdrop-filter: blur(3px); }
+.login-dlg__box { position: relative; display: grid; gap: 14px; padding: 30px 26px 24px; }
+.login-dlg__box::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 5px; border-radius: 22px 22px 0 0; background: linear-gradient(90deg, var(--red) 0 34%, #fff 34% 35%, var(--blue-bright) 35%); }
+.login-dlg__close { position: absolute; top: 14px; right: 14px; display: grid; place-items: center; width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink-soft); cursor: pointer; }
+.login-dlg__close:hover { color: var(--ink); border-color: var(--blue-bright); }
+.login-dlg__icon { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 14px; background: var(--blue-050); color: var(--blue); }
+.login-dlg h2 { margin: 0; font-size: 22px; }
+.login-dlg__box > p { margin: -8px 0 4px; color: var(--ink-soft); font-size: 14px; line-height: 1.5; }
+.login-dlg__field { display: grid; gap: 6px; }
+.login-dlg__field > span:first-child { font-size: 14px; font-weight: 600; }
+.login-dlg__field input { width: 100%; min-height: 46px; padding: 10px 14px; border: 1px solid #cbd6e6; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 16px; }
+.login-dlg__field input:focus { outline: 0; border-color: var(--blue-bright); box-shadow: 0 0 0 4px rgba(23, 105, 232, 0.15); }
+.login-dlg__pass { display: flex; gap: 8px; }
+.login-dlg__pass input { flex: 1; min-width: 0; }
+.login-dlg__pass button { display: grid; place-items: center; width: 46px; flex: none; border: 1px solid #cbd6e6; border-radius: 12px; background: #fff; color: var(--ink-soft); cursor: pointer; }
+.login-dlg__pass button:hover { border-color: var(--blue-bright); color: var(--blue-bright); }
+.login-dlg__error { margin: 0; padding: 10px 12px; border: 1px solid #f6c1c5; border-radius: 10px; background: #fff0f1; color: #9c0f18; font-size: 13.5px; }
+.login-dlg__submit { min-height: 46px; border: 0; border-radius: 12px; background: var(--blue); color: #fff; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+.login-dlg__submit:hover { background: var(--blue-bright); }
+.login-dlg__submit:disabled { opacity: 0.6; cursor: progress; }

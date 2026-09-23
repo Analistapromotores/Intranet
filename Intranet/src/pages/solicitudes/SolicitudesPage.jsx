@@ -7,7 +7,7 @@ import ConsultaPage from './ConsultaPage.jsx'
 import GestionPage from './GestionPage.jsx'
 import { PageHeader } from './ui.jsx'
 import { FOTOS, MARCA } from './brand.js'
-import { IconArrowRight, IconCheckCircle, IconClipboard, IconClock, IconExternal, IconHeadset, IconLaptop, IconList, IconLock, IconSearch, IconSend, IconUserCheck, IconUserSearch } from './icons.jsx'
+import { IconArrowRight, IconCheckCircle, IconClipboard, IconClock, IconHeadset, IconLaptop, IconList, IconLock, IconSearch, IconSend, IconUserCheck, IconUserSearch } from './icons.jsx'
 import './solicitudes.css'
 import './brand.css'
 
@@ -37,7 +37,6 @@ const SERVICIOS = [
     title: 'Búsqueda de personal',
     text: 'Realiza solicitudes para encontrar el candidato requerido para un cargo mediante un formulario sencillo, organizado y centralizado.',
     meta: '2 formatos · Orden de servicio e Informe de ingreso',
-    status: ['Genera Excel y correo', 'ok'],
     cta: 'Ver formatos',
   },
   {
@@ -48,7 +47,6 @@ const SERVICIOS = [
     title: 'Soporte IT',
     text: 'Encuentra información y accede al canal oficial para registrar solicitudes e incidentes relacionados con tecnología.',
     meta: 'Canal oficial: GLPI',
-    status: ['Se gestiona en GLPI', 'ext'],
     cta: 'Ir a Soporte IT',
   },
   {
@@ -59,7 +57,6 @@ const SERVICIOS = [
     title: 'Préstamo de equipos',
     text: 'Realiza aquí las solicitudes para el préstamo de los equipos y elementos que requieras para tus actividades.',
     meta: 'Portátiles, video beam, sonido, pendones y más',
-    status: ['Sujeto a disponibilidad', 'warn'],
     cta: 'Solicitar préstamo',
   },
 ]
@@ -86,7 +83,6 @@ function Inicio() {
                   <img src={s.photo.src} alt="" style={{ objectPosition: s.photo.pos }} loading="lazy" />
                 </span>
                 <span className="sv-service__icon"><s.icon width={28} height={28} /></span>
-                <span className={`sv-chip sv-chip--${s.status[1]}`}>{s.status[1] === 'ext' ? <IconExternal width={14} height={14} /> : <IconCheckCircle width={14} height={14} />} {s.status[0]}</span>
                 <h2>{s.title}</h2>
                 <p>{s.text}</p>
                 <small>{s.meta}</small>

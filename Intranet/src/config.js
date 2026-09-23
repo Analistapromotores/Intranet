@@ -3,7 +3,7 @@
 
 // URL de la mesa de ayuda GLPI (reemplazar por la instancia real).
 export const GLPI_URL =
-  import.meta.env.VITE_GLPI_URL || 'https://glpi.gestionyservicios.local/'
+  import.meta.env.VITE_GLPI_URL || 'https://glpi.gestionyservicios.com.co/'
 
 // Perfil público de Instagram (enlace "Ver todas" del bloque de noticias).
 export const IG_PROFILE_URL =

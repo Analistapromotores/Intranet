@@ -11,6 +11,9 @@ import CorpoquindioPage from './pages/corpoquindio/CorpoquindioPage.jsx'
 import PromotoresPage from './pages/promotores/PromotoresPage.jsx'
 import GysPage from './pages/gys/GysPage.jsx'
 import MediadoresPage from './pages/mediadores/MediadoresPage.jsx'
+import CumpleanosPage from './pages/cumpleanos/CumpleanosPage.jsx'
+import GestorPage from './pages/cumpleanos/GestorPage.jsx'
+import SolicitudesPage from './pages/solicitudes/SolicitudesPage.jsx'
 import './App.css'
 
 const STORAGE_KEY = 'gys-nav-layout'
@@ -73,7 +76,7 @@ export default function App() {
   }, [navLayout])
 
   /* Vistas de proyecto con ruta propia (#id o #id-seccion). */
-  const route = ['corpoquindio', 'promotores', 'gys', 'mediadores'].find(
+  const route = ['corpoquindio', 'promotores', 'gys', 'mediadores', 'cumpleanos', 'solicitudes'].find(
     (r) => hash === r || hash.startsWith(r + '-'),
   )
   const activeId = route || hash || 'inicio'
@@ -87,6 +90,8 @@ export default function App() {
         {route === 'promotores' && <PromotoresPage />}
         {route === 'gys' && <GysPage />}
         {route === 'mediadores' && <MediadoresPage />}
+        {route === 'solicitudes' && <SolicitudesPage hash={hash} />}
+        {route === 'cumpleanos' && (hash === 'cumpleanos-gestor' ? <GestorPage /> : <CumpleanosPage />)}
         {!route && <Home />}
       </div>
     </div>

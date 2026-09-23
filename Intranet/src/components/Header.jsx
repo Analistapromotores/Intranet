@@ -20,8 +20,6 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', fuera)
   }, [])
 
-  useEffect(() => setActivo(0), [texto])
-
   const ir = (r) => {
     if (!r) return
     setAbierto(false)
@@ -69,6 +67,7 @@ export default function Header() {
             autoComplete="off"
             onChange={(e) => {
               setTexto(e.target.value)
+              setActivo(0)
               setAbierto(true)
             }}
             onFocus={() => setAbierto(true)}

@@ -7,4 +7,11 @@ export default defineConfig({
   // y bajo un subpath como GitHub Pages (usuario.github.io/Intranet/).
   base: './',
   plugins: [react()],
+  // En desarrollo la API de cumpleaños corre aparte (npm run dev:api).
+  server: {
+    proxy: {
+      '/api': 'http://localhost:3001',
+      '/uploads': 'http://localhost:3001',
+    },
+  },
 })

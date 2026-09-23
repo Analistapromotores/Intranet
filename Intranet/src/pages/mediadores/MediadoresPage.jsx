@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { IconArrowRight, IconDownload } from '../../components/Icons.jsx'
 import { useReveal } from '../../lib/useReveal.js'
 import logo from '../../assets/mediadores/IMAGENES/MEDIADORES DE CONVIVENCIA LOGO_Horizontal.png'
 import heroImage from '../../assets/mediadores/IMAGENES/CARTILLA_MEDIADORES_PARTE1-03 (1).png'
 import teamImage from '../../assets/mediadores/IMAGENES/CARTILLA_MEDIADORES_PARTE3_Mesa de trabajo 1.png'
+import ValleMap from './ValleMap.jsx'
 import './mediadores.css'
 
 const STATS = [
@@ -12,10 +13,8 @@ const STATS = [
   ['422', 'mediadores en Colombia', 'Promedio anual'],
   ['42', 'municipios con presencia', 'Cobertura territorial'],
 ]
-const ZONES = ['Zona 1', 'Zona 2', 'Zona 3', 'Zona 4', 'Zona 5', 'Zona 6', 'Zona 7', 'Zona 8']
 
 export default function MediadoresPage() {
-  const [zone, setZone] = useState('Zona 1')
   useReveal()
   useEffect(() => { const h = window.location.hash.replace(/^#/, ''); const section = h && h !== 'mediadores' ? document.getElementById(h) : null; if (section) section.scrollIntoView(); else window.scrollTo({ top: 0, behavior: 'auto' }) }, [])
   return <div className="med"><main>
@@ -27,7 +26,7 @@ export default function MediadoresPage() {
 
     <section className="med-sec med-activity" id="mediadores-actividades"><div className="med-wrap med-activity__grid"><div data-reveal><p className="med-eyebrow">Actividades numeradas</p><h2>Así se mueve la <em>operación</em>.</h2><p>La hoja de ruta organiza 25 actividades. Cada registro queda enumerado para facilitar el seguimiento territorial y la consolidación de resultados.</p></div><div className="med-activity__list" data-reveal><article><b>Articulaciones institucionales</b><span>Acciones en conjunto con secretarías y entidades aliadas.</span></article><article><b>Actividades institucionales</b><span>Acciones en colegios, instituciones y otros entornos institucionales.</span></article><article><b>Percepción ciudadana y escucha activa</b><span>Registro de quejas y mediación con las autoridades encargadas.</span></article><article><b>Capacitaciones</b><span>Espacios de formación para la convivencia y la gestión territorial.</span></article></div></div></section>
 
-    <section className="med-sec med-zones" id="mediadores-zonas"><div className="med-wrap"><p className="med-eyebrow">Cobertura operativa</p><h2>Un equipo conectado en <em>ocho zonas</em>.</h2><p className="med-territory__lead">Selecciona una zona para resaltarla en el mapa operativo. Cada zona articula los municipios asignados y cuenta con una coordinación territorial.</p><div className="med-zones__grid"><div className="med-zones__map" data-reveal>{ZONES.map((item, index) => <button key={item} onClick={() => setZone(item)} className={`${item === zone ? 'is-active' : ''} med-zones__shape med-zones__shape--${index + 1}`}><span>{item}</span></button>)}</div><aside className="med-zone-detail" data-reveal><span>Zona resaltada</span><h3>{zone}</h3><p>Coordinación territorial que acompaña los municipios asignados, consolida las actividades y fortalece la conexión del equipo mediador.</p><a href="#mediadores-actividades">Ver cómo actuamos <IconArrowRight width={16} height={16} /></a></aside></div></div></section>
+    <section className="med-sec med-zones" id="mediadores-zonas"><div className="med-wrap"><p className="med-eyebrow">Cobertura operativa</p><h2>Un equipo conectado en <em>ocho zonas</em>.</h2><p className="med-territory__lead">Pasa el cursor sobre el mapa para ver cada municipio del Valle del Cauca y la zona operativa a la que pertenece. Cada zona cuenta con una coordinación territorial.</p><div className="med-zones__map" data-reveal><ValleMap /></div></div></section>
 
 
     <section className="med-sec med-story"><div className="med-wrap med-story__grid"><img src={teamImage} alt="Trabajo colaborativo de Mediadores de Convivencia" data-reveal /><div data-reveal><p className="med-eyebrow">Escuchar para actuar</p><h2>La escucha activa también es <em>intervención</em>.</h2><p>La presencia territorial permite identificar necesidades, recibir quejas y facilitar la mediación entre las personas y las autoridades responsables. Esa información orienta las acciones de convivencia en cada municipio.</p><p>De Gestores a Mediadores: una evolución que hace explícito el propósito de tender puentes y construir soluciones con la comunidad.</p></div></div></section>

@@ -1,0 +1,85 @@
+/* Ausentismo laboral: formulario, vista previa del FT-OP-76 e impresión. */
+.au-layout { max-width: 980px; }
+.au-form { display: grid; gap: 20px; }
+.au-mt { margin-top: 18px; }
+.au-grid4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.au-motivos { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.au-motivo { position: relative; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 10px 12px; border: 1px solid #cbd6e6; border-radius: 12px; background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: border-color .15s, background .15s; }
+.au-motivo input, .au-yesno input { position: absolute; opacity: 0; }
+.au-motivo__dot { width: 18px; height: 18px; flex: none; border: 2px solid #aebdd3; border-radius: 50%; transition: border .15s; }
+.au-motivo.is-on { border-color: var(--sv-red); background: #fff5f5; color: #9c0f18; }
+.au-motivo.is-on .au-motivo__dot { border: 6px solid var(--sv-red); }
+.au-motivo:has(input:focus-visible), .au-yesno label:has(input:focus-visible) { outline: 3px solid #7fb0ff; outline-offset: 2px; }
+.au-motivos.has-error .au-motivo { border-color: #d92a36; }
+.au-yesno { display: inline-flex; gap: 8px; }
+.au-yesno label { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 80px; min-height: 46px; padding: 0 16px; border: 1px solid #cbd6e6; border-radius: 12px; background: #fff; font-weight: 700; cursor: pointer; }
+.au-yesno label.is-on { border-color: var(--sv-blue); background: var(--sv-blue); color: #fff; }
+.au-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; padding-top: 6px; }
+
+/* Vista previa */
+.au-preview { width: min(900px, calc(100% - 24px)); max-height: calc(100dvh - 24px); padding: 0; border: 0; border-radius: 18px; background: #eef1f5; box-shadow: 0 30px 80px rgba(3, 20, 55, .35); }
+.au-preview::backdrop { background: rgba(5, 24, 58, .55); }
+.au-preview__bar { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 18px; background: #fff; border-bottom: 1px solid var(--sv-line, #e5eaf1); }
+.au-preview__bar h2 { margin: 0; font-size: 18px; }
+.au-preview__bar > div { display: flex; gap: 8px; }
+.au-preview__hint { margin: 12px 18px 0; color: #55657f; font-size: 13px; }
+.au-sheet { width: min(816px, calc(100% - 24px)); margin: 12px auto 24px; padding: 28px 34px; background: #fff; box-shadow: 0 6px 20px rgba(0, 0, 0, .12); }
+.au-sheet__cut { margin: 18px 0; border-top: 1px dashed #9aa3b2; }
+
+/* Réplica del formato */
+.fo { color: #000; font-family: 'Century Gothic', 'Segoe UI', Arial, sans-serif; font-size: 10.5px; }
+.fo table { width: 100%; border-collapse: collapse; }
+.fo td, .fo th { padding: 3px 6px; border: 1px solid #000; vertical-align: middle; text-align: left; font-weight: 400; }
+.fo th { font-weight: 700; white-space: nowrap; background: #f2f2f2; }
+.fo-head td { font-size: 9.5px; }
+.fo-head__logo { width: 70px; text-align: center !important; }
+.fo-head__logo img { width: 52px; }
+.fo-head__title { font-size: 15px !important; font-weight: 700 !important; text-align: center !important; letter-spacing: .5px; }
+.fo-head td:last-child { width: 130px; }
+.fo-date { display: flex; justify-content: flex-end; gap: 8px; margin: 6px 0; }
+.fo-date span { font-weight: 700; }
+.fo-date b { min-width: 110px; padding: 1px 6px; border: 1px solid #000; text-align: center; font-weight: 400; }
+.fo-sec { margin-top: 6px; padding: 3px 6px; border: 1px solid #000; background: #d9d9d9; font-weight: 700; }
+.fo-motivos td { width: 20%; }
+.fo-motivos td span { margin-right: 6px; }
+.fo-motivos td { white-space: nowrap; }
+.fo-motivos td b { display: inline-grid; place-items: center; width: 16px; height: 16px; vertical-align: middle; border: 1px solid #000; font-size: 10px; }
+.fo-wide { width: 60%; }
+.fo-box { width: 50px; text-align: center !important; }
+.fo-grid + .fo-grid { border-top: 0; }
+.fo-people td:first-child, .fo-people th:first-child { width: 30px; text-align: center; }
+.fo-people td { height: 20px; }
+.fo-obs { min-height: 36px; padding: 4px 6px; border: 1px solid #000; border-top: 0; }
+.fo-signs td { height: 46px; text-align: center; vertical-align: bottom; width: 50%; }
+.fo-signs th { text-align: center; background: #fff; }
+
+@media (max-width: 900px) {
+  .au-motivos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .au-grid4 { grid-template-columns: 1fr 1fr; }
+  .au-sheet { padding: 16px; overflow-x: auto; }
+}
+@media (max-width: 560px) {
+  .au-motivos, .au-grid4 { grid-template-columns: 1fr; }
+}
+
+/* Impresión: solo la hoja del formato, dos copias en una página carta. */
+@media print {
+  @page { size: letter portrait; margin: 8mm; }
+  body.au-printing > *:not(.au-portal) { display: none !important; }
+  body.au-printing { background: #fff !important; }
+  body.au-printing .au-preview { position: static; display: block; width: auto; max-width: none; max-height: none; margin: 0; overflow: visible; border-radius: 0; box-shadow: none; background: #fff; }
+  body.au-printing .au-preview::backdrop { display: none; }
+  body.au-printing .au-preview__bar, body.au-printing .au-preview__hint { display: none; }
+  body.au-printing .au-sheet { width: 100%; margin: 0; padding: 0; box-shadow: none; }
+  body.au-printing .au-sheet__cut { margin: 5mm 0; }
+  body.au-printing .fo { font-size: 8.5px; }
+  body.au-printing .fo td, body.au-printing .fo th { padding: 2px 5px; }
+  body.au-printing .fo-head__logo img { width: 40px; }
+  body.au-printing .fo-head__title { font-size: 13px !important; }
+  body.au-printing .fo-people td { height: 15px; }
+  body.au-printing .fo-obs { min-height: 24px; }
+  body.au-printing .fo-signs td { height: 34px; }
+  body.au-printing .fo-date { margin: 3px 0; }
+  body.au-printing .fo-sec { margin-top: 3px; }
+  .fo th, .fo-sec { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

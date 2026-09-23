@@ -141,7 +141,8 @@ export default function SessionBox({ onNavigate }) {
               setUser(u)
               setDialogo(false)
               const h = window.location.hash.replace(/^#/, '')
-              if (RUTAS_PRIVADAS.includes(h)) window.location.reload()
+              if (u.role === 'admin' && h !== 'admin') window.location.hash = 'admin'
+              else if (RUTAS_PRIVADAS.includes(h)) window.location.reload()
             }}
           />
         )}

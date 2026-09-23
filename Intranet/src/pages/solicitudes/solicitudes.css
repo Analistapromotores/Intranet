@@ -99,6 +99,7 @@
 .sv-service::before { content: ''; position: absolute; inset: 0 0 auto; height: 4px; border-radius: 22px 22px 0 0; background: var(--c); }
 .sv-service--violet { --c: var(--sv-violet); --c-soft: #efeafe; }
 .sv-service--teal { --c: var(--sv-teal); --c-soft: #e3f5f6; }
+.sv-service--red { --c: #c8111c; --c-soft: #fdecee; }
 .sv-service:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--c) 35%, var(--sv-line)); box-shadow: 0 18px 36px rgba(16, 42, 86, .12); }
 .sv-service__icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 16px; background: var(--c-soft); color: var(--c); }
 .sv-service .sv-chip { position: absolute; top: 24px; right: 20px; }

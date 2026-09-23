@@ -8,6 +8,7 @@ import path from 'node:path'
 import { DATA_DIR, PROD, ROOT } from './config.js'
 import { readJson, writeJson } from './store.js'
 import { solicitudesRouter } from './solicitudes/routes.js'
+import { salasRouter } from './salas/routes.js'
 
 const UPLOADS = path.join(DATA_DIR, 'uploads')
 const PEOPLE_FILE = path.join(DATA_DIR, 'people.json')
@@ -78,7 +79,7 @@ async function ensureUsers() {
     return true
   }
   asegurar(process.env.GESTOR_USER || (PROD ? null : 'gestor'), process.env.GESTOR_PASSWORD || (PROD ? null : 'cumple2026'), 'Gestor de la intranet', 'gestor')
-  asegurar(process.env.ADMIN_USER || (PROD ? null : 'admin'), process.env.ADMIN_PASSWORD || (PROD ? null : 'admin2026'), 'Administrador de la intranet', 'admin')
+  asegurar(process.env.ADMIN_USER || (PROD ? null : 'admin'), process.env.ADMIN_PASSWORD || (PROD ? null : 'admin'), 'Administrador de la intranet', 'admin')
   if (cambios) await writeJson(USERS_FILE, users)
   if (!users.length) console.warn('[usuarios] Sin GESTOR_USER/GESTOR_PASSWORD ni ADMIN_USER/ADMIN_PASSWORD: nadie podrá iniciar sesión hasta definirlos.')
 }
@@ -262,6 +263,16 @@ async function requireAuth(req, res, next) {
   next()
 }
 
+/* Adjunta el usuario si hay sesión, sin exigirla. */
+async function sesionOpcional(req, _res, next) {
+  const username = readToken(getCookie(req, COOKIE))
+  if (username) {
+    const users = await readJson(USERS_FILE, [])
+    req.user = users.find((u) => u.username === username) || null
+  }
+  next()
+}
+
 api.get('/auth/me', requireAuth, (req, res) => res.json(sesion(req.user)))
 
 /* Solo administradores. Se usa encadenado después de requireAuth. */
@@ -271,7 +282,46 @@ function requireAdmin(req, res, next) {
 }
 
 /* Panel de administración: por ahora solo confirma el acceso; aquí irán sus funciones. */
-api.get('/admin/panel', requireAuth, requireAdmin, (req, res) => res.json({ ok: true, user: sesion(req.user), modulos: [] }))
+api.get('/admin/panel', requireAuth, requireAdmin, async (req, res) => {
+  const [users, people, sol, reservas] = await Promise.all([
+    readJson(USERS_FILE, []),
+    readJson(PEOPLE_FILE, []),
+    readJson(path.join(DATA_DIR, 'solicitudes.json'), { items: [] }),
+    readJson(path.join(DATA_DIR, 'reservas.json'), { items: [] }),
+  ])
+  const { y, m } = hoyBogota()
+  const mesClave = (fechaIso) => String(fechaIso).slice(0, 7)
+  const ultimosMeses = Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(Date.UTC(y, m - 1 - (11 - i), 1))
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`
+  })
+  const esteMes = ultimosMeses[11]
+  const mesPasado = ultimosMeses[10]
+  const solicitudes = sol.items || []
+  const porMes = (lista, campo) => ultimosMeses.map((k) => lista.filter((x) => mesClave(x[campo]) === k).length)
+  const porTipoMes = ['informe_ingreso', 'orden_servicio', 'prestamo_equipos'].map((t) => ({ tipo: t, datos: porMes(solicitudes.filter((s) => s.tipo === t), 'creada') }))
+  const variacion = (a, b) => (b ? Math.round(((a - b) / b) * 1000) / 10 : null)
+  const solMes = solicitudes.filter((s) => mesClave(s.creada) === esteMes).length
+  const solMesPasado = solicitudes.filter((s) => mesClave(s.creada) === mesPasado).length
+  const resMes = (reservas.items || []).filter((r) => mesClave(r.fecha) === esteMes).length
+  const resMesPasado = (reservas.items || []).filter((r) => mesClave(r.fecha) === mesPasado).length
+  const cerradas = solicitudes.filter((s) => ['aprobada', 'cerrada'].includes(s.estado)).length
+  res.json({
+    ok: true,
+    user: sesion(req.user),
+    metricas: {
+      solicitudes: { total: solicitudes.length, mes: solMes, variacion: variacion(solMes, solMesPasado) },
+      reservas: { total: (reservas.items || []).length, mes: resMes, variacion: variacion(resMes, resMesPasado) },
+      cumpleanos: { total: people.length, publicados: people.filter((p) => p.published).length, mes: people.filter((p) => p.month === m).length },
+      usuarios: { total: users.length, admins: users.filter((u) => rolDe(u) === 'admin').length },
+    },
+    meses: ultimosMeses,
+    solicitudesPorTipo: porTipoMes,
+    reservasPorMes: porMes(reservas.items || [], 'fecha'),
+    avance: { resueltas: cerradas, total: solicitudes.length, pendientes: solicitudes.filter((s) => ['enviada', 'en_proceso', 'pendiente'].includes(s.estado)).length },
+    porEstado: solicitudes.reduce((acc, s) => ({ ...acc, [s.estado]: (acc[s.estado] || 0) + 1 }), {}),
+  })
+})
 
 api.put('/auth/password', requireAuth, async (req, res) => {
   const { current, next: nueva } = req.body || {}
@@ -389,6 +439,7 @@ api.post('/admin/import', requireAuth, async (req, res) => {
 
 app.use('/api', api)
 app.use('/api', solicitudesRouter({ requireAuth }))
+app.use('/api', salasRouter({ sesionOpcional }))
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Ruta no encontrada.' }))
 
 /* Build de Vite (en desarrollo lo sirve Vite y este bloque no aplica). */

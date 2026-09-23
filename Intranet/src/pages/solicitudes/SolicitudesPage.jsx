@@ -5,9 +5,12 @@ import PrestamoPage from './PrestamoPage.jsx'
 import SoportePage from './SoportePage.jsx'
 import ConsultaPage from './ConsultaPage.jsx'
 import GestionPage from './GestionPage.jsx'
+import SalasPage from './SalasPage.jsx'
+import AusentismoPage from './AusentismoPage.jsx'
+import IncapacidadesPage from './IncapacidadesPage.jsx'
 import { PageHeader } from './ui.jsx'
 import { FOTOS, MARCA } from './brand.js'
-import { IconArrowRight, IconCheckCircle, IconClipboard, IconClock, IconHeadset, IconLaptop, IconList, IconLock, IconSearch, IconSend, IconUserCheck, IconUserSearch } from './icons.jsx'
+import { IconArrowRight, IconCheckCircle, IconClipboard, IconCalendarPlus, IconClock, IconHeadset, IconMedical, IconUserClock, IconLaptop, IconList, IconLock, IconSearch, IconSend, IconUserCheck, IconUserSearch } from './icons.jsx'
 import './solicitudes.css'
 import './brand.css'
 
@@ -24,6 +27,9 @@ export default function SolicitudesPage({ hash }) {
     case 'solicitudes-prestamo': return <PrestamoPage />
     case 'solicitudes-consulta': return <ConsultaPage />
     case 'solicitudes-gestion': return <GestionPage />
+    case 'solicitudes-salas': return <SalasPage />
+    case 'solicitudes-ausentismo': return <AusentismoPage />
+    case 'solicitudes-incapacidades': return <IncapacidadesPage />
     default: return <Inicio />
   }
 }
@@ -58,6 +64,36 @@ const SERVICIOS = [
     text: 'Realiza aquí las solicitudes para el préstamo de los equipos y elementos que requieras para tus actividades.',
     meta: 'Portátiles, video beam, sonido, pendones y más',
     cta: 'Solicitar préstamo',
+  },
+  {
+    href: '#solicitudes-salas',
+    photo: FOTOS.equipoOficina,
+    icon: IconCalendarPlus,
+    tone: 'red',
+    title: 'Reserva de salas',
+    text: 'Consulta la disponibilidad en el calendario y aparta la sala para tus reuniones en segundos.',
+    meta: 'Vista por día, semana o mes',
+    cta: 'Reservar sala',
+  },
+  {
+    href: '#solicitudes-ausentismo',
+    photo: FOTOS.equipoBanner,
+    icon: IconUserClock,
+    tone: 'blue',
+    title: 'Ausentismo laboral',
+    text: 'Diligencia el formato FT-OP-76, descárgalo en Excel o imprímelo y guárdalo en PDF.',
+    meta: 'Formato FT-OP-76',
+    cta: 'Diligenciar formato',
+  },
+  {
+    href: '#solicitudes-incapacidades',
+    photo: FOTOS.soporte,
+    icon: IconMedical,
+    tone: 'teal',
+    title: 'Incapacidades',
+    text: 'Conoce la documentación que necesitas para cada tipo de incapacidad o licencia y a dónde enviarla.',
+    meta: 'General, laboral, tránsito, maternidad y paternidad',
+    cta: 'Ver requisitos',
   },
 ]
 

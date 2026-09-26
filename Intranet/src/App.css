@@ -1665,3 +1665,16 @@ button.cal__day {
 .news__thumb { position: relative; }
 .news__thumb .nw-blur { position: absolute; inset: -14%; width: 128%; height: 128%; object-fit: cover; filter: blur(10px) saturate(1.2); opacity: .85; }
 .news__thumb .nw-fit { position: relative; width: 100%; height: 100%; object-fit: contain; }
+
+/* Enlace para saltar la navegación: solo se ve al recibir el foco con el teclado. */
+.skip-link { position: absolute; left: 12px; top: -60px; z-index: 1000; padding: 10px 16px; border-radius: 10px; background: var(--blue); color: #fff; font-weight: 700; text-decoration: none; transition: top .15s; }
+.skip-link:focus { top: 12px; outline: 3px solid var(--blue-bright); outline-offset: 2px; }
+
+/* Texto solo para lectores de pantalla (títulos H1 de vistas cuyo encabezado visual es un logo). */
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* Marcador mientras se descarga una sección: ocupa el alto de la pantalla para que no haya saltos. */
+.vista-cargando { display: flex; align-items: center; justify-content: center; gap: 10px; min-height: 60vh; color: var(--ink-soft); font-size: 15px; font-weight: 600; }
+.vista-cargando__punto { width: 18px; height: 18px; border: 3px solid var(--line); border-top-color: var(--blue-bright); border-radius: 50%; animation: vista-giro .8s linear infinite; }
+@keyframes vista-giro { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .vista-cargando__punto { animation: none; } }

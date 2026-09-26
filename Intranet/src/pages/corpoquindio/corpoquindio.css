@@ -1139,3 +1139,7 @@
   color: var(--qe-terracota-deep);
   transform: translateX(3px);
 }
+
+/* En pantallas muy angostas una palabra larga («Comercialización») empujaba la cuadrícula fuera de la pantalla. */
+.qe-sectores > li { min-width: 0; }
+.qe-card__label { overflow-wrap: anywhere; }

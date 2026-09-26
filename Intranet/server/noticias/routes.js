@@ -4,6 +4,7 @@ import express from 'express'
 import crypto from 'node:crypto'
 import path from 'node:path'
 import { dataPath, deleteBlob, readJson, saveBlob, update } from '../store.js'
+import { firmaDeImagen } from '../seguridad.js'
 
 const POSTS = dataPath('noticias.json')
 const REDES = dataPath('redes.json')
@@ -36,6 +37,7 @@ async function guardarImagen(valor) {
   const buf = Buffer.from(m[2], 'base64')
   if (buf.length > 8 * 1024 * 1024) throw new Error('Una imagen supera 8 MB. Redúcela un poco e inténtalo de nuevo.')
   const file = `${crypto.randomUUID()}.${m[1] === 'jpeg' ? 'jpg' : m[1]}`
+  if (firmaDeImagen(buf) !== m[1]) throw new Error('Uno de los archivos no es una imagen válida.')
   await saveBlob(`uploads/${file}`, buf, `image/${m[1] === 'jpeg' ? 'jpeg' : m[1]}`)
   return file
 }

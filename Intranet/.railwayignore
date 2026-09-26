@@ -4,3 +4,12 @@ dist
 .railway
 npm-debug.log*
 /data
+
+# Material en bruto que la web no usa (pesa cientos de MB)
+src/assets/PROMOTORES/*.MOV
+src/assets/PROMOTORES/*.mov
+src/assets/PROMOTORES/*.MP4
+src/assets/PROMOTORES/*.mp4
+src/assets/PROMOTORES/todo el equipo.png
+src/assets/infraestructura/fotos y videos
+src/assets/infraestructura/originales

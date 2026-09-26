@@ -1,0 +1,11 @@
+/* Pantallas de estado: página no encontrada y error inesperado. Usan la paleta y los botones de la intranet. */
+.estado { display: grid; place-items: center; min-height: 70vh; padding: 48px 20px; }
+.estado__card { width: min(560px, 100%); padding: 40px 32px; border: 1px solid var(--line); border-radius: 20px; background: var(--white); text-align: center; box-shadow: 0 14px 40px rgba(16, 42, 86, .08); }
+.estado__codigo { margin: 0 0 6px; color: var(--red); font-size: clamp(56px, 12vw, 84px); font-weight: 800; line-height: 1; letter-spacing: -.03em; }
+.estado__card h1 { margin: 0 0 10px; color: var(--ink); font-size: clamp(22px, 4vw, 28px); line-height: 1.2; }
+.estado__card p { margin: 0 auto 22px; max-width: 42ch; color: var(--ink-soft); font-size: 15px; line-height: 1.55; }
+.estado__acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.estado__enlaces { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line); }
+.estado__enlaces a { color: var(--blue-bright); font-size: 14px; font-weight: 600; text-decoration: none; }
+.estado__enlaces a:hover { text-decoration: underline; }
+.estado__enlaces a:focus-visible, .estado__acciones .ui-btn:focus-visible { outline: 3px solid var(--blue-bright); outline-offset: 2px; }

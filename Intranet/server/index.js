@@ -175,9 +175,10 @@ const adminView = (p) => ({ ...publicView(p), year: p.year, published: p.publish
 /* ---------- App ---------- */
 const app = express()
 app.disable('x-powered-by')
-/* Railway (y cualquier proxy) pone la IP real al final de X-Forwarded-For; sin esto todos los límites por IP
-   verían una sola IP: la del proxy. */
-app.set('trust proxy', 1)
+/* En Railway, X-Forwarded-For llega como «cliente, proxy-de-borde» y el proxy de borde cambia entre peticiones.
+   Confiando en 2 saltos, req.ip es la IP real del cliente (y no se puede falsificar desde fuera). Sin esto los
+   límites por IP verían un valor distinto en cada petición y nunca se activarían. En local no hay proxy: se usa la conexión directa. */
+app.set('trust proxy', PROD ? 2 : false)
 app.use(forzarHttps)
 app.use(cabeceras)
 app.use(compression())

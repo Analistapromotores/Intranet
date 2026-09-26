@@ -49,6 +49,7 @@ export default function PasaportesPage() {
     <div className="ps">
       {/* ---------- Encabezado ---------- */}
       <header className="ps-hero">
+        <h1 className="sr-only">UT Gestión Pasaportes: operador logístico de la Oficina de Pasaportes del Valle del Cauca</h1>
         <img className="ps-hero__img" src={portada} alt="Equipo de la Oficina de Pasaportes con el chaleco institucional" />
         <div className="ps-wrap ps-hero__bar">
           <img className="ps-hero__logo" src={logoUT} alt="UT Gestión Pasaportes · Operador logístico" />

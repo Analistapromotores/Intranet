@@ -5,6 +5,7 @@ import ExcelJS from 'exceljs'
 import path from 'node:path'
 import { ROOT } from '../config.js'
 import { dataPath, readJson, update } from '../store.js'
+import { limitador } from '../seguridad.js'
 import { MAX_COLABORADORES, MOTIVOS, SALAS, seCruzan, validarAusentismo, validarReserva } from '../../shared/salas.js'
 
 const FILE = dataPath('reservas.json')
@@ -13,7 +14,9 @@ const FILE = dataPath('reservas.json')
 const hoyBogota = () => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(new Date())
 const limpio = (v, max) => String(v ?? '').trim().slice(0, max)
 
-const vista = (r) => ({ id: r.id, sala: r.sala, fecha: r.fecha, inicio: r.inicio, fin: r.fin, descripcion: r.descripcion, nombre: r.nombre, colaborador: r.colaborador })
+/* El calendario es público: sin sesión el correo de quien reservó se muestra parcialmente (a***@dominio). */
+const ocultarCorreo = (c) => String(c || '').replace(/^(.).*(@.*)$/, '$1***$2')
+const vista = (r, completo = true) => ({ id: r.id, sala: r.sala, fecha: r.fecha, inicio: r.inicio, fin: r.fin, descripcion: r.descripcion, nombre: r.nombre, colaborador: completo ? r.colaborador : ocultarCorreo(r.colaborador) })
 
 /* ---------- Excel FT-OP-76: el formato trae dos copias en la misma hoja ---------- */
 const COPIAS = [0, 33]
@@ -70,12 +73,12 @@ export function salasRouter({ sesionOpcional }) {
   r.get('/salas', (_req, res) => res.json({ salas: SALAS, hoy: hoyBogota() }))
 
   /* Reservas de un rango de fechas (para el calendario). */
-  r.get('/salas/reservas', async (req, res) => {
+  r.get('/salas/reservas', sesionOpcional, async (req, res) => {
     const desde = String(req.query.desde || '')
     const hasta = String(req.query.hasta || '')
     const { items } = await readJson(FILE, { items: [] })
     res.set('Cache-Control', 'no-store')
-    res.json(items.filter((x) => (!desde || x.fecha >= desde) && (!hasta || x.fecha <= hasta)).map(vista))
+    res.json(items.filter((x) => (!desde || x.fecha >= desde) && (!hasta || x.fecha <= hasta)).map((x) => vista(x, Boolean(req.user))))
   })
 
   r.post('/salas/reservas', async (req, res) => {
@@ -107,7 +110,7 @@ export function salasRouter({ sesionOpcional }) {
   })
 
   /* Cancelar: quien reservó (con su llave) o un gestor/admin con sesión. */
-  r.delete('/salas/reservas/:id', sesionOpcional, async (req, res) => {
+  r.delete('/salas/reservas/:id', limitador({ ventana: 10 * 60e3, max: 40 }), sesionOpcional, async (req, res) => {
     const key = String(req.body?.key || req.query.key || '')
     const ok = await update(FILE, { items: [] }, (db) => {
       const i = db.items.findIndex((x) => x.id === req.params.id)

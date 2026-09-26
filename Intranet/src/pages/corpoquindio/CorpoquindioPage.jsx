@@ -53,6 +53,7 @@ export default function CorpoquindioPage() {
 
           <div className="qe-hero__inner">
             <div className="qe-hero__text" data-reveal>
+              <h1 className="sr-only">Quindío Emprendedor, {PROJECT.convocatoria}</h1>
               <a className="qe-hero__cobrand" href="#inicio" aria-label="Ir a la intranet de Gestión y Servicios">
                 <img src={gysLogo} alt="Gestión y Servicios" />
               </a>

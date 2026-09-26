@@ -6,6 +6,7 @@ import { dataPath, readBlob, readJson, saveBlob, update } from '../store.js'
 import { ESTADOS, TIPOS, validar } from '../../shared/solicitudes.js'
 import { GENERADORES } from './documents.js'
 import { componerCorreo } from './email.js'
+import { limitador } from '../seguridad.js'
 import { enviar, smtpActivo } from './mailer.js'
 
 const FILE = dataPath('solicitudes.json')
@@ -92,7 +93,7 @@ export function solicitudesRouter({ requireAuth }) {
   /* Registrar una solicitud */
   r.post('/solicitudes/:tipo', async (req, res) => {
     const tipo = req.params.tipo
-    if (!TIPOS[tipo]) return res.status(404).json({ error: 'Tipo de solicitud desconocido.' })
+    if (!Object.hasOwn(TIPOS, tipo)) return res.status(404).json({ error: 'Tipo de solicitud desconocido.' })
     if (limitado(req.ip)) return res.status(429).json({ error: 'Has enviado muchas solicitudes seguidas. Intenta más tarde.' })
     const datos = req.body || {}
     const errores = validar(tipo, datos)
@@ -128,7 +129,8 @@ export function solicitudesRouter({ requireAuth }) {
   })
 
   /* Consulta del solicitante: número + correo con el que la registró. */
-  r.get('/solicitudes/consulta', async (req, res) => {
+  const consultas = limitador({ ventana: 10 * 60e3, max: 60 })
+  r.get('/solicitudes/consulta', consultas, async (req, res) => {
     const numero = String(req.query.numero || '').trim().toUpperCase()
     const correo = String(req.query.correo || '').trim().toLowerCase()
     if (!numero || !correo) return res.status(400).json({ error: 'Escribe el número de solicitud y tu correo.' })
@@ -139,7 +141,7 @@ export function solicitudesRouter({ requireAuth }) {
   })
 
   /* Todas las solicitudes de un correo (historial del solicitante). */
-  r.get('/solicitudes/mias', async (req, res) => {
+  r.get('/solicitudes/mias', consultas, async (req, res) => {
     const correo = String(req.query.correo || '').trim().toLowerCase()
     const numeros = String(req.query.numeros || '').split(',').map((n) => n.trim().toUpperCase()).filter(Boolean)
     if (!correo || !numeros.length) return res.json([])

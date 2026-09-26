@@ -3,9 +3,9 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  // Rutas relativas: funciona igual en local, en la raíz de un dominio
-  // y bajo un subpath como GitHub Pages (usuario.github.io/Intranet/).
-  base: './',
+  // La intranet se sirve desde la raíz del dominio (Railway); con rutas absolutas los recursos cargan
+  // bien aunque alguien abra una URL profunda como /algo/que/no/existe.
+  base: '/',
   plugins: [react()],
   // En desarrollo la API de cumpleaños corre aparte (npm run dev:api).
   server: {

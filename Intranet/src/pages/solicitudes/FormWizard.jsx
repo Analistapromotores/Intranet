@@ -14,6 +14,7 @@ export default function FormWizard({ form, steps, labels, review, correoSolicita
   const [resumen, setResumen] = useState([])
   const [confirmar, setConfirmar] = useState(false)
   const [enviando, setEnviando] = useState(false)
+  const envioEnCurso = useRef(false) // evita registrar dos veces la solicitud con un doble clic
   const [errorEnvio, setErrorEnvio] = useState('')
   const [resultado, setResultado] = useState(null)
   const [destino, setDestino] = useState(null)
@@ -42,6 +43,8 @@ export default function FormWizard({ form, steps, labels, review, correoSolicita
   }
 
   async function enviar() {
+    if (envioEnCurso.current) return
+    envioEnCurso.current = true
     setEnviando(true)
     setErrorEnvio('')
     try {
@@ -63,6 +66,7 @@ export default function FormWizard({ form, steps, labels, review, correoSolicita
         }
       }
     } finally {
+      envioEnCurso.current = false
       setEnviando(false)
     }
   }

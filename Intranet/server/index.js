@@ -1,8 +1,9 @@
 /* Servidor de la intranet: sirve el build de Vite y la API (Cumpleaños y Solicitudes).
    Datos en archivos JSON y archivos en disco, dentro de DATA_DIR (en Railway, un volumen). */
 import express from 'express'
+import compression from 'compression'
 import crypto from 'node:crypto'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { DATA_DIR, PROD, ROOT } from './config.js'
 import { dbListo, deleteBlob, readBlob, readJson, saveBlob, usaPostgres, writeJson } from './store.js'
@@ -10,6 +11,7 @@ import { solicitudesRouter } from './solicitudes/routes.js'
 import { salasRouter } from './salas/routes.js'
 import { noticiasRouter } from './noticias/routes.js'
 import { tiRouter, programarResumenDiario } from './ti/routes.js'
+import { cabeceras, errorGlobal, firmaDeImagen, forzarHttps, limitador, mismoOrigen } from './seguridad.js'
 
 const PEOPLE_FILE = path.join(DATA_DIR, 'people.json')
 const USERS_FILE = path.join(DATA_DIR, 'users.json')
@@ -84,14 +86,20 @@ async function ensureUsers() {
   if (!users.length) console.warn('[usuarios] Sin GESTOR_USER/GESTOR_PASSWORD ni ADMIN_USER/ADMIN_PASSWORD: nadie podrá iniciar sesión hasta definirlos.')
 }
 
-/* Freno simple a la fuerza bruta: 8 intentos fallidos por IP cada 15 minutos. */
-const attempts = new Map()
-function tooManyAttempts(ip) {
-  const now = Date.now()
-  const list = (attempts.get(ip) || []).filter((t) => now - t < 15 * 60e3)
-  attempts.set(ip, list)
-  return list.length >= 8
+/* Freno a la fuerza bruta: 8 intentos fallidos por usuario y IP, y 40 por IP, cada 15 minutos.
+   Contar por usuario evita que una persona que se equivoca bloquee a toda la oficina (misma IP pública). */
+const VENTANA_LOGIN = 15 * 60e3
+const fallos = new Map()
+const vigentes = (k) => {
+  const lista = (fallos.get(k) || []).filter((t) => Date.now() - t < VENTANA_LOGIN)
+  fallos.set(k, lista)
+  return lista
 }
+const bloqueadoLogin = (ip, user) => vigentes(`${ip}|${user}`).length >= 8 || vigentes(ip).length >= 40
+const anotarFallo = (ip, user) => { vigentes(`${ip}|${user}`).push(Date.now()); vigentes(ip).push(Date.now()) }
+setInterval(() => { for (const k of fallos.keys()) if (!vigentes(k).length) fallos.delete(k) }, 5 * 60e3).unref()
+/* Contraseña falsa para gastar el mismo tiempo cuando el usuario no existe (no revelar quién existe). */
+const HASH_FALSO = hashPassword(crypto.randomBytes(12).toString('hex'))
 
 /* ---------- Validación de personas ---------- */
 const clean = (v, max) => String(v ?? '').trim().slice(0, max)
@@ -127,6 +135,7 @@ async function savePhoto(dataUrl) {
   if (!m) return null
   const buf = Buffer.from(m[2], 'base64')
   if (buf.length > 2.5 * 1024 * 1024) throw new Error('La foto supera 2.5 MB.')
+  if (firmaDeImagen(buf) !== m[1]) throw new Error('El archivo no es una imagen válida.')
   const ext = m[1] === 'jpeg' ? 'jpg' : m[1]
   const file = `${crypto.randomUUID()}.${ext}`
   await saveBlob(`uploads/${file}`, buf, `image/${m[1] === 'jpeg' ? 'jpeg' : m[1]}`)
@@ -166,7 +175,23 @@ const adminView = (p) => ({ ...publicView(p), year: p.year, published: p.publish
 /* ---------- App ---------- */
 const app = express()
 app.disable('x-powered-by')
-app.use(express.json({ limit: '60mb' }))
+/* Railway (y cualquier proxy) pone la IP real al final de X-Forwarded-For; sin esto todos los límites por IP
+   verían una sola IP: la del proxy. */
+app.set('trust proxy', 1)
+app.use(forzarHttps)
+app.use(cabeceras)
+app.use(compression())
+
+/* Tamaño máximo del cuerpo según el tipo de ruta: solo donde llegan imágenes se admiten cuerpos grandes. */
+app.use(['/api/admin/noticias', '/api/admin/people', '/api/admin/import'], express.json({ limit: '25mb' }))
+app.use('/api/ti', express.json({ limit: '5mb' }))
+app.use(['/api/solicitudes', '/api/documentos'], express.json({ limit: '2mb' }))
+app.use(express.json({ limit: '1mb' }))
+app.use('/api', mismoOrigen)
+/* Tope general por IP: solo frena automatismos; una oficina completa detrás de una IP no lo alcanza. */
+const lecturas = limitador({ ventana: 60e3, max: 2400 })
+const escrituras = limitador({ ventana: 60e3, max: 300 })
+app.use('/api', (req, res, next) => (req.method === 'GET' || req.method === 'HEAD' ? lecturas(req, res, next) : escrituras(req, res, next)))
 /* Imágenes subidas. Los nombres son UUID y nunca cambian de contenido, así que se pueden cachear un año. */
 const MIME = { webp: 'image/webp', jpg: 'image/jpeg', png: 'image/png' }
 app.get('/uploads/:file', async (req, res) => {
@@ -242,7 +267,7 @@ api.post('/birthdays/:id/wishes', async (req, res) => {
 })
 
 /* Quien felicitó puede añadir o cambiar su mensaje con la llave que recibió. */
-api.patch('/birthdays/:id/wishes/:wid', async (req, res) => {
+api.patch('/birthdays/:id/wishes/:wid', limitador({ ventana: 10 * 60e3, max: 40 }), async (req, res) => {
   const wishes = await readJson(WISHES_FILE, [])
   const wish = wishes.find((w) => w.id === req.params.wid && w.personId === req.params.id)
   const key = String(req.body?.key || '')
@@ -257,15 +282,17 @@ api.patch('/birthdays/:id/wishes/:wid', async (req, res) => {
 
 api.post('/auth/login', async (req, res) => {
   const ip = req.ip
-  if (tooManyAttempts(ip)) return res.status(429).json({ error: 'Demasiados intentos. Espera 15 minutos.' })
   const { username, password } = req.body || {}
+  const nombre = String(username || '').trim().toLowerCase().slice(0, 64)
+  if (bloqueadoLogin(ip, nombre)) return res.status(429).json({ error: 'Demasiados intentos. Espera 15 minutos.' })
   const users = await readJson(USERS_FILE, [])
-  const user = users.find((u) => u.username.toLowerCase() === String(username || '').trim().toLowerCase())
-  if (!user || !checkPassword(String(password || ''), user.password)) {
-    attempts.get(ip).push(Date.now())
+  const user = users.find((u) => u.username.toLowerCase() === nombre)
+  const correcta = checkPassword(String(password || '').slice(0, 200), user ? user.password : HASH_FALSO)
+  if (!user || !correcta) {
+    anotarFallo(ip, nombre)
     return res.status(401).json({ error: 'Usuario o contraseña incorrectos.' })
   }
-  attempts.delete(ip)
+  fallos.delete(`${ip}|${nombre}`)
   setSession(res, makeToken(user.username), SESSION_HOURS * 3600)
   res.json(sesion(user))
 })
@@ -294,7 +321,11 @@ async function sesionOpcional(req, _res, next) {
   next()
 }
 
-api.get('/auth/me', requireAuth, (req, res) => res.json(sesion(req.user)))
+/* Sin sesión responde 200 con null (no es un error): así la consola de cada visitante no se llena de 401. */
+api.get('/auth/me', sesionOpcional, (req, res) => {
+  res.set('Cache-Control', 'no-store')
+  res.json(req.user ? sesion(req.user) : null)
+})
 
 /* Solo TI y administradores. Se usa encadenado después de requireAuth. */
 function requireTi(req, res, next) {
@@ -494,9 +525,45 @@ app.use('/api', (_req, res) => res.status(404).json({ error: 'Ruta no encontrada
 
 /* Build de Vite (en desarrollo lo sirve Vite y este bloque no aplica). */
 if (existsSync(DIST)) {
-  app.use(express.static(DIST, { index: false, maxAge: '1h' }))
-  app.get('/{*splat}', (_req, res) => res.sendFile(path.join(DIST, 'index.html')))
+  /* Dirección pública del sitio, para el enlace canónico, la imagen social y el sitemap.
+     SITE_URL manda; si no está, se usa el host de la petición solo cuando tiene forma de dominio. */
+  const sitioUrl = (req) => {
+    if (process.env.SITE_URL) return process.env.SITE_URL.replace(/\/+$/, '')
+    const host = String(req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim()
+    if (!/^[a-z0-9.-]+(:\d{1,5})?$/i.test(host)) return ''
+    return `${PROD ? 'https' : req.protocol}://${host}`
+  }
+  const INDEX = readFileSync(path.join(DIST, 'index.html'), 'utf8')
+  const servirIndex = (req, res) => {
+    res.set({ 'Cache-Control': 'no-cache', 'Content-Type': 'text/html; charset=utf-8' })
+    res.send(INDEX.replaceAll('__SITE_URL__', sitioUrl(req)))
+  }
+  app.get(['/', '/index.html'], servirIndex)
+
+  /* Solo se rastrea la portada pública; la API queda fuera. Las secciones usan #, que los buscadores no tratan como páginas. */
+  app.get('/robots.txt', (req, res) => {
+    res.type('text/plain').send(`User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${sitioUrl(req)}/sitemap.xml\n`)
+  })
+  app.get('/sitemap.xml', (req, res) => {
+    res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url>\n    <loc>${sitioUrl(req)}/</loc>\n    <changefreq>daily</changefreq>\n    <priority>1.0</priority>\n  </url>\n</urlset>\n`)
+  })
+
+  app.use(express.static(DIST, {
+    index: false,
+    setHeaders: (res, file) => {
+      /* Lo de /assets lleva el hash en el nombre: se puede guardar un año. El resto, una hora. */
+      res.setHeader('Cache-Control', /[\\/]assets[\\/]/.test(file) ? 'public, max-age=31536000, immutable' : 'public, max-age=3600')
+    },
+  }))
+  app.get('/{*splat}', (req, res) => {
+    /* Un archivo que no existe responde 404 de verdad, no la portada. */
+    if (/\.[a-z0-9]{2,5}$/i.test(req.path)) return res.status(404).type('text/plain').send('No encontrado')
+    servirIndex(req, res)
+  })
 }
+
+app.use(errorGlobal)
+process.on('unhandledRejection', (e) => console.error('[error] promesa sin manejar:', e?.stack || e))
 
 await ensureUsers()
 programarResumenDiario()

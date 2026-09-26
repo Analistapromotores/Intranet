@@ -95,6 +95,7 @@ export default function PromotoresPage() {
     <div className="mcb">
       {/* ---------- Portada ---------- */}
       <header className="mcb-hero" id="promotores-proyecto">
+        <h1 className="sr-only">{PROJECT.nombre}: {PROJECT.sub}</h1>
         <span className="mcb-hero__blob mcb-hero__blob--a" />
         <span className="mcb-hero__blob mcb-hero__blob--b" />
         <Skyline className="mcb-hero__skyline" />

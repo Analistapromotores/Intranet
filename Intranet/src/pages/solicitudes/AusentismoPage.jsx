@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { cloneElement, isValidElement, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { MAX_COLABORADORES, MOTIVOS, validarAusentismo } from '../../../shared/salas.js'
 import { hoyISO } from '../../../shared/solicitudes.js'
@@ -198,13 +198,18 @@ export default function AusentismoPage() {
 }
 
 function Campo({ label, error, optional, full, children }) {
+  /* El texto se asocia al control (for/id) y el error se anuncia junto a él (aria-describedby). */
+  const id = useId()
+  const control = isValidElement(children) && ['input', 'select', 'textarea'].includes(children.type)
+    ? cloneElement(children, { id: children.props.id || id, 'aria-invalid': error ? true : undefined, 'aria-describedby': error ? `${id}-error` : undefined })
+    : children
   return (
     <div className={`sv-field ${error ? 'has-error' : ''} ${full ? 'sv-col-2' : ''}`}>
-      <label className="sv-label">
+      <label className="sv-label" htmlFor={isValidElement(control) ? control.props.id : undefined}>
         {label} {optional ? <small className="sv-opt">(opcional)</small> : <i className="sv-required" aria-hidden="true">*</i>}
       </label>
-      {children}
-      {error && <small className="sv-error" role="alert"><IconAlert width={14} height={14} /> {error}</small>}
+      {control}
+      {error && <small id={`${id}-error`} className="sv-error" role="alert"><IconAlert width={14} height={14} /> {error}</small>}
     </div>
   )
 }

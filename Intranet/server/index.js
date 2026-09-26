@@ -2,15 +2,15 @@
    Datos en archivos JSON y archivos en disco, dentro de DATA_DIR (en Railway, un volumen). */
 import express from 'express'
 import crypto from 'node:crypto'
-import fs from 'node:fs/promises'
-import { existsSync, mkdirSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import path from 'node:path'
 import { DATA_DIR, PROD, ROOT } from './config.js'
-import { readJson, writeJson } from './store.js'
+import { dbListo, deleteBlob, readBlob, readJson, saveBlob, usaPostgres, writeJson } from './store.js'
 import { solicitudesRouter } from './solicitudes/routes.js'
 import { salasRouter } from './salas/routes.js'
+import { noticiasRouter } from './noticias/routes.js'
+import { tiRouter, programarResumenDiario } from './ti/routes.js'
 
-const UPLOADS = path.join(DATA_DIR, 'uploads')
 const PEOPLE_FILE = path.join(DATA_DIR, 'people.json')
 const USERS_FILE = path.join(DATA_DIR, 'users.json')
 const WISHES_FILE = path.join(DATA_DIR, 'wishes.json')
@@ -20,8 +20,6 @@ const COOKIE = 'gys_session'
 const SESSION_HOURS = 12
 /* Sin SESSION_SECRET las sesiones se invalidan al reiniciar: seguro, solo pide volver a entrar. */
 const SECRET = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex')
-
-mkdirSync(UPLOADS, { recursive: true })
 
 /* ---------- Contraseñas y sesiones ---------- */
 function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
@@ -61,9 +59,10 @@ function setSession(res, value, maxAgeSec) {
   res.setHeader('Set-Cookie', parts.join('; '))
 }
 
-/* Roles: 'gestor' (cumpleaños y solicitudes) y 'admin' (además, la administración).
+/* Roles: 'gestor' (cumpleaños, solicitudes y noticias), 'ti' (además, alertas y seguimiento de TI)
+   y 'admin' (todo, más el control de accesos).
    Los usuarios iniciales salen de variables de entorno; en desarrollo hay unos por defecto. */
-const ROLES = ['gestor', 'admin']
+const ROLES = ['gestor', 'ti', 'admin']
 const rolDe = (u) => (ROLES.includes(u?.role) ? u.role : 'gestor')
 const sesion = (u) => ({ username: u.username, name: u.name, role: rolDe(u) })
 
@@ -79,6 +78,7 @@ async function ensureUsers() {
     return true
   }
   asegurar(process.env.GESTOR_USER || (PROD ? null : 'gestor'), process.env.GESTOR_PASSWORD || (PROD ? null : 'cumple2026'), 'Gestor de la intranet', 'gestor')
+  asegurar(process.env.TI_USER || (PROD ? null : 'ti'), process.env.TI_PASSWORD || (PROD ? null : 'ti12345'), 'Equipo de TI', 'ti')
   asegurar(process.env.ADMIN_USER || (PROD ? null : 'admin'), process.env.ADMIN_PASSWORD || (PROD ? null : 'admin'), 'Administrador de la intranet', 'admin')
   if (cambios) await writeJson(USERS_FILE, users)
   if (!users.length) console.warn('[usuarios] Sin GESTOR_USER/GESTOR_PASSWORD ni ADMIN_USER/ADMIN_PASSWORD: nadie podrá iniciar sesión hasta definirlos.')
@@ -129,11 +129,11 @@ async function savePhoto(dataUrl) {
   if (buf.length > 2.5 * 1024 * 1024) throw new Error('La foto supera 2.5 MB.')
   const ext = m[1] === 'jpeg' ? 'jpg' : m[1]
   const file = `${crypto.randomUUID()}.${ext}`
-  await fs.writeFile(path.join(UPLOADS, file), buf)
+  await saveBlob(`uploads/${file}`, buf, `image/${m[1] === 'jpeg' ? 'jpeg' : m[1]}`)
   return file
 }
 async function removePhoto(file) {
-  if (file) await fs.rm(path.join(UPLOADS, path.basename(file)), { force: true })
+  if (file) await deleteBlob(`uploads/${path.basename(file)}`)
 }
 
 /* ---------- Felicitaciones ---------- */
@@ -166,8 +166,29 @@ const adminView = (p) => ({ ...publicView(p), year: p.year, published: p.publish
 /* ---------- App ---------- */
 const app = express()
 app.disable('x-powered-by')
-app.use(express.json({ limit: '4mb' }))
-app.use('/uploads', express.static(UPLOADS, { maxAge: '7d', immutable: true }))
+app.use(express.json({ limit: '60mb' }))
+/* Imágenes subidas. Los nombres son UUID y nunca cambian de contenido, así que se pueden cachear un año. */
+const MIME = { webp: 'image/webp', jpg: 'image/jpeg', png: 'image/png' }
+app.get('/uploads/:file', async (req, res) => {
+  const file = path.basename(req.params.file)
+  const ext = file.split('.').pop().toLowerCase()
+  if (!MIME[ext]) return res.status(404).end()
+  const blob = await readBlob(`uploads/${file}`)
+  if (!blob) return res.status(404).end()
+  res.set({ 'Content-Type': blob.mime || MIME[ext], 'Cache-Control': 'public, max-age=31536000, immutable', ETag: `"${file}"` })
+  if (req.headers['if-none-match'] === `"${file}"`) return res.status(304).end()
+  res.send(blob.data)
+})
+
+/* Comprobación de salud para Railway: responde solo si la base de datos contesta. */
+app.get('/api/health', async (_req, res) => {
+  try {
+    await dbListo()
+    res.json({ ok: true, db: usaPostgres ? 'postgres' : 'archivos' })
+  } catch {
+    res.status(503).json({ ok: false })
+  }
+})
 
 const api = express.Router()
 
@@ -275,52 +296,79 @@ async function sesionOpcional(req, _res, next) {
 
 api.get('/auth/me', requireAuth, (req, res) => res.json(sesion(req.user)))
 
+/* Solo TI y administradores. Se usa encadenado después de requireAuth. */
+function requireTi(req, res, next) {
+  if (!['ti', 'admin'].includes(rolDe(req.user))) return res.status(403).json({ error: 'Esta sección es solo para el equipo de TI.' })
+  next()
+}
+
 /* Solo administradores. Se usa encadenado después de requireAuth. */
 function requireAdmin(req, res, next) {
   if (rolDe(req.user) !== 'admin') return res.status(403).json({ error: 'Esta sección es solo para administradores.' })
   next()
 }
 
-/* Panel de administración: por ahora solo confirma el acceso; aquí irán sus funciones. */
-api.get('/admin/panel', requireAuth, requireAdmin, async (req, res) => {
-  const [users, people, sol, reservas] = await Promise.all([
-    readJson(USERS_FILE, []),
-    readJson(PEOPLE_FILE, []),
-    readJson(path.join(DATA_DIR, 'solicitudes.json'), { items: [] }),
-    readJson(path.join(DATA_DIR, 'reservas.json'), { items: [] }),
-  ])
-  const { y, m } = hoyBogota()
-  const mesClave = (fechaIso) => String(fechaIso).slice(0, 7)
-  const ultimosMeses = Array.from({ length: 12 }, (_, i) => {
-    const d = new Date(Date.UTC(y, m - 1 - (11 - i), 1))
-    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`
-  })
-  const esteMes = ultimosMeses[11]
-  const mesPasado = ultimosMeses[10]
-  const solicitudes = sol.items || []
-  const porMes = (lista, campo) => ultimosMeses.map((k) => lista.filter((x) => mesClave(x[campo]) === k).length)
-  const porTipoMes = ['informe_ingreso', 'orden_servicio', 'prestamo_equipos'].map((t) => ({ tipo: t, datos: porMes(solicitudes.filter((s) => s.tipo === t), 'creada') }))
-  const variacion = (a, b) => (b ? Math.round(((a - b) / b) * 1000) / 10 : null)
-  const solMes = solicitudes.filter((s) => mesClave(s.creada) === esteMes).length
-  const solMesPasado = solicitudes.filter((s) => mesClave(s.creada) === mesPasado).length
-  const resMes = (reservas.items || []).filter((r) => mesClave(r.fecha) === esteMes).length
-  const resMesPasado = (reservas.items || []).filter((r) => mesClave(r.fecha) === mesPasado).length
-  const cerradas = solicitudes.filter((s) => ['aprobada', 'cerrada'].includes(s.estado)).length
-  res.json({
-    ok: true,
-    user: sesion(req.user),
-    metricas: {
-      solicitudes: { total: solicitudes.length, mes: solMes, variacion: variacion(solMes, solMesPasado) },
-      reservas: { total: (reservas.items || []).length, mes: resMes, variacion: variacion(resMes, resMesPasado) },
-      cumpleanos: { total: people.length, publicados: people.filter((p) => p.published).length, mes: people.filter((p) => p.month === m).length },
-      usuarios: { total: users.length, admins: users.filter((u) => rolDe(u) === 'admin').length },
-    },
-    meses: ultimosMeses,
-    solicitudesPorTipo: porTipoMes,
-    reservasPorMes: porMes(reservas.items || [], 'fecha'),
-    avance: { resueltas: cerradas, total: solicitudes.length, pendientes: solicitudes.filter((s) => ['enviada', 'en_proceso', 'pendiente'].includes(s.estado)).length },
-    porEstado: solicitudes.reduce((acc, s) => ({ ...acc, [s.estado]: (acc[s.estado] || 0) + 1 }), {}),
-  })
+/* ---------- Control de accesos: usuarios y roles (solo admin) ---------- */
+const USERNAME_RE = /^[a-z0-9._-]{3,32}$/i
+const userView = (u) => ({ username: u.username, name: u.name, role: rolDe(u) })
+const esUltimoAdmin = (users, u) => rolDe(u) === 'admin' && users.filter((x) => rolDe(x) === 'admin').length <= 1
+
+api.get('/admin/users', requireAuth, requireAdmin, async (_req, res) => {
+  const users = await readJson(USERS_FILE, [])
+  res.json(users.map(userView))
+})
+
+api.post('/admin/users', requireAuth, requireAdmin, async (req, res) => {
+  const username = clean(req.body?.username, 32)
+  const name = clean(req.body?.name, 80)
+  const role = ROLES.includes(req.body?.role) ? req.body.role : 'gestor'
+  const password = String(req.body?.password || '')
+  const fields = {}
+  if (!USERNAME_RE.test(username)) fields.username = 'Usa de 3 a 32 letras, números, punto, guion o guion bajo.'
+  if (name.length < 3) fields.name = 'Escribe el nombre completo.'
+  if (password.length < 8) fields.password = 'La contraseña debe tener al menos 8 caracteres.'
+  if (Object.keys(fields).length) return res.status(400).json({ error: 'Revisa los campos marcados.', fields })
+  const users = await readJson(USERS_FILE, [])
+  if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) {
+    return res.status(409).json({ error: 'Ese usuario ya existe.', fields: { username: 'Ese usuario ya existe.' } })
+  }
+  const user = { username, name, role, password: hashPassword(password) }
+  users.push(user)
+  await writeJson(USERS_FILE, users)
+  res.status(201).json(userView(user))
+})
+
+api.patch('/admin/users/:username', requireAuth, requireAdmin, async (req, res) => {
+  const users = await readJson(USERS_FILE, [])
+  const user = users.find((u) => u.username === req.params.username)
+  if (!user) return res.status(404).json({ error: 'El usuario ya no existe.' })
+  if (req.body?.name !== undefined) {
+    const name = clean(req.body.name, 80)
+    if (name.length < 3) return res.status(400).json({ error: 'Escribe el nombre completo.' })
+    user.name = name
+  }
+  if (req.body?.role !== undefined) {
+    if (!ROLES.includes(req.body.role)) return res.status(400).json({ error: 'Rol no válido.' })
+    if (req.body.role !== rolDe(user) && esUltimoAdmin(users, user)) return res.status(400).json({ error: 'Debe quedar al menos un administrador.' })
+    user.role = req.body.role
+  }
+  if (req.body?.password) {
+    if (String(req.body.password).length < 8) return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres.' })
+    user.password = hashPassword(String(req.body.password))
+  }
+  await writeJson(USERS_FILE, users)
+  res.json(userView(user))
+})
+
+api.delete('/admin/users/:username', requireAuth, requireAdmin, async (req, res) => {
+  const users = await readJson(USERS_FILE, [])
+  const idx = users.findIndex((u) => u.username === req.params.username)
+  if (idx === -1) return res.status(404).json({ error: 'El usuario ya no existe.' })
+  if (users[idx].username === req.user.username) return res.status(400).json({ error: 'No puedes eliminar tu propio usuario.' })
+  if (esUltimoAdmin(users, users[idx])) return res.status(400).json({ error: 'Debe quedar al menos un administrador.' })
+  users.splice(idx, 1)
+  await writeJson(USERS_FILE, users)
+  res.json({ ok: true })
 })
 
 api.put('/auth/password', requireAuth, async (req, res) => {
@@ -440,6 +488,8 @@ api.post('/admin/import', requireAuth, async (req, res) => {
 app.use('/api', api)
 app.use('/api', solicitudesRouter({ requireAuth }))
 app.use('/api', salasRouter({ sesionOpcional }))
+app.use('/api', noticiasRouter({ requireAuth, sesionOpcional }))
+app.use('/api', tiRouter({ requireAuth, requireTi }))
 app.use('/api', (_req, res) => res.status(404).json({ error: 'Ruta no encontrada.' }))
 
 /* Build de Vite (en desarrollo lo sirve Vite y este bloque no aplica). */
@@ -449,4 +499,5 @@ if (existsSync(DIST)) {
 }
 
 await ensureUsers()
-app.listen(PORT, () => console.log(`[intranet] http://localhost:${PORT} · datos en ${DATA_DIR}`))
+programarResumenDiario()
+app.listen(PORT, () => console.log(`[intranet] http://localhost:${PORT} · datos en ${usaPostgres ? 'PostgreSQL' : DATA_DIR}`))

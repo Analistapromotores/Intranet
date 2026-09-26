@@ -1,0 +1,61 @@
+/* Visor de videos: miniatura + modal de cristal (estilo iOS) con el logo de G&S siempre abajo a la izquierda. */
+.vp { position: relative; display: block; width: 100%; padding: 0; overflow: hidden; border: 0; border-radius: 18px; background: #0b1220; cursor: pointer; isolation: isolate; }
+.vp > video, .vp > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .8, .2, 1); }
+.vp:hover > video, .vp:hover > img, .vp:focus-visible > video, .vp:focus-visible > img { transform: scale(1.05); }
+.vp__shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45%, rgba(0, 0, 0, .5)); transition: opacity .3s; }
+.vp:hover .vp__shade { opacity: .6; }
+.vp__play { position: absolute; z-index: 2; left: 50%; top: 50%; display: grid; place-items: center; width: 74px; height: 74px; padding-left: 4px; border: 1px solid rgba(255, 255, 255, .55); border-radius: 50%; background: rgba(255, 255, 255, .22); color: #fff; box-shadow: 0 10px 30px rgba(0, 0, 0, .3), inset 0 1px 0 rgba(255, 255, 255, .5); backdrop-filter: blur(14px) saturate(170%); -webkit-backdrop-filter: blur(14px) saturate(170%); transform: translate(-50%, -50%); transition: transform .3s cubic-bezier(.34, 1.4, .64, 1), background .2s; }
+.vp__play::before { content: ''; position: absolute; inset: -8px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .45); animation: vp-pulse 2.4s ease-out infinite; }
+.vp:hover .vp__play { transform: translate(-50%, -50%) scale(1.12); background: rgba(255, 255, 255, .34); }
+.vp__logo { position: absolute; z-index: 2; left: 12px; bottom: 12px; display: grid; place-items: center; height: 34px; padding: 4px 10px; border-radius: 12px; background: rgba(255, 255, 255, .88); box-shadow: 0 4px 12px rgba(0, 0, 0, .25); backdrop-filter: blur(8px); }
+.vp__logo img { height: 100%; width: auto; }
+.vp:focus-visible { outline: 3px solid #1769e8; outline-offset: 3px; }
+@keyframes vp-pulse { 0% { transform: scale(.85); opacity: .9; } 80%, 100% { transform: scale(1.35); opacity: 0; } }
+
+/* Modal */
+html.vmod-open { overflow: hidden; }
+.vmod { width: 100vw; max-width: 100vw; height: 100dvh; max-height: 100dvh; margin: 0; padding: clamp(10px, 3vw, 40px); border: 0; background: transparent; color: #fff; overflow: hidden; }
+.vmod[open] { display: grid; place-items: center; }
+.vmod::backdrop { background: radial-gradient(90% 70% at 50% 40%, rgba(23, 105, 232, .35), transparent 70%), rgba(6, 14, 34, .62); backdrop-filter: blur(22px) saturate(140%); -webkit-backdrop-filter: blur(22px) saturate(140%); animation: vmod-fade .3s ease both; }
+.vmod__panel { width: min(1120px, 100%); padding: 12px; border: 1px solid rgba(255, 255, 255, .38); border-radius: 32px; background: linear-gradient(155deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, .08) 60%); box-shadow: 0 40px 100px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 255, 255, .5); backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%); animation: vmod-pop .45s cubic-bezier(.2, 1.1, .3, 1) both; }
+.vmod__screen { position: relative; display: grid; place-items: center; overflow: hidden; border-radius: 22px; background: #050a14; aspect-ratio: 16 / 9; max-height: calc(100dvh - 190px); margin-inline: auto; }
+.vmod__screen video, .vmod__screen iframe { width: 100%; height: 100%; border: 0; object-fit: contain; background: #050a14; }
+.vmod__close { position: absolute; z-index: 3; top: 12px; right: 12px; display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid rgba(255, 255, 255, .5); border-radius: 50%; background: rgba(20, 30, 55, .45); color: #fff; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); cursor: pointer; transition: transform .2s, background .2s; }
+.vmod__close:hover { transform: scale(1.1) rotate(90deg); background: rgba(229, 29, 42, .85); }
+.vmod__close:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.vmod__bar { display: flex; align-items: center; gap: 14px; padding: 12px 6px 2px; min-height: 60px; }
+.vmod__brand { display: grid; place-items: center; flex: none; height: 46px; padding: 6px 16px; border-radius: 16px; background: rgba(255, 255, 255, .92); box-shadow: 0 8px 20px rgba(0, 0, 0, .25); }
+.vmod__brand img { height: 100%; width: auto; }
+.vmod__title { min-width: 0; overflow: hidden; color: #fff; font-family: Poppins, var(--sans); font-size: clamp(14px, 1.6vw, 18px); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 8px rgba(0, 0, 0, .35); }
+@keyframes vmod-fade { from { opacity: 0; } }
+@keyframes vmod-pop { from { opacity: 0; transform: translateY(24px) scale(.94); } }
+@media (max-width: 640px) {
+  .vmod__panel { padding: 8px; border-radius: 24px; }
+  .vmod__screen { border-radius: 16px; max-height: calc(100dvh - 150px); }
+  .vmod__brand { height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) { .vmod__panel, .vmod::backdrop, .vp__play::before { animation: none; } .vp > video, .vp > img { transition: none; } }
+
+/* Tamaños explícitos del logo (evitan que la imagen se estire) */
+.vmod__brand { height: 46px; }
+.vmod__brand img { display: block; height: 30px; width: auto; max-width: 150px; }
+.vp__logo img { display: block; height: 22px; width: auto; }
+.vmod__panel { justify-self: center; }
+.vmod[open] { grid-template-columns: minmax(0, 1fr); }
+.vmod__panel { width: 100%; max-width: 1120px; }
+
+/* Visor de imágenes */
+.vmod__screen--img { aspect-ratio: auto; height: min(74dvh, 780px); background: rgba(5, 10, 20, .55); }
+.vmod__screen--img img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; border-radius: 4px; }
+.vmod__nav { position: absolute; z-index: 3; top: 50%; display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid rgba(255, 255, 255, .5); border-radius: 50%; background: rgba(20, 30, 55, .45); color: #fff; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transform: translateY(-50%); cursor: pointer; transition: background .2s, transform .2s; }
+.vmod__nav:hover { background: rgba(255, 255, 255, .28); transform: translateY(-50%) scale(1.08); }
+.vmod__nav:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.vmod__nav--prev { left: 12px; }
+.vmod__nav--next { right: 12px; }
+.vmod__count { flex: none; margin-left: auto; padding: 4px 12px; border-radius: 999px; background: rgba(255, 255, 255, .18); color: #fff; font-size: 13px; font-weight: 600; }
+
+/* Imágenes verticales: visor angosto y alto, a la medida de una historia 9:16 */
+.vmod__panel--vertical { max-width: min(470px, 100%); transition: max-width .3s ease; }
+.vmod__panel--vertical .vmod__screen--img { height: min(80dvh, 840px); }
+.vmod__panel--vertical .vmod__screen--img img { height: 100%; width: auto; max-width: 100%; }
+.vmod__panel--vertical .vmod__count { display: none; }

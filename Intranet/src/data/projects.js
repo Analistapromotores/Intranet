@@ -5,6 +5,7 @@ import mediadores from '../assets/mediadores/IMAGENES/MEDIADORES DE CONVIVENCIA 
 import pasaportes from '../assets/pasaportes/logo_pasaportes.png'
 import valleinn from '../assets/valleINN.png'
 import promotores from '../assets/promotores.png'
+import infraestructura from '../assets/infraestructura/logo.webp'
 import quindioEmprendedor from '../assets/CORPOQUINDIO/quindio_emprendedor.png'
 
 /* Las iniciativas corporativas. `logo` con la marca; si no, `monogram` + `color`.
@@ -34,6 +35,7 @@ export const projects = [
   },
   {
     id: 'corpores',
+    oculto: true,
     name: 'Corpores',
     logo: corpores,
     desc: 'Corporación Enlaces Sociales: gestión comunitaria y acompañamiento social.',
@@ -55,6 +57,7 @@ export const projects = [
   },
   {
     id: 'valleinn',
+    oculto: true,
     name: 'Fondo ValleINN',
     logo: valleinn,
     desc: 'Fondo de bienestar, salud y beneficios para colaboradores y sus familias.',
@@ -70,9 +73,8 @@ export const projects = [
   {
     id: 'infraestructura',
     name: 'Infraestructura',
-    monogram: 'IN',
-    color: '#c2410c',
+    logo: infraestructura,
     href: '#infraestructura',
-    desc: 'Talento humano y equipos para el mantenimiento de la malla vial de Santiago de Cali (BP-26005375).',
+    desc: 'Talento humano y equipos para el mantenimiento de la malla vial de Santiago de Cali.',
   },
 ]

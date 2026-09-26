@@ -93,10 +93,10 @@ export const LINEAS = [
 
 /* Colorimetría oficial del manual de marca. */
 export const COLORES = [
-  { hex: '#215C53', name: 'Verde oscuro', detail: 'C99 M34 Y65 K34' },
-  { hex: '#92C03A', name: 'Verde lima', detail: 'C58 M0 Y98 K0' },
-  { hex: '#A6C64E', name: 'Lima claro', detail: 'Gama de apoyo' },
+  { hex: '#215C53', name: 'Verde oscuro', detail: 'Color principal · C99 M34 Y65 K34' },
+  { hex: '#92C03A', name: 'Verde lima', detail: 'Color de acento · C58 M0 Y98 K0' },
   { hex: '#2C6B1F', name: 'Verde bosque', detail: 'Gama de apoyo' },
+  { hex: '#A6C64E', name: 'Lima claro', detail: 'Gama de apoyo' },
 ]
 
 export const RECURSOS = [
@@ -160,7 +160,37 @@ export const DOTACION = [
 export const SECCIONES = [
   { id: 'proyecto', label: 'El proyecto' },
   { id: 'objetivos', label: 'Objetivos' },
+  { id: 'videos', label: 'Videos' },
+  { id: 'equipo', label: 'Equipo' },
+  { id: 'territorio', label: 'Mapa de intervenciones' },
   { id: 'bella', label: 'Bella' },
   { id: 'marca', label: 'Identidad' },
   { id: 'recursos', label: 'Recursos' },
+]
+
+/* Videos del proyecto (MP4 optimizados en public/media/promotores; los originales quedan en assets/PROMOTORES). */
+const MEDIA = `${import.meta.env.BASE_URL}media/promotores/`
+export const VIDEOS_PROMOTORES = [
+  {
+    id: 'equipo',
+    titulo: 'Un solo equipo por Cali',
+    texto: 'Promotores, UAESP y Mi Cali Bella: las personas que recuperan la ciudad todos los días.',
+    src: `${MEDIA}equipo-promotores.mp4`,
+    poster: `${MEDIA}equipo-promotores.jpg`,
+  },
+  {
+    id: 'sismo',
+    titulo: 'Gracias por seguir trabajando',
+    texto: 'Mensaje de agradecimiento a los promotores por su trabajo tras el sismo del 10 de agosto: siguieron en las calles y ayudaron a levantar Cali de nuevo.',
+    src: `${MEDIA}agradecimiento-sismo.mp4`,
+    poster: `${MEDIA}agradecimiento-sismo.jpg`,
+  },
+]
+
+/* Cómo se ve el trabajo día a día (pasos que ya describe el plan de trabajo). */
+export const PASOS = [
+  { n: '01', title: 'Formamos al equipo', text: 'Cada promotor se cualifica en jornadas presenciales y virtuales antes de salir a la calle.' },
+  { n: '02', title: 'Llegamos al barrio', text: 'Conversamos y enseñamos en territorio cómo separar en la fuente y por qué importa.' },
+  { n: '03', title: 'Recuperamos el espacio', text: 'Limpiamos, recuperamos y embellecemos los puntos críticos y los devolvemos a la comunidad.' },
+  { n: '04', title: 'Los cuidamos juntos', text: 'Los cuidadores acompañan a la comunidad para que el espacio recuperado se mantenga.' },
 ]

@@ -34,7 +34,13 @@ function textoConteo(n, nombre) {
   return n === 1 ? '1 felicitación' : `${n} felicitaciones`
 }
 
-export default function BirthdayPost({ person, reverse = false, index = 0, onCelebrate }) {
+const TEXTOS = {
+  hoy: { sticker: '¡Hoy!', titulo: (n) => <>¡Feliz cumpleaños, <span>{n}!</span></> },
+  manana: { sticker: 'Mañana', titulo: (n) => <>Mañana cumple años <span>{n}</span></> },
+  ayer: { sticker: 'Ayer', titulo: (n) => <>Ayer cumplió años <span>{n}</span></> },
+}
+
+export default function BirthdayPost({ person, cuando = 'hoy', reverse = false, index = 0, onCelebrate }) {
   const nombre = primerNombre(person.name)
   const [count, setCount] = useState(person.wishes || 0)
   const [mio, setMio] = useState(() => deseoGuardado(person.id))
@@ -102,13 +108,13 @@ export default function BirthdayPost({ person, reverse = false, index = 0, onCel
     <article className={`cb-post ${reverse ? 'cb-post--reverse' : ''}`} style={{ '--i': index }} aria-labelledby={`cb-post-${person.id}`}>
       <div className="cb-post__media">
         <span className="cb-post__glow" aria-hidden="true" />
-        <Polaroid person={person} size="xl" tilt={reverse ? 3 : -3} caption={false} sticker="¡Hoy!" loading="eager" />
+        <Polaroid person={person} size="xl" tilt={reverse ? 3 : -3} caption={false} sticker={TEXTOS[cuando].sticker} loading="eager" />
       </div>
 
       <div className="cb-post__body">
         <p className="cb-post__kicker"><IconCake width={18} height={18} /> Gestión y Servicios celebra</p>
         <h2 id={`cb-post-${person.id}`} className="cb-post__title">
-          ¡Feliz cumpleaños, <span>{nombre}!</span>
+          {TEXTOS[cuando].titulo(nombre)}
         </h2>
         <p className="cb-post__who">
           <b>{person.name}</b>

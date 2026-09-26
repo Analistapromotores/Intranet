@@ -132,3 +132,10 @@
 .med-activity__list.is-in article:nth-child(4) { animation-delay: .3s; }
 @keyframes med-pop { from { opacity: 0; transform: translateY(22px) scale(.97); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .med-activity__list article, .med-activity__list article::before { transition: none; animation: none !important; } }
+
+/* Móvil: nada se sale de la pantalla (las tarjetas de documentos y el mapa se ajustan al ancho) */
+.med-docs__grid > a, .med-docs__grid span { min-width: 0; }
+.med-docs__grid a b, .med-docs__grid a small { overflow-wrap: anywhere; }
+@media (max-width: 800px) { .med-docs__grid { grid-template-columns: minmax(0, 1fr); } }
+.vm { max-width: 100%; }
+.vm__stage, .vm__side { min-width: 0; }

@@ -1,0 +1,100 @@
+/* Panel de TI. Identidad G&S (azul marino + rojo) con semáforo de alertas:
+   rojo = vencido, ámbar = por vencer, azul = informativo, verde = al día. */
+.ti { --ti-navy: #0a2a5e; --ti-red: #e51d2a; --ti-amber: #b7791f; min-height: 100vh; background: var(--bg); color: var(--ink); }
+.ti h1, .ti h2, .ti h3 { font-family: Poppins, var(--sans); }
+.ti-wrap { width: min(1280px, 100%); margin-inline: auto; padding-inline: 28px; }
+.ti :focus-visible { outline: 3px solid rgba(23, 105, 232, .45); outline-offset: 2px; }
+.ti-loading { padding: 40px 0; color: var(--ink-soft); text-align: center; }
+.ti-gate { display: grid; justify-items: start; gap: 14px; max-width: 520px; margin: 90px auto; padding: 28px; border: 1px solid var(--line); border-radius: var(--r-xl); background: #fff; }
+.ti-gate p { color: var(--ink-soft); }
+
+.ti-hero { position: relative; overflow: hidden; padding: 44px 0 0; background: linear-gradient(135deg, #0d3577 0%, var(--ti-navy) 55%, #061a3d 100%); color: #fff; }
+.ti-hero::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .05) 1px, transparent 1px); background-size: 42px 42px; mask-image: linear-gradient(90deg, transparent 10%, #000 90%); pointer-events: none; }
+.ti-hero::after { content: ''; position: absolute; right: -80px; top: -90px; width: 300px; height: 300px; border-radius: 50%; border: 38px solid rgba(229, 29, 42, .85); pointer-events: none; }
+.ti-hero__inner { position: relative; z-index: 1; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.ti-kicker { display: inline-flex; align-items: center; gap: 8px; margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, .14); font-size: 12.5px; font-weight: 700; letter-spacing: .5px; }
+.ti-hero h1 { margin: 12px 0 0; color: #fff; font-size: clamp(30px, 4vw, 46px); letter-spacing: -1px; }
+.ti-hero h1 span { color: #ff8b93; }
+.ti-hero__lead { max-width: 56ch; margin: 10px 0 0; color: #cfe0fb; font-size: 15.5px; line-height: 1.6; }
+.ti-hero__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.ti-btn-light { background: #fff; color: var(--ti-navy); }
+.ti-btn-light:hover { background: #fff; color: var(--ti-red); box-shadow: 0 10px 24px rgba(0, 0, 0, .25); }
+.ti-btn-glass { background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .3); }
+.ti-btn-glass:hover { background: rgba(255, 255, 255, .24); box-shadow: none; }
+
+.ti-stats { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 30px; transform: translateY(34px); }
+.ti-stat { display: grid; gap: 2px; padding: 16px 18px; border: 1px solid var(--line); border-top: 4px solid #cbd5e1; border-radius: 18px; background: #fff; color: var(--ink); box-shadow: 0 14px 30px rgba(6, 26, 61, .18); }
+.ti-stat > span { display: inline-flex; align-items: center; gap: 8px; color: var(--ink-soft); font-size: 12.5px; font-weight: 700; }
+.ti-stat b { font-family: Poppins, var(--sans); font-size: 34px; line-height: 1.1; }
+.ti-stat .ti-stat__txt { font-size: 24px; padding-block: 5px; }
+.ti-stat small { color: var(--ink-soft); font-size: 12.5px; }
+.ti-stat.is-red { border-top-color: var(--ti-red); } .ti-stat.is-red b { color: var(--ti-red); }
+.ti-stat.is-amber { border-top-color: #f5a623; } .ti-stat.is-amber b { color: var(--ti-amber); }
+.ti-stat.is-blue { border-top-color: var(--blue-bright); } .ti-stat.is-blue b { color: var(--blue-bright); }
+
+.ti-main { display: grid; gap: 18px; padding-block: 62px 60px; }
+.ti-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.ti-tabs a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 18px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); font-size: 14px; font-weight: 700; transition: border-color .18s, background .18s, color .18s; }
+.ti-tabs a:hover { border-color: var(--blue-bright); color: var(--blue-bright); }
+.ti-tabs a.is-on { border-color: var(--blue); background: var(--blue); color: #fff; }
+.ti-tabs em { min-width: 22px; padding: 0 7px; border-radius: 999px; background: var(--ti-red); color: #fff; font-size: 12px; font-style: normal; line-height: 22px; text-align: center; }
+
+.ti-tab { display: grid; gap: 16px; }
+.ti-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.ti-toolbar__right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ti-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.ti-chips button { min-height: 38px; padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .18s; }
+.ti-chips button:hover { border-color: var(--blue-bright); color: var(--blue-bright); }
+.ti-chips button.is-on { border-color: var(--ink); background: var(--ink); color: #fff; }
+.ti-search, .ti-select { min-height: 42px; padding: 8px 14px; border: 1px solid #cfd9e8; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 14px; }
+.ti-search { min-width: 220px; }
+.ti-search:focus, .ti-select:focus { border-color: var(--blue-bright); outline: 0; box-shadow: 0 0 0 4px rgba(23, 105, 232, .14); }
+
+.ti-card { border: 1px solid var(--line); border-radius: var(--r-lg); background: #fff; box-shadow: var(--shadow-sm); }
+.ti-table-card { overflow: hidden; }
+.ti-h3 { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 18px 20px 6px; font-size: 17px; }
+.ti-h3 small { color: var(--ink-soft); font-family: var(--sans); font-size: 12.5px; font-weight: 500; }
+.ti-scroll { overflow-x: auto; }
+.ti-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.ti-table th { padding: 12px 14px; border-bottom: 1px solid var(--line); background: #f6f9fd; color: var(--ink-soft); font-size: 12px; font-weight: 800; letter-spacing: .4px; text-align: left; text-transform: uppercase; white-space: nowrap; }
+.ti-table th small { text-transform: none; letter-spacing: 0; font-weight: 500; }
+.ti-table td { padding: 12px 14px; border-bottom: 1px solid #edf1f7; vertical-align: middle; }
+.ti-table tbody tr { box-shadow: inset 4px 0 0 transparent; transition: background .15s; }
+.ti-table tbody tr:hover { background: #f8fafe; }
+.ti-table tr.is-red { box-shadow: inset 4px 0 0 var(--ti-red); background: #fffafa; }
+.ti-table tr.is-amber { box-shadow: inset 4px 0 0 #f5a623; background: #fffdf6; }
+.ti-table tfoot td { padding: 14px; background: #f6f9fd; font-size: 14px; }
+.ti-num { font-variant-numeric: tabular-nums; letter-spacing: .3px; white-space: nowrap; }
+.ti-vence { display: block; margin-bottom: 3px; font-variant-numeric: tabular-nums; }
+.ti-none { padding: 30px !important; color: var(--ink-soft); text-align: center; }
+.ti-actions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; white-space: nowrap; }
+.ti-sr, .ti-sr-col { position: static; }
+.ti-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ti-pill { display: inline-block; padding: 3px 10px; border-radius: 999px; background: #eef1f5; color: #4b5a70; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.ti-pill--red { background: #fde8ea; color: #b8131e; }
+.ti-pill--amber { background: #fff1d6; color: #8a5a00; }
+.ti-pill--green { background: #e3f6ea; color: #16613a; }
+.ti-mail { display: inline-flex; align-items: center; gap: 6px; color: var(--blue-bright); font-weight: 600; }
+.ti-mail:hover { text-decoration: underline; }
+.ti-empty { display: grid; justify-items: center; gap: 12px; padding: 44px 24px; color: var(--ink-soft); text-align: center; }
+.ti-empty > svg { width: 38px; height: 38px; color: var(--blue-bright); }
+.ti-empty p { max-width: 52ch; }
+.ti-empty b { color: var(--ink); }
+.ti-soon { margin: 6px 0 0; padding: 14px 18px; border: 2px dashed #cfdcf0; border-radius: 16px; color: var(--ink-soft); font-size: 13.5px; text-align: center; }
+
+.ti-form { display: grid; gap: 14px; }
+.ti-form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ti-form__row--center { align-items: center; }
+.ti-paste { font-family: ui-monospace, Consolas, monospace !important; font-size: 13px !important; white-space: pre; }
+.ti-file { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 14px; border: 2px dashed #b9cdf0; border-radius: 12px; color: var(--blue-600); font-size: 14px; font-weight: 700; cursor: pointer; }
+.ti-file:hover { background: var(--blue-050); }
+.ti-modo { display: grid; gap: 6px; margin: 0; padding: 0; border: 0; font-size: 14px; }
+.ti-modo label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+
+@media (max-width: 1100px) { .ti-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ti-main { padding-top: 130px; } }
+@media (max-width: 960px) { .ti-hero { padding-top: 78px; } }
+@media (max-width: 640px) { .ti-wrap { padding-inline: 16px; } .ti-stats { grid-template-columns: 1fr 1fr; } .ti-form__row { grid-template-columns: 1fr; } .ti-search { min-width: 0; width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .ti * { transition: none !important; } }
+.ti-stats { transform: none; margin-top: 30px; padding-bottom: 26px; }
+.ti-main { padding-block: 30px 60px; }
+@media (max-width: 1100px) { .ti-main { padding-top: 30px; } }

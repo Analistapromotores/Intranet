@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { IconArrowRight, IconChevronLeft, IconChevronRight } from './Icons.jsx'
 import portada from '../assets/portada.png'
-import pasaportes from '../assets/pasaportes/pasaportes_portad.png'
+import oficina from '../assets/gys/trbajadoras_gys.png'
+import equipoPromotores from '../assets/PROMOTORES/equipo-administrativo.webp'
+import castor from '../assets/infraestructura/castor-3d-saludando.webp'
 
+/* `fit: 'contain'` + `bg` se usan con imágenes recortadas (sin fondo) sobre un color de marca. */
 const slides = [
   {
     id: 'talento',
@@ -15,24 +18,38 @@ const slides = [
     pos: '18% center',
   },
   {
-    id: 'pasaportes',
-    kicker: 'Servicio al ciudadano',
-    lineA: 'Oficina de Pasaportes,',
-    lineB: 'atención que ',
-    accent: 'acerca',
-    text: 'Trámites ágiles, horario ampliado y un equipo dedicado a atender a cada persona.',
-    img: pasaportes,
-    pos: '75% center',
-  },
-  {
     id: 'bienestar',
     kicker: 'Personas primero',
     lineA: 'Bienestar y desarrollo',
     lineB: 'para tu ',
     accent: 'equipo',
     text: 'Programas de formación, salud y acompañamiento para los colaboradores durante todo el año.',
-    img: portada,
-    pos: '50% center',
+    img: oficina,
+    pos: '62% 30%',
+  },
+  {
+    id: 'promotores',
+    kicker: 'Promotores Mi Cali Bella',
+    lineA: 'Recuperar a Cali',
+    lineB: 'es tarea de ',
+    accent: 'todas y todos',
+    text: 'Pedagogía, prevención y control en el manejo de residuos sólidos, junto a la Alcaldía de Santiago de Cali.',
+    img: equipoPromotores,
+    fit: 'contain',
+    pos: 'center bottom',
+    bg: 'linear-gradient(135deg, #215c53 0%, #164a42 60%, #0f3a33 100%)',
+  },
+  {
+    id: 'infraestructura',
+    kicker: 'Infraestructura vial',
+    lineA: 'Mantenemos la malla vial,',
+    lineB: 'construimos ',
+    accent: 'ciudad',
+    text: 'Talento humano y equipos para recuperar las vías de Santiago de Cali, con seguridad y compromiso.',
+    img: castor,
+    fit: 'contain',
+    pos: 'center bottom',
+    bg: 'linear-gradient(135deg, #3a414b 0%, #2d333b 55%, #1f2328 100%)',
   },
 ]
 
@@ -97,12 +114,13 @@ export default function Hero() {
         </div>
       </div>
 
-      <div className="hero__right">
+      <div className="hero__right" style={slide.bg ? { background: slide.bg } : undefined}>
         <img
+          key={slide.id}
           className="hero__img"
           src={slide.img}
           alt=""
-          style={{ objectPosition: slide.pos }}
+          style={{ objectPosition: slide.pos, objectFit: slide.fit || 'cover', padding: slide.fit === 'contain' ? '18px 8% 0 26%' : 0 }}
         />
         <span className="hero__stripe hero__stripe--red" aria-hidden="true" />
         <span className="hero__stripe hero__stripe--blue" aria-hidden="true" />

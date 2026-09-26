@@ -1,18 +1,14 @@
 /* API de Solicitudes: registro público, consulta por el solicitante y gestión con sesión. */
 import express from 'express'
 import crypto from 'node:crypto'
-import fs from 'node:fs/promises'
-import { mkdirSync } from 'node:fs'
 import { MAIL, URL_GLPI, destinatario } from '../config.js'
-import { dataPath, readJson, update } from '../store.js'
+import { dataPath, readBlob, readJson, saveBlob, update } from '../store.js'
 import { ESTADOS, TIPOS, validar } from '../../shared/solicitudes.js'
 import { GENERADORES } from './documents.js'
 import { componerCorreo } from './email.js'
 import { enviar, smtpActivo } from './mailer.js'
 
 const FILE = dataPath('solicitudes.json')
-const DIR = dataPath('solicitudes')
-mkdirSync(DIR, { recursive: true })
 
 /* Estructura en disco: { consecutivos: { 'II-2026': 3 }, items: [ solicitud ] } */
 const VACIO = { consecutivos: {}, items: [] }
@@ -60,7 +56,7 @@ async function procesar(id) {
     const gen = GENERADORES[sol.tipo]
     const buffer = await gen.fn(sol)
     archivo = { nombre: gen.nombre(sol), ruta: `${sol.id}.xlsx` }
-    await fs.writeFile(`${DIR}/${archivo.ruta}`, buffer)
+    await saveBlob(`solicitudes/${archivo.ruta}`, buffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     attachments.push({ filename: archivo.nombre, content: buffer, contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
   }
 
@@ -188,7 +184,13 @@ export function solicitudesRouter({ requireAuth }) {
     const { items } = await readJson(FILE, VACIO)
     const sol = items.find((s) => s.id === req.params.id)
     if (!sol?.archivo) return res.status(404).json({ error: 'Esta solicitud no tiene archivo.' })
-    res.download(`${DIR}/${sol.archivo.ruta}`, sol.archivo.nombre)
+    const blob = await readBlob(`solicitudes/${sol.archivo.ruta}`)
+    if (!blob) return res.status(404).json({ error: 'El archivo ya no está disponible. Usa «reenviar» para regenerarlo.' })
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(sol.archivo.nombre)}`,
+    })
+    res.send(blob.data)
   })
 
   return r

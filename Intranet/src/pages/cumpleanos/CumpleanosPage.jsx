@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { IconChevronLeft, IconChevronRight } from '../../components/Icons.jsx'
 import { api } from './api.js'
-import { MESES, diasPara, fechaCorta, ordenarPorProximo, textoFaltan } from './dates.js'
+import { MESES, cuandoCelebra, diasPara, fechaCorta, ordenarPorProximo, textoFaltan } from './dates.js'
 import Avatar from './Avatar.jsx'
 import BirthdayPost from './BirthdayPost.jsx'
 import Polaroid from './Polaroid.jsx'
@@ -25,11 +25,17 @@ export default function CumpleanosPage() {
 
   const lista = personas || []
   const cumplenHoy = lista.filter((p) => diasPara(p, hoy) === 0)
-  const semana = ordenarPorProximo(lista.filter((p) => { const d = diasPara(p, hoy); return d > 0 && d <= 7 }), hoy)
+  /* Se puede felicitar desde el día anterior hasta el día siguiente: hoy primero, luego ayer y mañana. */
+  const ORDEN = { hoy: 0, ayer: 1, manana: 2 }
+  const celebrantes = lista
+    .map((p) => ({ p, cuando: cuandoCelebra(p, hoy) }))
+    .filter((x) => x.cuando)
+    .sort((a, b) => ORDEN[a.cuando] - ORDEN[b.cuando] || a.p.name.localeCompare(b.p.name, 'es'))
+  const semana = ordenarPorProximo(lista.filter((p) => { const d = diasPara(p, hoy); return d > 1 && d <= 7 }), hoy)
   const delMes = lista.filter((p) => p.month === mes + 1).sort((a, b) => a.day - b.day || a.name.localeCompare(b.name, 'es'))
   const proximo = ordenarPorProximo(lista.filter((p) => diasPara(p, hoy) > 0), hoy)[0]
   const fechaHoy = hoy.toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' }).replace(/^./, (c) => c.toUpperCase())
-  const fiesta = cumplenHoy.length > 0
+  const fiesta = celebrantes.length > 0
 
   return (
     <div className="cb">
@@ -41,11 +47,11 @@ export default function CumpleanosPage() {
         <div className="cb-wrap cb-hero__inner">
           <p className="cb-date"><IconSparkle width={16} height={16} /> {fechaHoy}</p>
           <h1 id="cb-titulo">
-            {personas === null ? 'Preparando la fiesta…' : fiesta ? <>¡Hoy estamos de <em>fiesta</em>!</> : <>Cumpleaños del <em>equipo</em></>}
+            {personas === null ? 'Preparando la fiesta…' : fiesta ? (cumplenHoy.length ? <>¡Hoy estamos de <em>fiesta</em>!</> : <>Se viene una <em>celebración</em></>) : <>Cumpleaños del <em>equipo</em></>}
           </h1>
           <p className="cb-lead">
             {fiesta
-              ? `${cumplenHoy.length === 1 ? 'Alguien muy especial cumple' : `${cumplenHoy.length} personas del equipo cumplen`} años hoy. Toca el botón y envíale tu felicitación: le llega al instante.`
+              ? (!cumplenHoy.length ? 'Ya puedes dejar tu felicitación: el saludo se abre desde el día anterior y le llega al instante.' : `${cumplenHoy.length === 1 ? 'Alguien muy especial cumple' : `${cumplenHoy.length} personas del equipo cumplen`} años hoy. Toca el botón y envíale tu felicitación: le llega al instante.`)
               : 'Aquí celebramos a cada persona del equipo en su día. Vuelve cuando haya torta.'}
           </p>
 
@@ -65,8 +71,8 @@ export default function CumpleanosPage() {
 
         {fiesta && (
           <div className="cb-wrap cb-posts">
-            {cumplenHoy.map((p, i) => (
-              <BirthdayPost key={p.id} person={p} index={i} reverse={i % 2 === 1} onCelebrate={() => setRafaga((r) => r + 1)} />
+            {celebrantes.map(({ p, cuando }, i) => (
+              <BirthdayPost key={p.id} cuando={cuando} person={p} index={i} reverse={i % 2 === 1} onCelebrate={() => setRafaga((r) => r + 1)} />
             ))}
           </div>
         )}

@@ -25,7 +25,7 @@ function add(entrada) {
 }
 
 /* --- accesos y menú --- */
-navItems.forEach(({ id, label, href, external }) =>
+navItems.filter((n) => !n.roles).forEach(({ id, label, href, external }) =>
   add({ id: `nav-${id}`, tipo: 'acceso', titulo: label, contexto: 'Intranet', href, externo: external }),
 )
 
@@ -42,7 +42,7 @@ EXTENSIONES.forEach((e) =>
 )
 
 /* --- proyectos --- */
-projects.forEach((p) => {
+projects.filter((p) => !p.oculto).forEach((p) => {
   add({ id: `proy-${p.id}`, tipo: 'proyecto', titulo: p.name, detalle: p.desc, contexto: 'Nuestros proyectos', href: p.href || '#inicio' })
   if (p.docsHref) {
     add({ id: `proy-${p.id}-docs`, tipo: 'seccion', titulo: `Documentos de ${p.name}`, contexto: p.name, href: p.docsHref })

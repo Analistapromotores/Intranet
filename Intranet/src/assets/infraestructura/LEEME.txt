@@ -1,0 +1,13 @@
+Recursos del proyecto Infraestructura vial de Cali. La vista #infraestructura los toma de aqui:
+
+  logo.*                  marca del proyecto
+  castor-3d-*.webp        castor en 3D (saludando, ok, maquina, senalando)
+  castor-sticker-*.webp   castor tipo sticker
+  galeria/*.webp          fotos de obra (el orden lo da el numero del nombre)
+  historias/*.webp        las historias verticales (9:16)
+  pdf, xlsx, docx, pptx   "Documentos y formatos" (el nombre del archivo es el titulo)
+  fotos y videos/         material en bruto: NO se publica ni se sube a git
+  originales/             PNG pesados: NO se publican
+
+Videos: public/media/infraestructura/ (dron-hero.mp4 para la portada, dron.mp4 para el visor).
+Para agregar una foto: convertirla a WebP (~1800 px de ancho) y guardarla en galeria/ con el siguiente numero.

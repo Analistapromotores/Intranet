@@ -36,3 +36,13 @@ export function iniciales(nombre) {
 
 export const ordenarPorProximo = (lista, hoy = new Date()) =>
   [...lista].sort((a, b) => diasPara(a, hoy) - diasPara(b, hoy) || a.name.localeCompare(b.name, 'es'))
+
+/* ¿Se puede felicitar ahora? El servidor abre el saludo desde el día anterior hasta el día siguiente al cumpleaños.
+   'hoy' | 'manana' | 'ayer' | null */
+export function cuandoCelebra(p, hoy = new Date()) {
+  const d = diasPara(p, hoy)
+  if (d === 0) return 'hoy'
+  if (d === 1) return 'manana'
+  const ayer = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate() - 1)
+  return diasPara(p, ayer) === 0 ? 'ayer' : null
+}

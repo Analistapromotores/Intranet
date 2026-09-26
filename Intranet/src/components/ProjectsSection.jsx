@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { projects } from '../data/projects.js'
+import { projects as todos } from '../data/projects.js'
+
+const projects = todos.filter((p) => !p.oculto)
 import SectionTitle from './SectionTitle.jsx'
 import { IconArrowRight, IconDownload, IconFolders } from './Icons.jsx'
 
-const PREVIEW = 3
+const PREVIEW = 4
 
 export default function ProjectsSection() {
   const [expanded, setExpanded] = useState(false)

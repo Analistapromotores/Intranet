@@ -1,0 +1,64 @@
+/* Piezas compartidas de los módulos nuevos (Noticias, Redes, Accesos): botones, campos y diálogos.
+   Usan los tokens de marca de index.css (azul #073b82 / #1769e8 y rojo #e51d2a). */
+.ui-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 9px 16px; border: 1px solid transparent; border-radius: 12px; background: var(--blue); color: #fff; font: inherit; font-size: 14px; font-weight: 700; line-height: 1.1; text-decoration: none; cursor: pointer; transition: background .18s, border-color .18s, color .18s, box-shadow .18s, transform .18s; }
+.ui-btn:hover { background: var(--blue-bright); box-shadow: 0 8px 18px rgba(23, 105, 232, .25); }
+.ui-btn:active { transform: scale(.97); }
+.ui-btn:disabled { opacity: .55; cursor: progress; box-shadow: none; transform: none; }
+.ui-btn--ghost { border-color: var(--line); background: #fff; color: var(--ink); }
+.ui-btn--ghost:hover { border-color: var(--blue-bright); background: #fff; color: var(--blue-bright); box-shadow: none; }
+.ui-btn--red { background: var(--red); }
+.ui-btn--red:hover { background: #b8131e; box-shadow: 0 8px 18px rgba(229, 29, 42, .25); }
+.ui-btn--sm { min-height: 36px; padding: 6px 12px; border-radius: 10px; font-size: 13px; }
+.ui-btn--block { width: 100%; }
+.ui-icon-btn { display: inline-grid; place-items: center; width: 40px; height: 40px; flex: none; padding: 0; border: 1px solid var(--line); border-radius: 11px; background: #fff; color: var(--ink-soft); cursor: pointer; transition: color .18s, border-color .18s, background .18s; }
+.ui-icon-btn:hover:not(:disabled) { border-color: var(--blue-bright); color: var(--blue-bright); }
+.ui-icon-btn--danger:hover:not(:disabled) { border-color: var(--red); color: var(--red); background: var(--red-050); }
+.ui-icon-btn:disabled { opacity: .4; cursor: not-allowed; }
+.ui-icon-btn--sm { width: 34px; height: 34px; border-radius: 9px; }
+:is(.ui-btn, .ui-icon-btn, .ui-field input, .ui-field select, .ui-field textarea):focus-visible { outline: 3px solid rgba(23, 105, 232, .4); outline-offset: 2px; }
+
+.ui-field { display: grid; gap: 6px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.ui-label { color: var(--ink); font-size: 13.5px; font-weight: 700; }
+.ui-label small { color: var(--ink-soft); font-weight: 500; }
+.ui-field input, .ui-field select, .ui-field textarea { width: 100%; min-height: 44px; padding: 10px 13px; border: 1px solid #cfd9e8; border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 15px; transition: border-color .18s, box-shadow .18s; }
+.ui-field textarea { min-height: 96px; resize: vertical; line-height: 1.55; }
+.ui-field input:focus, .ui-field select:focus, .ui-field textarea:focus { border-color: var(--blue-bright); outline: 0; box-shadow: 0 0 0 4px rgba(23, 105, 232, .14); }
+.ui-field.is-bad input, .ui-field.is-bad select, .ui-field.is-bad textarea { border-color: var(--red); }
+.ui-hint { margin: 0; color: var(--ink-soft); font-size: 12.5px; line-height: 1.45; }
+.ui-error { margin: 0; color: #a10f19; font-size: 12.5px; font-weight: 600; }
+.ui-alert { margin: 0; padding: 11px 14px; border: 1px solid #f6c1c5; border-radius: 12px; background: var(--red-050); color: #a10f19; font-size: 14px; }
+.ui-alert--ok { border-color: #b5e3c6; background: #effaf3; color: #16613a; }
+
+.ui-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; background: var(--blue-050); color: var(--blue-600); font-size: 11.5px; font-weight: 800; letter-spacing: .3px; white-space: nowrap; }
+.ui-badge--red { background: var(--red-050); color: #b8131e; }
+.ui-badge--gray { background: #eef1f5; color: #4b5a70; }
+.ui-badge--green { background: #e8f7ee; color: #16613a; }
+
+.ui-pass { position: relative; display: block; }
+.ui-pass input { padding-right: 46px; }
+.ui-pass button { position: absolute; top: 50%; right: 6px; display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 9px; background: transparent; color: var(--ink-soft); transform: translateY(-50%); cursor: pointer; }
+.ui-pass button:hover { color: var(--blue-bright); background: var(--blue-050); }
+
+.ui-switch { position: relative; display: flex; align-items: center; gap: 12px; min-height: 44px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink); }
+.ui-switch input { position: absolute; opacity: 0; pointer-events: none; }
+.ui-switch i { position: relative; flex: none; width: 42px; height: 24px; border-radius: 999px; background: #cbd5e1; transition: background .2s; }
+.ui-switch i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform .2s; }
+.ui-switch input:checked + i { background: var(--blue-bright); }
+.ui-switch input:checked + i::after { transform: translateX(18px); }
+.ui-switch input:focus-visible + i { outline: 3px solid rgba(23, 105, 232, .4); outline-offset: 2px; }
+.ui-switch small { display: block; color: var(--ink-soft); font-weight: 500; font-size: 12.5px; }
+
+/* Diálogo nativo */
+.ui-dialog { width: min(560px, calc(100% - 32px)); max-height: calc(100dvh - 32px); padding: 0; border: 0; border-radius: 22px; background: #fff; color: var(--ink); box-shadow: 0 30px 80px rgba(3, 20, 55, .35); }
+.ui-dialog--lg { width: min(760px, calc(100% - 32px)); }
+.ui-dialog--sm { width: min(440px, calc(100% - 32px)); }
+.ui-dialog[open] { animation: ui-pop .26s cubic-bezier(.2, .8, .2, 1); }
+.ui-dialog::backdrop { background: rgba(5, 24, 58, .55); backdrop-filter: blur(3px); }
+.ui-dialog__box { display: grid; gap: 16px; padding: 22px 24px; }
+.ui-dialog__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.ui-dialog__head h2 { font-size: 20px; letter-spacing: -.2px; }
+.ui-dialog__head p { margin: 4px 0 0; color: var(--ink-soft); font-size: 13.5px; }
+.ui-dialog__foot { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; padding-top: 4px; }
+@keyframes ui-pop { from { opacity: 0; transform: translateY(14px) scale(.97); } }
+@media (prefers-reduced-motion: reduce) { .ui-dialog[open] { animation: none; } .ui-btn, .ui-switch i, .ui-switch i::after { transition: none; } }
+@media (max-width: 560px) { .ui-dialog__box { padding: 18px 16px; } }

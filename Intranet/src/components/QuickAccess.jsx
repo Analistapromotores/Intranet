@@ -3,7 +3,7 @@ import SectionTitle from './SectionTitle.jsx'
 import { IconGrid } from './Icons.jsx'
 
 const shortcuts = navItems.filter(
-  (item) => item.id !== 'inicio' && item.quickAccess !== false,
+  (item) => item.id !== 'inicio' && item.quickAccess !== false && !item.roles,
 )
 
 export default function QuickAccess() {

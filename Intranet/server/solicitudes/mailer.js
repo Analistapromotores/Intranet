@@ -1,15 +1,10 @@
 /* Envío de correos de las solicitudes.
    - Con SMTP configurado (SMTP_HOST...) envía de verdad al destinatario que indique config.destinatario().
-   - Sin SMTP no sale nada: el correo completo (con adjunto) se guarda como .eml en DATA_DIR/outbox
+   - Sin SMTP no sale nada: el correo completo (con adjunto) se guarda como .eml (carpeta blobs/outbox en local, tabla blobs en Postgres)
      para revisarlo durante las pruebas. */
 import nodemailer from 'nodemailer'
-import fs from 'node:fs/promises'
-import { mkdirSync } from 'node:fs'
 import { MAIL } from '../config.js'
-import { dataPath } from '../store.js'
-
-const OUTBOX = dataPath('outbox')
-mkdirSync(OUTBOX, { recursive: true })
+import { saveBlob } from '../store.js'
 
 const transporte = MAIL.smtp
   ? nodemailer.createTransport(MAIL.smtp)
@@ -23,7 +18,7 @@ export async function enviar({ to, replyTo, subject, text, html, attachments = [
     const info = await transporte.sendMail(mensaje)
     if (smtpActivo) return { estado: 'enviado', to, messageId: info.messageId, fecha: new Date().toISOString() }
     const archivo = `${id || Date.now()}-${Date.now()}.eml`
-    await fs.writeFile(`${OUTBOX}/${archivo}`, info.message)
+    await saveBlob(`outbox/${archivo}`, info.message, 'message/rfc822')
     return { estado: 'simulado', to, archivo, fecha: new Date().toISOString(), detalle: 'SMTP sin configurar: el correo se guardó en la bandeja local y no se envió.' }
   } catch (e) {
     return { estado: 'error', to, fecha: new Date().toISOString(), detalle: e.message }

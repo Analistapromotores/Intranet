@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { IconArrowRight, IconExternal, IconFileText, IconShield, IconCheck, IconMapPin, IconPhone } from '../../components/Icons.jsx'
 import LiteYouTube from '../../components/LiteYouTube.jsx'
+import SocialSection from '../../components/SocialSection.jsx'
 import { useReveal } from '../../lib/useReveal.js'
 import monograma from '../../assets/gys/GyS Logo(1).png'
 import banner from '../../assets/gys/unnamed.png'
+import equipoOficina from '../../assets/gys/trbajadoras_gys.png'
 import accidente from '../../assets/gys/unnamed (1).png'
-import { ALIANZAS, APORTES, ASSETS, CANAL_YOUTUBE, CIFRAS, CONTACTO, FLUJO, FORMATS, QUALITY, SERVICIOS, SST, VIDEOS } from './data.js'
+import { ALIANZAS, ASSETS, CANAL_YOUTUBE, CIFRAS, CONTACTO, FLUJO, FORMATS, QUALITY, SERVICIOS, SST, VIDEOS } from './data.js'
 import { projects } from '../../data/projects.js'
 import './gys.css'
 
@@ -21,14 +23,6 @@ const ICONO_SERVICIO = {
 
 const PROYECTOS = Object.fromEntries(projects.map((p) => [p.id, p]))
 
-const ICONO_APORTE = {
-  personal: <svg {...svg} width={16} height={16}><circle cx="9" cy="8" r="3" /><path d="M3.5 19c.7-3 3-4.5 5.5-4.5s4.8 1.5 5.5 4.5" /><path d="M16 5.2a3 3 0 0 1 0 5.6M17 14.6c2 .6 3.4 2.1 4 4.4" /></svg>,
-  herramientas: <svg {...svg} width={16} height={16}><path d="M14.5 6.5a4 4 0 0 0-5.3 5.3L4 17l3 3 5.2-5.2a4 4 0 0 0 5.3-5.3l-2.3 2.3-2.4-.6-.6-2.4 2.3-2.3Z" /></svg>,
-  transporte: <svg {...svg} width={16} height={16}><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7" /><circle cx="7" cy="17.5" r="1.8" /><circle cx="17" cy="17.5" r="1.8" /></svg>,
-  espacio: <svg {...svg} width={16} height={16}><path d="M4 20V9l8-5 8 5v11" /><path d="M9 20v-6h6v6" /></svg>,
-  equipos: <svg {...svg} width={16} height={16}><rect x="4" y="5" width="16" height="11" rx="1.5" /><path d="M2 19h20" /></svg>,
-}
-
 const SECCIONES = [
   ['gys-quienes', 'Quiénes somos'],
   ['gys-funcionamos', 'Cómo funcionamos'],
@@ -39,6 +33,7 @@ const SECCIONES = [
   ['gys-calidad', 'Calidad'],
   ['gys-sst', 'SST'],
   ['gys-videos', 'Videos'],
+  ['gys-redes', 'Redes'],
   ['gys-contacto', 'Contacto'],
 ]
 
@@ -203,58 +198,34 @@ export default function GysPage() {
         </section>
 
         {/* ---------- Alianzas ---------- */}
-        <section className="gy-sec" id="gys-alianzas">
-          <div className="gy-wrap">
-            <div className="gy-head" data-reveal>
+        <section className="gy-sec gy-sec--soft" id="gys-alianzas">
+          <div className="gy-wrap gy-alli">
+            <div className="gy-alli__intro" data-reveal>
               <p className="gy-eyebrow">Nuestras alianzas</p>
               <h2>Unidos con otros proyectos para llegar más lejos.</h2>
               <p className="gy-text">Gestión y Servicios se une con otras organizaciones, mediante alianzas y uniones temporales, para operar proyectos que impactan a la región. En cada uno aportamos lo que el proyecto necesita: desde el talento humano hasta la logística completa.</p>
             </div>
 
-            <div className="gy-allies">
+            <ol className="gy-alli__list">
               {ALIANZAS.map((a, i) => {
                 const p = PROYECTOS[a.proyecto] || {}
                 return (
-                  <article key={a.proyecto} className="gy-ally" data-reveal style={{ '--d': `${i * 70}ms` }}>
-                    <div className="gy-ally__logo">
-                      {p.logo ? <img src={p.logo} alt={a.nombre} /> : <span className="gy-ally__mono" style={{ background: p.color }}>{p.monogram}</span>}
-                    </div>
-                    <h3>{a.nombre}</h3>
-                    <p>{a.texto}</p>
-                    <ul className="gy-ally__chips" aria-label="Lo que aporta G&S">
-                      {a.aportes.map((k) => <li key={k}>{ICONO_APORTE[k]}{APORTES[k]}</li>)}
-                    </ul>
-                    {p.href && <a className="gy-ally__link" href={p.href}>Ver proyecto <IconArrowRight width={16} height={16} /></a>}
-                  </article>
+                  <li key={a.proyecto} className="gy-alli__item" data-reveal style={{ '--d': `${i * 70}ms` }}>
+                    <span className="gy-alli__node" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                    <a className="gy-alli__card" href={p.href || '#gys-alianzas'}>
+                      <span className="gy-alli__logo">
+                        {p.logo ? <img src={p.logo} alt={a.nombre} /> : <span className="gy-ally__mono" style={{ background: p.color }}>{p.monogram}</span>}
+                      </span>
+                      <span className="gy-alli__body">
+                        <b>{a.nombre}</b>
+                        <span>{a.texto}</span>
+                      </span>
+                      {p.href && <IconArrowRight className="gy-alli__go" width={20} height={20} />}
+                    </a>
+                  </li>
                 )
               })}
-            </div>
-
-            <div className="gy-matrix-wrap" data-reveal>
-              <table className="gy-matrix">
-                <caption>Qué aporta Gestión y Servicios en cada proyecto</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">Proyecto</th>
-                    {Object.entries(APORTES).map(([k, v]) => <th key={k} scope="col">{v}</th>)}
-                  </tr>
-                </thead>
-                <tbody>
-                  {ALIANZAS.map((a) => (
-                    <tr key={a.proyecto}>
-                      <th scope="row">{a.nombre}</th>
-                      {Object.keys(APORTES).map((k) => (
-                        <td key={k}>
-                          {a.aportes.includes(k)
-                            ? <span className="gy-matrix__yes"><IconCheck width={16} height={16} /><span className="gy-sr">Sí</span></span>
-                            : <span className="gy-matrix__no" aria-label="No">—</span>}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            </ol>
           </div>
         </section>
 
@@ -284,19 +255,25 @@ export default function GysPage() {
 
         {/* ---------- Valores ---------- */}
         <section className="gy-sec" id="gys-valores">
-          <div className="gy-wrap">
-            <div className="gy-head" data-reveal>
-              <p className="gy-eyebrow">Nuestra esencia</p>
-              <h2>Cuatro valores, una forma de trabajar.</h2>
-            </div>
-            <div className="gy-values">
-              {VALORES.map(([t, d], i) => (
-                <article key={t} className="gy-value" data-reveal style={{ '--d': `${i * 60}ms` }}>
-                  <span>0{i + 1}</span>
-                  <h3>{t}</h3>
-                  <p>{d}</p>
-                </article>
-              ))}
+          <div className="gy-wrap gy-esencia">
+            <figure className="gy-esencia__foto" data-reveal>
+              <img src={equipoOficina} alt="Colaboradoras de Gestión y Servicios trabajando en equipo" loading="lazy" />
+              <figcaption><img src={monograma} alt="" /><span>Personas que hacen posible cada proyecto</span></figcaption>
+            </figure>
+            <div className="gy-esencia__body">
+              <div className="gy-head" data-reveal>
+                <p className="gy-eyebrow">Nuestra esencia</p>
+                <h2>Cuatro valores, una forma de trabajar.</h2>
+              </div>
+              <div className="gy-values">
+                {VALORES.map(([t, d], i) => (
+                  <article key={t} className="gy-value" data-reveal style={{ '--d': `${i * 60}ms` }}>
+                    <span>0{i + 1}</span>
+                    <h3>{t}</h3>
+                    <p>{d}</p>
+                  </article>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -384,6 +361,13 @@ export default function GysPage() {
                 </article>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* ---------- Redes sociales ---------- */}
+        <section className="gy-sec" id="gys-redes">
+          <div className="gy-wrap">
+            <SocialSection id="gys-redes-social" />
           </div>
         </section>
 

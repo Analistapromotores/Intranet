@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "seven-action-documentation": {
+      "source": "theletterf/sevenactionmodel",
+      "sourceType": "github",
+      "skillPath": "skills/seven-action-documentation/SKILL.md",
+      "computedHash": "0300ccdb27f0b73d134ab4ba61221558861896fe9d37161f3fef2315be378617"
+    }
+  }
+}

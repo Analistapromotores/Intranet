@@ -23,3 +23,10 @@ Desktop.ini
 
 # --- Node (por si se instala algo en la raíz) ---
 node_modules/
+
+# --- Videos originales de Promotores (pesan ~90 MB cada uno; la web usa las versiones de public/media) ---
+Intranet/src/assets/PROMOTORES/*.MOV
+Intranet/src/assets/PROMOTORES/*.MP4
+Intranet/src/assets/PROMOTORES/todo el equipo.png
+# Infraestructura: material en bruto (las versiones optimizadas están en galeria/, historias/ y public/media)
+Intranet/src/assets/infraestructura/fotos y videos/

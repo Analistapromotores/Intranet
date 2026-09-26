@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import PlatformSection from '../../components/PlatformSection.jsx'
+import { PLATAFORMAS } from '../../data/plataformas.js'
 import {
   IconArrowRight,
   IconCheck,
@@ -218,7 +219,7 @@ export default function CorpoquindioPage() {
           id="corpoquindio-plataforma"
           title="Conoce nuestra plataforma"
           text="Quindío Connect Hub reúne en un solo lugar la gestión digital del proyecto Quindío Emprendedor. Ingresa con tu usuario para acceder."
-          url="https://quindio-connect-hub.vercel.app/login"
+          url={PLATAFORMAS.corpoquindio.url}
           style={{ '--pf-accent': '#b96f45', '--pf-deep': '#5d3d2e', '--pf-soft': '#f7f1e7', '--pf-ink': '#203139' }}
         />
 

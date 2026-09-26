@@ -7,6 +7,9 @@ import ProjectsSection from './components/ProjectsSection.jsx'
 import NewsCard from './components/NewsCard.jsx'
 import CorporateCalendar from './components/CorporateCalendar.jsx'
 import HelpCard from './components/HelpCard.jsx'
+import BirthdayCard from './components/BirthdayCard.jsx'
+import Comunicados from './components/Comunicados.jsx'
+import SocialSection from './components/SocialSection.jsx'
 import CorpoquindioPage from './pages/corpoquindio/CorpoquindioPage.jsx'
 import PromotoresPage from './pages/promotores/PromotoresPage.jsx'
 import GysPage from './pages/gys/GysPage.jsx'
@@ -18,6 +21,8 @@ import ExtensionesPage from './pages/extensiones/ExtensionesPage.jsx'
 import InfraestructuraPage from './pages/infraestructura/InfraestructuraPage.jsx'
 import AdminPage from './pages/admin/AdminPage.jsx'
 import PasaportesPage from './pages/pasaportes/PasaportesPage.jsx'
+import NoticiasPage from './pages/noticias/NoticiasPage.jsx'
+import TiPage from './pages/ti/TiPage.jsx'
 import './App.css'
 
 const STORAGE_KEY = 'gys-nav-layout'
@@ -49,14 +54,21 @@ function Home() {
 
       <main className="main" id="inicio">
         <Hero />
-        <QuickAccess />
-        <ProjectsSection />
-
-        <div className="board">
+        {/* La tarjeta de cumpleaños flota a la derecha y el resto del contenido se acomoda a su lado, sin huecos. */}
+        <div className="home-flow">
+          <BirthdayCard />
+          <QuickAccess />
           <NewsCard />
+          <Comunicados />
+          <ProjectsSection />
+        </div>
+
+        <div className="board board--2">
           <CorporateCalendar />
           <HelpCard />
         </div>
+
+        <SocialSection id="redes" />
       </main>
 
       <footer className="foot">
@@ -80,7 +92,7 @@ export default function App() {
   }, [navLayout])
 
   /* Vistas de proyecto con ruta propia (#id o #id-seccion). */
-  const route = ['corpoquindio', 'promotores', 'gys', 'mediadores', 'cumpleanos', 'solicitudes', 'extensiones', 'infraestructura', 'admin', 'pasaportes'].find(
+  const route = ['corpoquindio', 'promotores', 'gys', 'mediadores', 'cumpleanos', 'solicitudes', 'extensiones', 'infraestructura', 'admin', 'pasaportes', 'noticias', 'ti'].find(
     (r) => hash === r || hash.startsWith(r + '-'),
   )
   const activeId = route || hash || 'inicio'
@@ -97,6 +109,8 @@ export default function App() {
         {route === 'solicitudes' && <SolicitudesPage hash={hash} />}
         {route === 'infraestructura' && <InfraestructuraPage />}
         {route === 'admin' && <AdminPage />}
+        {route === 'ti' && <TiPage hash={hash} />}
+        {route === 'noticias' && <NoticiasPage hash={hash} />}
         {route === 'pasaportes' && <PasaportesPage />}
         {route === 'extensiones' && <ExtensionesPage key={hash} hash={hash} />}
         {route === 'cumpleanos' && (hash === 'cumpleanos-gestor' ? <GestorPage /> : <CumpleanosPage />)}

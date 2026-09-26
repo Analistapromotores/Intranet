@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { IconClose } from './Icons.jsx'
+import { refrescarSesion } from '../lib/useSession.js'
 
 /* Acceso de gestores en el menú: mismo usuario y sesión que el panel de Cumpleaños
    (API /api/auth/*, cookie httpOnly). Con sesión, lleva a los paneles de gestión. */
@@ -9,6 +10,8 @@ const IconLock = () => <svg {...svg}><rect x="5" y="11" width="14" height="10" r
 const IconLogout = () => <svg {...svg}><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16l-4-4 4-4M6 12h10" /></svg>
 const IconCake = () => <svg {...svg}><path d="M5 21v-6.2a2.8 2.8 0 0 1 2.8-2.8h8.4A2.8 2.8 0 0 1 19 14.8V21M3 21h18M12 6.7V10M12 3c.9.8 1.4 1.6 1.4 2.3 0 .8-.6 1.4-1.4 1.4s-1.4-.6-1.4-1.4c0-.7.5-1.5 1.4-2.3Z" /></svg>
 const IconShield = () => <svg {...svg}><path d="M12 3 4 6v6c0 4.5 3.4 8.2 8 9 4.6-.8 8-4.5 8-9V6l-8-3Z" /><path d="m9 12 2 2 4-4" /></svg>
+const IconNews = () => <svg {...svg}><path d="M4 5h13v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5Z" /><path d="M17 8h2.5A1.5 1.5 0 0 1 21 9.5V19a1 1 0 0 1-1 1M7 9h7M7 12.5h7M7 16h4" /></svg>
+const IconAlert = () => <svg {...svg}><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9ZM10 20a2 2 0 0 0 4 0" /></svg>
 const IconList = () => <svg {...svg}><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01" /></svg>
 const IconEye = ({ off }) => (
   <svg {...svg}>
@@ -29,8 +32,9 @@ async function pedir(path, body) {
   return data
 }
 
-const RUTAS_PRIVADAS = ['cumpleanos-gestor', 'solicitudes-gestion', 'admin']
-const ROL = { admin: 'Administrador', gestor: 'Gestor' }
+const RUTAS_PRIVADAS = ['cumpleanos-gestor', 'solicitudes-gestion', 'admin', 'ti', 'noticias-nueva', 'noticias-editar']
+const esPrivada = (h) => RUTAS_PRIVADAS.some((r) => h === r || h.startsWith(r + '-'))
+const ROL = { admin: 'Administrador', ti: 'TI', gestor: 'Gestor' }
 const iniciales = (n) => String(n || '').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join('') || 'G'
 
 function LoginDialog({ onClose, onLogin }) {
@@ -119,9 +123,10 @@ export default function SessionBox({ onNavigate }) {
   async function salir() {
     await pedir('/auth/logout', {}).catch(() => {})
     setUser(null)
+    refrescarSesion()
     setMenu(false)
     const h = window.location.hash.replace(/^#/, '')
-    if (RUTAS_PRIVADAS.includes(h)) window.location.hash = 'inicio'
+    if (esPrivada(h)) window.location.hash = 'inicio'
   }
 
   const ir = () => { setMenu(false); onNavigate?.() }
@@ -139,10 +144,12 @@ export default function SessionBox({ onNavigate }) {
             onClose={() => setDialogo(false)}
             onLogin={(u) => {
               setUser(u)
+              refrescarSesion()
               setDialogo(false)
               const h = window.location.hash.replace(/^#/, '')
-              if (u.role === 'admin' && h !== 'admin') window.location.hash = 'admin'
-              else if (RUTAS_PRIVADAS.includes(h)) window.location.reload()
+              if (u.role === 'admin' && h !== 'admin' && !h.startsWith('admin-')) window.location.hash = 'admin'
+              else if (u.role === 'ti' && h !== 'ti' && !h.startsWith('ti-')) window.location.hash = 'ti'
+              else if (esPrivada(h)) window.location.reload()
             }}
           />
         )}
@@ -159,7 +166,9 @@ export default function SessionBox({ onNavigate }) {
       </button>
       {menu && (
         <div className="session__menu" role="menu">
-          {user.role === 'admin' && <a role="menuitem" href="#admin" onClick={ir}><IconShield /> Administración</a>}
+          {user.role === 'admin' && <a role="menuitem" href="#admin" onClick={ir}><IconShield /> Accesos y roles</a>}
+          {(user.role === 'admin' || user.role === 'ti') && <a role="menuitem" href="#ti" onClick={ir}><IconAlert /> Panel de TI</a>}
+          <a role="menuitem" href="#noticias-nueva" onClick={ir}><IconNews /> Publicar noticia o comunicado</a>
           <a role="menuitem" href="#cumpleanos-gestor" onClick={ir}><IconCake /> Panel de cumpleaños</a>
           <a role="menuitem" href="#solicitudes-gestion" onClick={ir}><IconList /> Gestión de solicitudes</a>
           <button type="button" role="menuitem" onClick={salir}><IconLogout /> Cerrar sesión</button>

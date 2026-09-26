@@ -8,7 +8,7 @@ export class ApiError extends Error {
   }
 }
 
-async function request(path, { method = 'GET', body } = {}) {
+export async function request(path, { method = 'GET', body } = {}) {
   let res
   try {
     res = await fetch(`/api${path}`, {

@@ -30,3 +30,6 @@ src/assets/CORPOQUINDIO/*.ai
 
 # Datos del módulo de cumpleaños (personas, usuarios y fotos)
 /data/
+
+# PDF de entrega de la documentación (se generan a partir de los .md)
+/docs/entrega/

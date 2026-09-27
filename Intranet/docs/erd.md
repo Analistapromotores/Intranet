@@ -1,18 +1,27 @@
 # Modelo de datos (ERD)
 
-> **Para quién es:** quien necesita saber **qué se guarda, dónde y cómo se relaciona** antes de tocar el
-> servidor, migrar a una base de datos o construir un reporte. Al terminar sabrás qué archivo contiene cada
-> entidad y qué campo enlaza con qué.
-
-La intranet **no usa una base de datos**: cada colección es un archivo JSON dentro de `DATA_DIR`
-(`./data` en local, el volumen en Railway). Este ERD es, por eso, un **modelo lógico**: las «claves foráneas»
-son campos que el código respeta, no restricciones que un motor haga cumplir.
-
-Diagrama editable: [diagramas/erd.excalidraw](diagramas/erd.excalidraw) (ábrelo en <https://excalidraw.com>).
+Esta guía explica **qué se guarda, dónde y cómo se relaciona**, para consultar, construir reportes o ampliar el
+sistema. Diagrama editable: [diagramas/erd.excalidraw](diagramas/erd.excalidraw) (ábrelo en <https://excalidraw.com>).
 
 ![Modelo de datos](diagramas/erd.png)
 
-## Diagrama
+## Cómo se almacena
+
+Los datos viven en **PostgreSQL** (servicio propio en Railway, con volumen persistente) y se organizan en dos tablas:
+
+| Tabla | Contenido | Columnas |
+| --- | --- | --- |
+| `kv` | Una fila por **colección** (usuarios, personas, noticias, solicitudes…) | `name` (PK, p. ej. `people.json`), `data` (jsonb), `updated_at` |
+| `blobs` | **Archivos**: fotos, imágenes de noticias, Excel generados, correos guardados | `name` (PK, p. ej. `uploads/<uuid>.webp`), `mime`, `data` (bytea), `created_at` |
+
+Cada modificación se hace dentro de una **transacción con bloqueo de fila** (`SELECT … FOR UPDATE`): dos peticiones
+simultáneas sobre la misma colección se ejecutan una tras otra, sin pisarse. Por eso los consecutivos de las
+solicitudes y las reservas de una sala nunca se duplican. Las lecturas son directas.
+
+Al arrancar, el servidor crea las tablas si no existen y espera a la base hasta 20 segundos. En desarrollo, sin
+`DATABASE_URL`, la misma interfaz guarda las colecciones como JSON en `data/` y los archivos en `data/blobs/`.
+
+## Diagrama entidad-relación
 
 ```mermaid
 erDiagram
@@ -27,8 +36,8 @@ erDiagram
     BLOQUES ||--o| UPLOAD : "imagen.archivo"
     PEOPLE ||--o| UPLOAD : "photo"
     SALAS_CATALOGO ||--o{ RESERVAS : "sala"
-    TI_LINEAS }o--|| TI_CONFIG : "usa diasRecarga/diasAviso"
-    TI_CORREOS }o--|| TI_CONFIG : "usa diasInactivo"
+    TI_LINEAS }o--|| TI_CONFIG : "diasRecarga / diasAviso"
+    TI_CORREOS }o--|| TI_CONFIG : "diasInactivo"
 
     USERS {
         string username PK "3-32, único sin distinguir mayúsculas"
@@ -46,13 +55,11 @@ erDiagram
         int day
         int year "opcional"
         bool published
-        string photo "archivo en uploads"
-        iso createdAt
-        iso updatedAt
+        string photo "archivo en blobs"
     }
     WISHES {
         uuid id PK
-        string key "llave secreta de quien felicita"
+        string key "llave de quien felicita"
         uuid personId FK
         int year
         string name "máx 40"
@@ -64,13 +71,11 @@ erDiagram
         string tipo "noticia | comunicado"
         string titulo
         string resumen "máx 280"
-        string portada "archivo en uploads"
+        string portada "archivo en blobs"
         bool destacado
         bool publicado
         string autor "nombre del usuario"
         iso publicadoEn
-        iso creada
-        iso actualizada
     }
     BLOQUES {
         string id
@@ -87,9 +92,8 @@ erDiagram
         string numero UK "II-2026-0001"
         string tipo "informe_ingreso|orden_servicio|prestamo_equipos"
         string estado
-        iso creada
-        iso actualizada
         json datos "campos del formulario"
+        iso creada
     }
     SOLICITUD_HISTORIAL {
         string estado
@@ -99,25 +103,26 @@ erDiagram
     }
     ARCHIVO_XLSX {
         string nombre
-        string ruta "id.xlsx en data/solicitudes"
+        string ruta "solicitudes/id.xlsx en blobs"
     }
     CORREO_ENVIADO {
-        string estado
+        string estado "enviado | simulado | error"
         string to
         iso fecha
-        string detalle
+        string canal "gmail | smtp"
     }
     RESERVAS {
         uuid id PK
-        string key "llave para cancelar"
-        string colaborador "correo"
-        string nombre
-        string sala FK
+        string tipo "reserva | evento"
+        string sala FK "opcional en eventos"
+        string lugar "solo eventos sin sala"
         date fecha
         string inicio "HH:MM"
         string fin "HH:MM"
+        string colaborador "correo (reservas)"
+        string nombre
         string descripcion "máx 160"
-        iso creada
+        string key "llave para cancelar"
     }
     SALAS_CATALOGO {
         string id PK "piso2"
@@ -131,7 +136,6 @@ erDiagram
         int plan "pesos"
         date recarga
         date vence
-        string observacion
     }
     TI_CORREOS {
         uuid id PK
@@ -149,13 +153,13 @@ erDiagram
         date ultimoResumen
     }
     UPLOAD {
-        string archivo "uuid.webp/jpg/png"
+        string archivo "uuid.webp | jpg | png"
     }
 ```
 
 ## Dónde vive cada entidad
 
-| Entidad | Archivo en `DATA_DIR` | Forma del archivo | Código que la maneja |
+| Entidad | Nombre en `kv` / `blobs` | Forma del dato | Código |
 | --- | --- | --- | --- |
 | Usuarios | `users.json` | `[ usuario ]` | [server/index.js](../server/index.js) |
 | Personas (cumpleaños) | `people.json` | `[ persona ]` | [server/index.js](../server/index.js) |
@@ -163,56 +167,48 @@ erDiagram
 | Noticias y comunicados | `noticias.json` | `{ items: [ publicación ] }` | [server/noticias/routes.js](../server/noticias/routes.js) |
 | Redes sociales | `redes.json` | `{ items: [ red ] }` | [server/noticias/routes.js](../server/noticias/routes.js) |
 | Solicitudes | `solicitudes.json` | `{ consecutivos: { "II-2026": 3 }, items: [ … ] }` | [server/solicitudes/routes.js](../server/solicitudes/routes.js) |
-| Excel de solicitudes | `solicitudes/<id>.xlsx` | binario | ídem |
-| Reservas de salas | `reservas.json` | `{ items: [ reserva ] }` | [server/salas/routes.js](../server/salas/routes.js) |
-| Líneas móviles | `ti-lineas.json` | `{ items: [ línea ] }` (se siembra sola la primera vez) | [server/ti/routes.js](../server/ti/routes.js) |
+| Reservas y reuniones | `reservas.json` | `{ items: [ reserva | evento ] }` | [server/salas/routes.js](../server/salas/routes.js) |
+| Líneas móviles | `ti-lineas.json` | `{ items: [ línea ] }` | [server/ti/routes.js](../server/ti/routes.js) |
 | Correos (reporte de inactivos) | `ti-correos.json` | `{ actualizado, items: [ correo ] }` | ídem |
 | Configuración de alertas de TI | `ti-config.json` | `{ diasAviso, diasInactivo, diasRecarga, correoAuto, ultimoResumen }` | ídem |
-| Fotos e imágenes subidas | `uploads/<uuid>.webp|jpg|png` | binario, servido en `/uploads` | varios |
-| Correos simulados | `outbox/*.eml` | solo si no hay SMTP | [server/solicitudes/mailer.js](../server/solicitudes/mailer.js) |
+| Fotos e imágenes | `blobs`: `uploads/<uuid>.webp\|jpg\|png` | binario, servido en `/uploads/<archivo>` | varios |
+| Excel de solicitudes | `blobs`: `solicitudes/<id>.xlsx` | binario | [server/solicitudes/routes.js](../server/solicitudes/routes.js) |
+| Correos guardados (sin Gmail ni SMTP) | `blobs`: `outbox/*.eml` | RFC 822 | [server/solicitudes/mailer.js](../server/solicitudes/mailer.js) |
 
-Catálogos que **no** están en archivos sino en código compartido: salas ([shared/salas.js](../shared/salas.js)),
-tipos y estados de solicitud, catálogos de formularios ([shared/solicitudes.js](../shared/solicitudes.js)).
+Los catálogos de salas, tipos y estados de solicitud y opciones de formularios están en código compartido:
+[shared/salas.js](../shared/salas.js) y [shared/solicitudes.js](../shared/solicitudes.js).
 
-## Cómo se relacionan (y dónde la relación es débil)
+## Relaciones
 
-| Relación | Cómo se enlaza | Detalle importante |
+| Relación | Cómo se enlaza | Detalle |
 | --- | --- | --- |
-| Persona → Felicitaciones | `wishes.personId = people.id` | Al **borrar una persona** se borran sus felicitaciones y su foto |
-| Publicación → autor | `noticias.autor` guarda el **nombre** | No es `username`: si renombras al usuario, la publicación conserva el nombre viejo |
-| Solicitud → historial | Lista incrustada en la solicitud | `por` guarda el nombre de quien cambió el estado, o el solicitante en el primer registro |
-| Solicitud → Excel | `archivo.ruta = <id>.xlsx` | Se regenera con «reenviar»; el archivo anterior se sobrescribe |
-| Publicación/bloque/persona → imagen | Nombre de archivo en `uploads` | Al editar o borrar, las imágenes que ya no se usan se eliminan del disco |
-| Reserva → sala | `reservas.sala = SALAS[].id` | Si quitas una sala del catálogo, sus reservas quedan huérfanas |
-| Reserva → dueño | `colaborador` (correo) + `key` secreta | No hay usuario: cancelar exige la `key` o una sesión |
-| Solicitud → solicitante | Correo dentro de `datos` | La consulta pública exige **número + correo** |
+| Persona → Felicitaciones | `wishes.personId = people.id` | Al eliminar una persona se eliminan sus felicitaciones y su foto |
+| Publicación → autor | `noticias.autor` guarda el nombre | Conserva el nombre con el que se publicó |
+| Solicitud → historial | Lista incrustada | `por` guarda el nombre de quien cambió el estado; en el primer registro, el solicitante |
+| Solicitud → Excel | `archivo.ruta = <id>.xlsx` | «Reenviar» lo regenera y reemplaza |
+| Publicación, bloque o persona → imagen | Nombre de archivo en `blobs` | Las imágenes que dejan de usarse se eliminan |
+| Reserva → sala | `reservas.sala = SALAS[].id` | Los eventos pueden ir sin sala (con `lugar`) |
+| Reserva → dueño | `colaborador` (correo) + `key` | Cancelar exige la `key` o una sesión (los eventos, sesión de administrador) |
+| Solicitud → solicitante | Correo o cédula dentro de `datos` | La consulta pública busca por cédula o por correo |
 
 ## Numeración de solicitudes
 
-`numero = <prefijo>-<año>-<consecutivo de 4 dígitos>`, por ejemplo `OS-2026-0007`. Prefijos: `II` (Informe de
-Ingreso), `OS` (Orden de Servicio), `PE` (Préstamo de equipos). El consecutivo se guarda en
-`solicitudes.json → consecutivos["OS-2026"]` y **reinicia cada año**.
+`numero = <prefijo>-<año>-<consecutivo de 4 dígitos>`, por ejemplo `OS-2026-0007`. Prefijos: `II` (Informe de Ingreso),
+`OS` (Orden de Servicio) y `PE` (Préstamo de equipos). El consecutivo se guarda en
+`solicitudes.json → consecutivos["OS-2026"]`, se asigna dentro de la misma transacción que crea la solicitud y
+reinicia cada año.
 
-## Por qué archivos JSON
+## Consultas de ejemplo
 
-Es una decisión deliberada, no un descuido; el propio código la documenta
-([server/store.js](../server/store.js)): el volumen de la intranet es bajo (una intranet interna de una empresa, no un
-sistema transaccional) y un archivo por colección permite desplegar **sin servicios adicionales** ni migraciones.
+```sql
+-- Colecciones y su tamaño
+SELECT name, pg_column_size(data) AS bytes, updated_at FROM kv ORDER BY name;
 
-Lo que hace seguro este enfoque:
+-- Solicitudes por estado
+SELECT s->>'estado' AS estado, count(*)
+FROM kv, jsonb_array_elements(data->'items') s
+WHERE name = 'solicitudes.json' GROUP BY 1;
 
-- **Escritura atómica:** se escribe un `.tmp` y se renombra, así un corte a mitad de escritura no deja un JSON roto.
-- **Cola en serie:** todas las escrituras pasan por una promesa encadenada; dos peticiones simultáneas nunca
-  se pisan (`update()` lee, modifica y guarda dentro de la misma cola).
-
-Sus límites, para saber cuándo migrar:
-
-- **Un solo proceso.** Con dos réplicas del servicio cada una tendría su copia de la cola y podrían pisarse.
-  Railway debe correr con **una** instancia.
-- **Sin consultas ni índices:** cada lectura carga el archivo completo. Cuando `solicitudes.json` o
-  `noticias.json` pasen de varios MB, conviene migrar.
-- **Requiere volumen persistente:** sin `DATA_DIR` apuntando a un volumen, todo se pierde en cada despliegue
-  (ver [despliegue.md](despliegue.md)).
-
-Migrar a una base de datos toca `store.js` y los routers que lo llaman (`readJson`, `writeJson`,
-`update`); el frontend habla con la API HTTP y no cambia.
+-- Archivos guardados y su peso
+SELECT split_part(name, '/', 1) AS carpeta, count(*), pg_size_pretty(sum(length(data))) FROM blobs GROUP BY 1;
+```

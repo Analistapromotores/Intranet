@@ -35,6 +35,22 @@ export function validarReserva(d, hoy) {
   return e
 }
 
+/* Reunión o evento creado por un administrador para el calendario de todos.
+   La sala es opcional (puede ser fuera de la oficina); si se elige una, no puede cruzarse con otra reserva. */
+export function validarEvento(d, hoy) {
+  const e = {}
+  if (!t(d.descripcion)) e.descripcion = 'Escribe el título de la reunión.'
+  else if (t(d.descripcion).length > 160) e.descripcion = 'Máximo 160 caracteres.'
+  if (!FECHA.test(t(d.fecha))) e.fecha = 'Elige la fecha.'
+  else if (hoy && d.fecha < hoy) e.fecha = 'La fecha ya pasó.'
+  if (!HORA.test(t(d.inicio))) e.inicio = 'Elige la hora de inicio.'
+  if (!HORA.test(t(d.fin))) e.fin = 'Elige la hora de fin.'
+  if (!e.inicio && !e.fin && minutos(d.fin) <= minutos(d.inicio)) e.fin = 'Debe ser posterior a la hora de inicio.'
+  if (d.sala && !SALAS.some((s) => s.id === d.sala)) e.sala = 'Elige una sala válida.'
+  if (t(d.lugar).length > 80) e.lugar = 'Máximo 80 caracteres.'
+  return e
+}
+
 /* ---------- Ausentismo laboral (FT-OP-76) ---------- */
 export const MOTIVOS = [
   ['cita', 'Cita médica'],

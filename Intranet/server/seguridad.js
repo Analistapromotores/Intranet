@@ -45,12 +45,16 @@ export function forzarHttps(req, res, next) {
 /* Defensa adicional contra CSRF: una petición que modifica datos y trae Origin debe venir de este mismo sitio.
    (La cookie ya es SameSite=Lax; esto cubre además navegadores y casos límite.) */
 export function mismoOrigen(req, res, next) {
+  /* En desarrollo el navegador entra por Vite (otro puerto) y el proxy reescribe el Host: no aplica. */
+  if (!PROD) return next()
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next()
   const origen = req.headers.origin
   if (origen) {
     let host = ''
     try { host = new URL(origen).host } catch { /* origen inválido */ }
-    if (host !== req.headers.host) return res.status(403).json({ error: 'Solicitud no permitida desde otro sitio.' })
+    /* Tras un proxy (Vite en desarrollo, Railway en producción) el sitio público llega en X-Forwarded-Host. */
+    const propios = [req.headers.host, String(req.headers['x-forwarded-host'] || '').split(',')[0].trim()]
+    if (!propios.includes(host)) return res.status(403).json({ error: 'Solicitud no permitida desde otro sitio.' })
   }
   next()
 }

@@ -429,3 +429,20 @@
 @media (max-width: 960px) {
   .sv-head { padding-top: 72px; }
 }
+
+/* Barra de pasos sin desplazamiento horizontal: los pasos se reparten el ancho, el texto se ajusta a dos líneas
+   y, si el contenedor es angosto, solo el paso actual muestra su nombre. */
+.sv-stepper { overflow: hidden; container-type: inline-size; }
+.sv-step { flex: 1 1 0; min-width: 0; }
+.sv-step button { min-width: 0; padding: 6px 8px; white-space: normal; text-align: left; line-height: 1.15; }
+.sv-step__label { min-width: 0; overflow-wrap: break-word; hyphens: auto; }
+@container (max-width: 1040px) {
+  .sv-step:not(.is-current) .sv-step__label { display: none; }
+  .sv-step:not(.is-current) { flex: 0 0 auto; }
+  .sv-step.is-current { flex: 1 1 auto; }
+  .sv-step:not(.is-current) button { padding: 6px; }
+}
+
+/* La búsqueda ahora es un solo campo (cédula o correo) más el botón. */
+.sv-lookup { grid-template-columns: minmax(0, 1fr) auto; }
+.sv-result .sv-reqs { margin-top: 10px; }

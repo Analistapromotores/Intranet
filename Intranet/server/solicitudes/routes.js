@@ -131,6 +131,18 @@ export function solicitudesRouter({ requireAuth }) {
   /* Consulta del solicitante: número + correo con el que la registró. */
   const consultas = limitador({ ventana: 10 * 60e3, max: 60 })
   r.get('/solicitudes/consulta', consultas, async (req, res) => {
+    /* Búsqueda por cédula o por correo (cualquiera de los dos): devuelve todas las solicitudes de esa persona. */
+    const dato = String(req.query.dato || '').trim().slice(0, 120)
+    if (dato) {
+      const esCorreo = dato.includes('@')
+      const limpio = (v) => String(v ?? '').replace(/[^0-9a-z]/gi, '').toLowerCase()
+      const buscado = esCorreo ? dato.toLowerCase() : limpio(dato)
+      if (!esCorreo && buscado.length < 5) return res.status(400).json({ error: 'Escribe tu número de cédula completo o tu correo.' })
+      const { items } = await readJson(FILE, VACIO)
+      const propias = items.filter((s) => (esCorreo ? correoDe(s) === buscado : [s.datos?.identificacion, s.datos?.documento].some((v) => v && limpio(v) === buscado)))
+      if (!propias.length) return res.status(404).json({ error: 'No encontramos solicitudes con ese dato.' })
+      return res.json(propias.slice().reverse().slice(0, 50).map(vistaPublica))
+    }
     const numero = String(req.query.numero || '').trim().toUpperCase()
     const correo = String(req.query.correo || '').trim().toLowerCase()
     if (!numero || !correo) return res.status(400).json({ error: 'Escribe el número de solicitud y tu correo.' })

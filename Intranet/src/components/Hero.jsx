@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { IconArrowRight, IconChevronLeft, IconChevronRight } from './Icons.jsx'
-import portada from '../assets/portada.png'
-import oficina from '../assets/gys/trbajadoras_gys.png'
+import equipo from '../assets/inicio/hero-1.webp'
+import certificados from '../assets/inicio/hero-2.webp'
+import sede from '../assets/inicio/hero-3.webp'
 import equipoPromotores from '../assets/PROMOTORES/equipo-administrativo.webp'
 import castor from '../assets/infraestructura/castor-3d-saludando.webp'
 
@@ -14,18 +15,34 @@ const slides = [
     lineB: 'impulsamos ',
     accent: 'resultados',
     text: 'Encuentra aquí herramientas, información y servicios para hacer tu día a día más fácil y eficiente.',
-    img: portada,
-    pos: '18% center',
+    img: equipo,
+    fit: 'contain',
+    pos: 'center',
+    pad: '0 0 0 70px', // deja libre la franja diagonal del panel azul, que tapaba el inicio del lema
+    bg: '#ffffff',
   },
   {
-    id: 'bienestar',
-    kicker: 'Personas primero',
-    lineA: 'Bienestar y desarrollo',
-    lineB: 'para tu ',
-    accent: 'equipo',
-    text: 'Programas de formación, salud y acompañamiento para los colaboradores durante todo el año.',
-    img: oficina,
-    pos: '62% 30%',
+    id: 'calidad',
+    kicker: 'Calidad certificada',
+    lineA: 'Certificados en',
+    lineB: 'la norma ',
+    accent: 'ISO 9001',
+    text: 'Nuestros procesos cuentan con certificación ICONTEC e IQNet: trabajamos con calidad en cada servicio.',
+    img: certificados,
+    fit: 'contain',
+    pos: 'center',
+    pad: 0,
+    bg: '#ffffff',
+  },
+  {
+    id: 'sede',
+    kicker: 'Nuestra sede',
+    lineA: 'Tu siguiente paso',
+    lineB: 'empieza ',
+    accent: 'aquí',
+    text: 'Conoce la casa de Gestión y Servicios, el lugar desde donde apoyamos el talento humano de nuestros clientes.',
+    img: sede,
+    pos: 'center 13%',
   },
   {
     id: 'promotores',
@@ -120,7 +137,7 @@ export default function Hero() {
           className="hero__img"
           src={slide.img}
           alt=""
-          style={{ objectPosition: slide.pos, objectFit: slide.fit || 'cover', padding: slide.fit === 'contain' ? '18px 8% 0 26%' : 0 }}
+          style={{ objectPosition: slide.pos, objectFit: slide.fit || 'cover', padding: slide.pad ?? (slide.fit === 'contain' ? '18px 8% 0 26%' : 0) }}
         />
         <span className="hero__stripe hero__stripe--red" aria-hidden="true" />
         <span className="hero__stripe hero__stripe--blue" aria-hidden="true" />

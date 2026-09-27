@@ -6,7 +6,7 @@ import path from 'node:path'
 import { ROOT } from '../config.js'
 import { dataPath, readJson, update } from '../store.js'
 import { limitador } from '../seguridad.js'
-import { MAX_COLABORADORES, MOTIVOS, SALAS, seCruzan, validarAusentismo, validarReserva } from '../../shared/salas.js'
+import { MAX_COLABORADORES, MOTIVOS, SALAS, minutos, seCruzan, validarAusentismo, validarEvento, validarReserva } from '../../shared/salas.js'
 
 const FILE = dataPath('reservas.json')
 
@@ -16,7 +16,32 @@ const limpio = (v, max) => String(v ?? '').trim().slice(0, max)
 
 /* El calendario es público: sin sesión el correo de quien reservó se muestra parcialmente (a***@dominio). */
 const ocultarCorreo = (c) => String(c || '').replace(/^(.).*(@.*)$/, '$1***$2')
-const vista = (r, completo = true) => ({ id: r.id, sala: r.sala, fecha: r.fecha, inicio: r.inicio, fin: r.fin, descripcion: r.descripcion, nombre: r.nombre, colaborador: completo ? r.colaborador : ocultarCorreo(r.colaborador) })
+/* Estado según la hora de Colombia: programada, en curso o finalizada. */
+const horaBogota = () => {
+  const [h, m] = new Intl.DateTimeFormat('en-GB', { timeZone: 'America/Bogota', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date()).split(':').map(Number)
+  return h * 60 + m
+}
+const estadoDe = (r) => {
+  const hoy = hoyBogota()
+  if (r.fecha < hoy) return 'finalizada'
+  if (r.fecha > hoy) return 'programada'
+  const ahora = horaBogota()
+  return ahora >= minutos(r.fin) ? 'finalizada' : ahora >= minutos(r.inicio) ? 'en_curso' : 'programada'
+}
+const vista = (r, completo = true) => ({
+  id: r.id,
+  tipo: r.tipo || 'reserva',
+  sala: r.sala || '',
+  lugar: r.lugar || '',
+  fecha: r.fecha,
+  inicio: r.inicio,
+  fin: r.fin,
+  descripcion: r.descripcion,
+  nombre: r.nombre,
+  colaborador: completo ? r.colaborador : ocultarCorreo(r.colaborador),
+  estado: estadoDe(r),
+  creada: r.creada,
+})
 
 /* ---------- Excel FT-OP-76: el formato trae dos copias en la misma hoja ---------- */
 const COPIAS = [0, 33]
@@ -81,9 +106,32 @@ export function salasRouter({ sesionOpcional }) {
     res.json(items.filter((x) => (!desde || x.fecha >= desde) && (!hasta || x.fecha <= hasta)).map((x) => vista(x, Boolean(req.user))))
   })
 
-  r.post('/salas/reservas', async (req, res) => {
+  r.post('/salas/reservas', sesionOpcional, async (req, res) => {
     if (limitado(req.ip, 60)) return res.status(429).json({ error: 'Demasiadas reservas seguidas. Intenta más tarde.' })
     const b = req.body || {}
+    /* Reunión o evento del calendario: solo administradores. */
+    if (b.tipo === 'evento') {
+      if (req.user?.role !== 'admin') return res.status(403).json({ error: 'Solo los administradores pueden crear reuniones en el calendario.' })
+      const ev = {
+        sala: limpio(b.sala, 30),
+        lugar: limpio(b.lugar, 80),
+        fecha: limpio(b.fecha, 10),
+        inicio: limpio(b.inicio, 5),
+        fin: limpio(b.fin, 5),
+        descripcion: limpio(b.descripcion, 200),
+      }
+      const fallos = validarEvento(ev, hoyBogota())
+      if (Object.keys(fallos).length) return res.status(400).json({ error: 'Revisa los campos marcados.', fields: fallos })
+      const hecho = await update(FILE, { items: [] }, (db) => {
+        const choque = ev.sala && db.items.find((x) => seCruzan(x, ev))
+        if (choque) return { choque }
+        const nueva = { id: crypto.randomUUID(), key: crypto.randomBytes(16).toString('hex'), tipo: 'evento', colaborador: '', nombre: req.user.name || req.user.username, ...ev, creada: new Date().toISOString() }
+        db.items.push(nueva)
+        return { nueva }
+      })
+      if (hecho.choque) return res.status(409).json({ error: `La sala ya está ocupada de ${hecho.choque.inicio} a ${hecho.choque.fin} (${hecho.choque.descripcion}).`, fields: { inicio: 'Horario ocupado.' } })
+      return res.status(201).json(vista(hecho.nueva))
+    }
     const d = {
       colaborador: limpio(b.colaborador, 120).toLowerCase(),
       nombre: limpio(b.nombre, 80),
@@ -116,13 +164,18 @@ export function salasRouter({ sesionOpcional }) {
       const i = db.items.findIndex((x) => x.id === req.params.id)
       if (i === -1) return 'no'
       const r0 = db.items[i]
-      const dueño = key && key.length === r0.key.length && crypto.timingSafeEqual(Buffer.from(key), Buffer.from(r0.key))
-      if (!dueño && !req.user) return 'prohibido'
+      /* Las reuniones del calendario solo las cancela un administrador; las reservas, su dueño (con la llave) o cualquier usuario con sesión. */
+      if (r0.tipo === 'evento') {
+        if (req.user?.role !== 'admin') return 'prohibido'
+      } else {
+        const dueño = key && key.length === r0.key.length && crypto.timingSafeEqual(Buffer.from(key), Buffer.from(r0.key))
+        if (!dueño && !req.user) return 'prohibido'
+      }
       db.items.splice(i, 1)
       return 'ok'
     })
     if (ok === 'no') return res.status(404).json({ error: 'La reserva ya no existe.' })
-    if (ok === 'prohibido') return res.status(403).json({ error: 'Solo quien hizo la reserva puede cancelarla.' })
+    if (ok === 'prohibido') return res.status(403).json({ error: 'No tienes permiso para cancelar esta reserva.' })
     res.json({ ok: true })
   })
 

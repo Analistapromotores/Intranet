@@ -1,0 +1,39 @@
+/* Calendario corporativo: reservas y reuniones, detalle y formulario de nueva reunión. */
+button.cal__day.has-events { box-shadow: inset 0 0 0 1.5px var(--blue-bright); }
+button.cal__day.has-events::after { content: ''; position: absolute; bottom: 2px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: var(--blue-bright); }
+button.cal__day.is-holiday.has-events::after { background: var(--red); }
+button.cal__day.is-today.has-events::after { background: #fff; }
+.cal__key--evento { background: var(--blue-bright); }
+.cal__nueva { margin-left: 8px; }
+
+.cal__evs { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.cal__ev { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); font: inherit; font-size: 12.5px; text-align: left; cursor: pointer; transition: border-color .15s, background .15s; }
+.cal__ev:hover, .cal__ev[aria-expanded='true'] { border-color: var(--blue-bright); background: var(--blue-050); }
+.cal__ev:focus-visible { outline: 3px solid var(--blue-bright); outline-offset: 2px; }
+.cal__ev-hora { color: var(--blue); font-weight: 700; white-space: nowrap; }
+.cal__ev-tit { min-width: 0; overflow: hidden; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.cal__chip { padding: 2px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 700; white-space: nowrap; }
+.cal__chip--programada { background: var(--blue-050); color: var(--blue-700); }
+.cal__chip--en_curso { background: #dcfce7; color: #166534; }
+.cal__chip--finalizada { background: #eef1f5; color: var(--ink-soft); }
+.cal__ev-det { display: grid; gap: 6px; margin: 4px 0 2px; padding: 10px 12px; border-radius: 10px; background: #f8fafd; font-size: 12.5px; }
+.cal__ev-det div { display: grid; grid-template-columns: 92px 1fr; gap: 8px; }
+.cal__ev-det dt { color: var(--ink-soft); font-weight: 600; }
+.cal__ev-det dd { margin: 0; overflow-wrap: anywhere; }
+.cal__ev-cancelar { justify-self: start; margin-top: 4px; padding: 6px 10px; border: 1px solid #f3c1c5; border-radius: 8px; background: #fff; color: var(--red); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.cal__ev-cancelar:hover { background: var(--red-050); }
+.cal__ev-cancelar:disabled { opacity: .6; cursor: progress; }
+.cal__error { margin: 8px 0 0; color: var(--red); font-size: 12.5px; }
+.cal__cargando { margin: 8px 0 0; color: var(--ink-soft); font-size: 12px; }
+
+.cal-form { display: grid; gap: 14px; padding: 4px 2px 2px; }
+.cal-form__fila { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 10px; }
+.cal-form__campo { display: grid; gap: 5px; min-width: 0; }
+.cal-form__campo label { font-size: 13px; font-weight: 700; color: var(--ink); }
+.cal-form__campo input, .cal-form__campo select { min-height: 42px; padding: 8px 10px; border: 1px solid #cdd8e8; border-radius: 10px; background: #fff; color: var(--ink); font: inherit; font-size: 14px; }
+.cal-form__campo input:focus-visible, .cal-form__campo select:focus-visible { outline: 3px solid var(--blue-bright); outline-offset: 1px; }
+.cal-form__campo.has-error input, .cal-form__campo.has-error select { border-color: var(--red); }
+.cal-form__campo small { color: var(--red); font-size: 12px; }
+.cal-form__error { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--red-050); color: var(--red); font-size: 13px; font-weight: 600; }
+.cal-form__acciones { display: flex; justify-content: flex-end; gap: 10px; }
+@media (max-width: 520px) { .cal-form__fila { grid-template-columns: 1fr; } .cal__ev { grid-template-columns: 1fr auto; } .cal__ev-hora { grid-column: 1 / -1; } }

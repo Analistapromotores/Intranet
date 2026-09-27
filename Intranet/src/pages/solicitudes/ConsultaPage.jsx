@@ -45,9 +45,8 @@ export function SolicitudCard({ s, abierta = false }) {
 export default function ConsultaPage() {
   const [locales] = useState(misSolicitudes)
   const [mias, setMias] = useState(() => (locales.length ? null : []))
-  const [numero, setNumero] = useState('')
-  const [correo, setCorreo] = useState('')
-  const [resultado, setResultado] = useState(null)
+  const [dato, setDato] = useState('')
+  const [resultados, setResultados] = useState(null)
   const [error, setError] = useState('')
   const [buscando, setBuscando] = useState(false)
 
@@ -61,11 +60,11 @@ export default function ConsultaPage() {
   async function buscar(e) {
     e.preventDefault()
     setError('')
-    setResultado(null)
-    if (!numero.trim() || !correo.trim()) return setError('Escribe el número de solicitud y el correo con el que la registraste.')
+    setResultados(null)
+    if (!dato.trim()) return setError('Escribe tu número de cédula o tu correo.')
     setBuscando(true)
     try {
-      setResultado(await api.consultar(numero.trim(), correo.trim()))
+      setResultados(await api.buscar(dato.trim()))
     } catch (err) {
       setError(err.message)
     } finally {
@@ -84,20 +83,22 @@ export default function ConsultaPage() {
       />
       <div className="sv-wrap sv-page sv-consulta">
         <section className="sv-card" aria-labelledby="sv-buscar">
-          <h2 id="sv-buscar" className="sv-card__title">Buscar por número</h2>
+          <h2 id="sv-buscar" className="sv-card__title">Buscar mis solicitudes</h2>
           <form className="sv-lookup" onSubmit={buscar} noValidate>
             <div className="sv-field">
-              <label className="sv-label" htmlFor="sv-num">Número de solicitud</label>
-              <input id="sv-num" className="sv-input" value={numero} onChange={(e) => setNumero(e.target.value.toUpperCase())} placeholder="Ej. II-2026-0001" autoComplete="off" />
-            </div>
-            <div className="sv-field">
-              <label className="sv-label" htmlFor="sv-mail">Correo con el que la registraste</label>
-              <input id="sv-mail" className="sv-input" type="email" value={correo} onChange={(e) => setCorreo(e.target.value)} autoComplete="email" />
+              <label className="sv-label" htmlFor="sv-dato">Número de cédula o correo</label>
+              <input id="sv-dato" className="sv-input" value={dato} onChange={(e) => setDato(e.target.value)} placeholder="Ej. 1130456789 o nombre@gestionyservicios.com.co" autoComplete="off" aria-describedby="sv-dato-ayuda" />
+              <small id="sv-dato-ayuda" className="sv-muted">Usa cualquiera de los dos: el correo con el que registraste la solicitud o la cédula que escribiste en ella.</small>
             </div>
             <button type="submit" className="sv-btn" disabled={buscando}>{buscando ? <><span className="sv-spinner" aria-hidden="true" /> Buscando…</> : <><IconSearch width={18} height={18} /> Consultar</>}</button>
           </form>
           {error && <p className="sv-alert sv-alert--error" role="alert">{error}</p>}
-          {resultado && <div className="sv-result"><SolicitudCard s={resultado} abierta /></div>}
+          {resultados && (
+            <div className="sv-result">
+              <p className="sv-muted" aria-live="polite">{resultados.length === 1 ? 'Encontramos 1 solicitud.' : `Encontramos ${resultados.length} solicitudes.`}</p>
+              <div className="sv-reqs">{resultados.map((s) => <SolicitudCard key={s.id} s={s} abierta={resultados.length === 1} />)}</div>
+            </div>
+          )}
         </section>
 
         <section aria-labelledby="sv-mias">

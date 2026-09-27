@@ -68,7 +68,7 @@ export default function SalasPage() {
   useEffect(() => {
     let vivo = true
     pedir(`/api/salas/reservas?desde=${desdeIso}&hasta=${hastaIso}`)
-      .then((r) => { if (vivo) setReservas(r) })
+      .then((r) => { if (vivo) setReservas(r.filter((x) => x.sala)) }) // las reuniones sin sala solo aparecen en el calendario de la portada
       .catch((e) => { if (vivo) { setReservas([]); setAviso(e.message) } })
     return () => { vivo = false }
   }, [desdeIso, hastaIso, version])
@@ -305,7 +305,7 @@ function Panel({ panel, hoy, esPropia, onClose, onGuardada, onCancelada }) {
             <dl>
               <div><dt>Fecha</dt><dd>{deIso(panel.r.fecha).toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })}</dd></div>
               <div><dt>Horario</dt><dd><IconClock width={16} height={16} /> {hora12(panel.r.inicio)} – {hora12(panel.r.fin)}</dd></div>
-              <div><dt>Reservada por</dt><dd>{panel.r.nombre}<small>{panel.r.colaborador}</small></dd></div>
+              <div><dt>{panel.r.tipo === 'evento' ? 'Organiza' : 'Reservada por'}</dt><dd>{panel.r.nombre}{panel.r.colaborador && <small>{panel.r.colaborador}</small>}</dd></div>
             </dl>
             {error && <p className="sv-alert sv-alert--error" role="alert">{error}</p>}
             {esPropia && panel.r.fecha >= hoy && (

@@ -29,6 +29,7 @@ let configCache = null
 export const api = {
   config: () => (configCache ||= request('/solicitudes/config').catch((e) => { configCache = null; throw e })),
   enviar: (tipo, datos) => request(`/solicitudes/${tipo}`, { method: 'POST', body: datos }),
+  buscar: (dato) => request(`/solicitudes/consulta?dato=${encodeURIComponent(dato)}`),
   consultar: (numero, correo) => request(`/solicitudes/consulta?numero=${encodeURIComponent(numero)}&correo=${encodeURIComponent(correo)}`),
   mias: (correo, numeros) => request(`/solicitudes/mias?correo=${encodeURIComponent(correo)}&numeros=${encodeURIComponent(numeros.join(','))}`),
   login: (username, password) => request('/auth/login', { method: 'POST', body: { username, password } }),

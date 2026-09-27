@@ -10,7 +10,7 @@ export const PROD = process.env.NODE_ENV === 'production'
 const modo = String(process.env.MAIL_MODE || 'pruebas').trim().toLowerCase()
 export const MAIL = {
   modo: modo === 'produccion' ? 'produccion' : 'pruebas',
-  pruebas: process.env.EMAIL_PRUEBAS || 'analistapromotres@gstionyservicios.com.co',
+  pruebas: process.env.EMAIL_PRUEBAS || 'analistapromotores@gestionyservicios.com.co',
   produccion: process.env.EMAIL_PRODUCCION || 'gerenciaadmin@gestionyservicios.com.co',
   /* Préstamos de equipos: en producción los recibe TI. */
   prestamos: process.env.EMAIL_PRESTAMOS || process.env.EMAIL_PRODUCCION || 'gerenciaadmin@gestionyservicios.com.co',

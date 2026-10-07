@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import PlatformSection from '../../components/PlatformSection.jsx'
+import VideoPlayer from '../../components/VideoPlayer.jsx'
 import { PLATAFORMAS } from '../../data/plataformas.js'
 import {
   IconArrowRight,
@@ -16,6 +17,7 @@ import {
   MUNICIPIOS,
   PASOS,
   PROJECT,
+  HISTORIAS,
   REDES,
   SECTORES,
   STATS,
@@ -44,7 +46,8 @@ export default function CorpoquindioPage() {
     <div className="qe">
       <main className="qe-main">
         {/* ---------- Hero ---------- */}
-        <section className="qe-hero" id="corpoquindio-proyecto">
+        <section className="qe-hero qe-hero--video" id="corpoquindio-proyecto">
+          <VideoFondo />
           <div className="qe-hero__deco" aria-hidden="true">
             <span className="qe-blob qe-blob--a" />
             <span className="qe-blob qe-blob--b" />
@@ -199,6 +202,63 @@ export default function CorpoquindioPage() {
           </div>
         </section>
 
+        {/* ---------- Historias y material audiovisual ---------- */}
+        <section className="qe-sec qe-sec--historias" id="corpoquindio-historias">
+          <div className="qe-wrap">
+            <div className="qe-historias__intro">
+              <SecTitle eyebrow="En territorio">
+                El proyecto también se <em>vive</em>
+              </SecTitle>
+              <p className="qe-sec__lead qe-sec__lead--left">
+                Conoce momentos de socialización, pitch y acompañamiento que hacen visible el
+                trabajo de Quindío Emprendedor en el departamento.
+              </p>
+            </div>
+
+            <div className="qe-video-folders qe-video-folders--vertical" aria-label="Videos verticales del proyecto">
+              {HISTORIAS.videos.filter((video) => video.ratio === '9 / 16').map((video, i) => (
+                <article className="qe-video-folder" key={video.src} data-reveal style={{ '--d': `${i * 90}ms` }}>
+                  <span className="qe-video-folder__tab">{video.etiqueta}</span>
+                  <div className="qe-video-folder__body">
+                    <VideoPlayer src={video.src} poster={video.poster} titulo={video.titulo} ratio={video.ratio} />
+                    <div className="qe-video-folder__copy">
+                      <h3>{video.titulo}</h3>
+                      <span>Ver video</span>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- Pitch de emprendimientos ---------- */}
+        <section className="qe-sec qe-sec--pitch" id="corpoquindio-pitch">
+          <div className="qe-wrap">
+            <SecTitle eyebrow="Pitch de emprendimientos" center>
+              Ideas que se convierten en <em>oportunidades</em>
+            </SecTitle>
+            <p className="qe-sec__lead">
+              Mira las presentaciones y experiencias de quienes hacen parte del ecosistema
+              emprendedor del Quindío.
+            </p>
+            <div className="qe-video-folders qe-video-folders--horizontal" aria-label="Videos horizontales de pitch">
+              {HISTORIAS.videos.filter((video) => video.ratio === '16 / 9').map((video, i) => (
+                <article className="qe-video-folder" key={video.src} data-reveal style={{ '--d': `${i * 90}ms` }}>
+                  <span className="qe-video-folder__tab">{video.etiqueta}</span>
+                  <div className="qe-video-folder__body">
+                    <VideoPlayer src={video.src} poster={video.poster} titulo={video.titulo} ratio={video.ratio} />
+                    <div className="qe-video-folder__copy">
+                      <h3>{video.titulo}</h3>
+                      <span>Ver video</span>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ---------- Territorio ---------- */}
         <section className="qe-sec qe-sec--territorio" id="corpoquindio-territorio">
           <div className="qe-wrap">
@@ -334,6 +394,71 @@ export default function CorpoquindioPage() {
         </div>
       </footer>
     </div>
+  )
+}
+
+function VideoFondo() {
+  const ref = useRef(null)
+  const [reproduciendo, setReproduciendo] = useState(false)
+
+  useEffect(() => {
+    const video = ref.current
+    if (!video || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) video.pause()
+      else if (video.dataset.manual !== 'pausa') video.play().catch(() => {})
+    })
+    const playing = () => setReproduciendo(true)
+    const paused = () => setReproduciendo(false)
+    observer.observe(video)
+    video.addEventListener('playing', playing)
+    video.addEventListener('pause', paused)
+    video.play().catch(() => {})
+
+    return () => {
+      observer.disconnect()
+      video.removeEventListener('playing', playing)
+      video.removeEventListener('pause', paused)
+    }
+  }, [])
+
+  const alternar = () => {
+    const video = ref.current
+    if (!video) return
+    if (video.paused) {
+      video.dataset.manual = ''
+      video.play().catch(() => {})
+    } else {
+      video.dataset.manual = 'pausa'
+      video.pause()
+    }
+  }
+
+  return (
+    <>
+      <video
+        ref={ref}
+        className="qe-hero__video"
+        src={HISTORIAS.videos[1].src}
+        poster={HISTORIAS.videos[1].poster}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-hidden="true"
+        tabIndex={-1}
+      />
+      <span className="qe-hero__video-shade" aria-hidden="true" />
+      <button
+        type="button"
+        className="qe-hero__video-toggle"
+        onClick={alternar}
+        aria-label={reproduciendo ? 'Pausar video de fondo' : 'Reproducir video de fondo'}
+      >
+        {reproduciendo ? 'Pausar video' : 'Reproducir video'}
+      </button>
+    </>
   )
 }
 

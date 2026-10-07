@@ -10,7 +10,7 @@ import './video.css'
 const IconPlay = () => <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8.5 5.8v12.4a.6.6 0 0 0 .92.5l9.6-6.2a.6.6 0 0 0 0-1L9.42 5.3a.6.6 0 0 0-.92.5Z" /></svg>
 const IconX = () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
 
-function VideoModal({ src, embed, poster, titulo, onClose }) {
+function VideoModal({ src, embed, poster, titulo, ratio, onClose }) {
   const ref = useRef(null)
 
   useEffect(() => {
@@ -32,7 +32,10 @@ function VideoModal({ src, embed, poster, titulo, onClose }) {
       onClick={(e) => { if (e.target === ref.current) onClose() }}
     >
       <div className="vmod__panel">
-        <div className="vmod__screen">
+        <div
+          className={`vmod__screen ${ratio === '9 / 16' ? 'vmod__screen--vertical' : ''}`}
+          style={{ aspectRatio: ratio }}
+        >
           {src ? (
             <video src={src} poster={poster} controls autoPlay playsInline controlsList="nodownload" />
           ) : (
@@ -83,7 +86,7 @@ export default function VideoPlayer({ src, embed, poster, titulo, ratio = '16 / 
         <span className="vp__play" aria-hidden="true"><IconPlay /></span>
         <span className="vp__logo" aria-hidden="true"><img src={gysLogo} alt="" /></span>
       </button>
-      {abierto && <VideoModal src={src} embed={embed} poster={poster} titulo={titulo} onClose={() => setAbierto(false)} />}
+      {abierto && <VideoModal src={src} embed={embed} poster={poster} titulo={titulo} ratio={ratio} onClose={() => setAbierto(false)} />}
     </>
   )
 }

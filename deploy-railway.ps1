@@ -208,7 +208,7 @@ else {
         }
 
         Write-Note "Enviando a origin/$Branch"
-        Invoke-Checked -Exe 'git' -Arguments @('push', 'origin', $Branch) -FailMessage 'Fallo git push'
+        Invoke-Checked -Exe 'git' -Arguments @('-c', 'http.version=HTTP/1.1', 'push', 'origin', $Branch) -FailMessage 'Fallo git push'
         Write-Ok "Push completado. Railway iniciara el despliegue."
     }
     finally {

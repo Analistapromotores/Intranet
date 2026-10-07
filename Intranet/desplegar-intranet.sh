@@ -5,8 +5,6 @@ set -Eeuo pipefail
 # Uso: ./desplegar-intranet.sh "Mensaje del cambio"
 
 APP_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ID="00240132-9c74-4a5c-880c-def01fd58314"
-ENVIRONMENT="production"
 BRANCH="main"
 
 fail() {
@@ -43,7 +41,7 @@ git -C "$APP_DIR/.." add -A
 if ! git -C "$APP_DIR/.." diff --cached --quiet; then
   git -C "$APP_DIR/.." commit -m "$MESSAGE"
 fi
-git -C "$APP_DIR/.." push origin "$BRANCH"
+git -C "$APP_DIR/.." -c http.version=HTTP/1.1 push origin "$BRANCH"
 
 printf '\n==> Push completado. Railway desplegará automáticamente Intranet.\n'
 printf 'URL: https://intranet-production-a9d0.up.railway.app\n'

@@ -3,8 +3,6 @@ import { IconArrowRight, IconChevronLeft, IconChevronRight } from './Icons.jsx'
 import equipo from '../assets/inicio/hero-1.webp'
 import certificados from '../assets/inicio/hero-2.webp'
 import sede from '../assets/inicio/hero-3.webp'
-import equipoPromotores from '../assets/PROMOTORES/equipo-administrativo.webp'
-import castor from '../assets/infraestructura/castor-3d-saludando.webp'
 
 /* `fit: 'contain'` + `bg` se usan con imágenes recortadas (sin fondo) sobre un color de marca. */
 const slides = [
@@ -43,30 +41,6 @@ const slides = [
     text: 'Conoce la casa de Gestión y Servicios, el lugar desde donde apoyamos el talento humano de nuestros clientes.',
     img: sede,
     pos: 'center 13%',
-  },
-  {
-    id: 'promotores',
-    kicker: 'Promotores Mi Cali Bella',
-    lineA: 'Recuperar a Cali',
-    lineB: 'es tarea de ',
-    accent: 'todas y todos',
-    text: 'Pedagogía, prevención y control en el manejo de residuos sólidos, junto a la Alcaldía de Santiago de Cali.',
-    img: equipoPromotores,
-    fit: 'contain',
-    pos: 'center bottom',
-    bg: 'linear-gradient(135deg, #215c53 0%, #164a42 60%, #0f3a33 100%)',
-  },
-  {
-    id: 'infraestructura',
-    kicker: 'Infraestructura vial',
-    lineA: 'Mantenemos la malla vial,',
-    lineB: 'construimos ',
-    accent: 'ciudad',
-    text: 'Talento humano y equipos para recuperar las vías de Santiago de Cali, con seguridad y compromiso.',
-    img: castor,
-    fit: 'contain',
-    pos: 'center bottom',
-    bg: 'linear-gradient(135deg, #3a414b 0%, #2d333b 55%, #1f2328 100%)',
   },
 ]
 

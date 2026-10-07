@@ -16,6 +16,7 @@ import {
 } from '../../components/Icons.jsx'
 
 const DOCS = `${import.meta.env.BASE_URL}docs/corpoquindio/`
+const MEDIA = `${import.meta.env.BASE_URL}media/corpoquindio/`
 
 export const WHATSAPP = '3175118221'
 export const WHATSAPP_URL = `https://wa.me/57${WHATSAPP}?text=${encodeURIComponent(
@@ -67,6 +68,47 @@ export const PASOS = [
     text: 'Asesoría técnica especializada, acompañamiento empresarial y activos productivos.',
   },
 ]
+
+export const HISTORIAS = {
+  destacado: {
+    src: `${MEDIA}video-promocional.mp4`,
+    poster: `${MEDIA}video-promocional.webp`,
+    ratio: '9 / 16',
+    titulo: 'Video promocional · Quindío Emprendedor',
+    etiqueta: 'Conoce la iniciativa',
+    texto: 'Una mirada cercana al propósito de fortalecer las unidades productivas del departamento.',
+  },
+  videos: [
+    {
+      src: `${MEDIA}video-promocional.mp4`,
+      poster: `${MEDIA}video-promocional.webp`,
+      titulo: 'Video promocional · Quindío Emprendedor',
+      etiqueta: 'Conoce la iniciativa',
+      ratio: '9 / 16',
+    },
+    {
+      src: `${MEDIA}socializacion-convocatoria.mp4`,
+      poster: `${MEDIA}socializacion-video.webp`,
+      titulo: 'Socialización de la convocatoria',
+      etiqueta: 'Territorio',
+      ratio: '9 / 16',
+    },
+    {
+      src: `${MEDIA}recopilacion-pitch.mp4`,
+      poster: `${MEDIA}pitch-video.webp`,
+      titulo: 'Recopilación de pitch',
+      etiqueta: 'Emprendimientos',
+      ratio: '16 / 9',
+    },
+    {
+      src: `${MEDIA}video-pitch.mp4`,
+      poster: `${MEDIA}video-pitch.webp`,
+      titulo: 'Video pitch',
+      etiqueta: 'Historias reales',
+      ratio: '16 / 9',
+    },
+  ],
+}
 
 export const DOCUMENTOS = [
   {
@@ -136,6 +178,8 @@ export const SECCIONES = [
   { id: 'proyecto', label: 'Conoce el proyecto' },
   { id: 'sectores', label: 'Quiénes participan' },
   { id: 'proceso', label: 'Proceso de fortalecimiento' },
+  { id: 'historias', label: 'Historias en territorio' },
+  { id: 'pitch', label: 'Pitch de emprendimientos' },
   { id: 'territorio', label: 'Cobertura' },
   { id: 'documentos', label: 'Recursos y documentos' },
 ]

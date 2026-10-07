@@ -1,7 +1,9 @@
 import { useEffect } from 'react'
 import { IconArrowRight, IconDownload } from '../../components/Icons.jsx'
+import VideoPlayer from '../../components/VideoPlayer.jsx'
 import { useReveal } from '../../lib/useReveal.js'
 import logo from '../../assets/mediadores/IMAGENES/MEDIADORES DE CONVIVENCIA LOGO_Horizontal.png'
+import logoVertical from '../../assets/mediadores/IMAGENES/MEDIADORES DE CONVIVENCIA LOGO_Vertical.png'
 import heroImage from '../../assets/mediadores/IMAGENES/CARTILLA_MEDIADORES_PARTE1-03 (1).png'
 import teamImage from '../../assets/mediadores/IMAGENES/CARTILLA_MEDIADORES_PARTE3_Mesa de trabajo 1.png'
 import ValleMap from './ValleMap.jsx'
@@ -12,6 +14,43 @@ const STATS = [
   ['295.278', 'actividades realizadas', 'Acumulado 2024–2026'],
   ['422', 'mediadores en Colombia', 'Promedio anual'],
   ['42', 'municipios con presencia', 'Cobertura territorial'],
+]
+
+const MEDIA = `${import.meta.env.BASE_URL}media/mediadores/`
+
+const MEDIADORES_VIDEOS = [
+  {
+    src: `${MEDIA}1.mp4`,
+    poster: `${MEDIA}1.webp`,
+    titulo: 'Mesa técnica por la convivencia',
+    descripcion: '42 territorios distintos con un solo objetivo: la convivencia pacífica. Desde Buga, los líderes territoriales y directores definimos y trazamos las hojas de ruta que guiarán nuestro trabajo en el Valle del Cauca. ¡Porque escuchar también transforma!',
+    enlace: 'https://www.instagram.com/reel/DZaVLuuugjL/?igsh=MW1odG9laWlpMXZqOQ%3D%3D',
+    etiqueta: 'Mesa técnica',
+  },
+  {
+    src: `${MEDIA}2.mp4`,
+    poster: `${MEDIA}2.webp`,
+    titulo: 'La Ruta Multiplicadora',
+    descripcion: 'La Ruta Multiplicadora es mucho más que un despliegue en territorio; es el reflejo del trabajo silencioso y constante de nuestros mediadores. La convivencia pacífica se construye desde adentro.',
+    enlace: 'https://www.instagram.com/reel/DbExUrch4AF/?igsh=MXJjeDJkczg5ZmczaA',
+    etiqueta: 'Trabajo territorial',
+  },
+  {
+    src: `${MEDIA}3.mp4`,
+    poster: `${MEDIA}3.webp`,
+    titulo: 'Una jornada que acompaña',
+    descripcion: 'Acompañar, orientar y construir confianza también transforma la experiencia de la ciudadanía. Esta jornada se desarrolló en un ambiente de respeto, tranquilidad y servicio para todos.',
+    enlace: 'https://www.instagram.com/reel/DaAlKTAuxWw/?igsh=c2QyOGF0dmlpcm16',
+    etiqueta: 'Cultura ciudadana',
+  },
+  {
+    src: `${MEDIA}4.mp4`,
+    poster: `${MEDIA}4.webp`,
+    titulo: 'Prevenir desde cada territorio',
+    descripcion: 'Conocer la realidad nos permite diseñar estrategias de prevención para cada territorio. El cambio empieza cuando decidimos actuar.',
+    enlace: 'https://www.instagram.com/reel/DZxWzaNODof/?igsh=MXN5b3lpd2Nka2Yycw',
+    etiqueta: 'Prevención',
+  },
 ]
 
 export default function MediadoresPage() {
@@ -30,6 +69,8 @@ export default function MediadoresPage() {
 
 
     <section className="med-sec med-story"><div className="med-wrap med-story__grid"><img src={teamImage} alt="Trabajo colaborativo de Mediadores de Convivencia" data-reveal /><div data-reveal><p className="med-eyebrow">Escuchar para actuar</p><h2>La escucha activa también es <em>intervención</em>.</h2><p>La presencia territorial permite identificar necesidades, recibir quejas y facilitar la mediación entre las personas y las autoridades responsables. Esa información orienta las acciones de convivencia en cada municipio.</p><p>De Gestores a Mediadores: una evolución que hace explícito el propósito de tender puentes y construir soluciones con la comunidad.</p></div></div></section>
+
+    <section className="med-sec med-videos" id="mediadores-videos"><div className="med-wrap"><div className="med-videos__head"><div><p className="med-eyebrow">Historias en movimiento</p><h2>Escuchar también <em>transforma</em>.</h2></div><p>Relatos de territorio, prevención y confianza contados por quienes hacen posible la convivencia cada día.</p></div><div className="med-videos__grid">{MEDIADORES_VIDEOS.map((video, i) => <article className={`med-video-card ${i === 0 ? 'med-video-card--featured' : ''}`} key={video.src} data-reveal style={{ '--d': `${i * 80}ms` }}><div className="med-video-card__media"><VideoPlayer src={video.src} poster={video.poster} titulo={video.titulo} ratio="9 / 16" className="med-video-card__player" />{i === 0 && <img className="med-video-card__seal" src={logoVertical} alt="Mediadores de Convivencia" />}</div><div className="med-video-card__body"><span className="med-video-card__tag">{video.etiqueta}</span><h3>{video.titulo}</h3><p>{video.descripcion}</p><a href={video.enlace} target="_blank" rel="noreferrer">Ver Reel en Instagram <IconArrowRight width={16} height={16} /></a></div></article>)}</div></div></section>
 
     <section className="med-sec med-docs" id="mediadores-recursos"><div className="med-wrap"><p className="med-eyebrow">Documentación</p><h2>Información y <em>herramientas</em></h2><div className="med-docs__grid"><a href="https://docs.google.com/presentation/d/1T3SoJQwjnmxo6mtSK20HaGyDXdOKAnt3/edit" target="_blank" rel="noreferrer"><IconDownload width={20} /><span><b>Presentación Mediadores</b><small>Material institucional</small></span></a><a href="https://drive.google.com/file/d/142AKz_ybWKmxxmcVO79h1q3DwEYF9tre/view?usp=sharing" target="_blank" rel="noreferrer"><IconDownload width={20} /><span><b>Informe ejecutivo</b><small>Gestión territorial</small></span></a><a href="https://drive.google.com/file/d/1JaagvvdPJPElIOj79dqEpSR5UTS26rsz/view?usp=sharing" target="_blank" rel="noreferrer"><IconDownload width={20} /><span><b>Hoja de ruta</b><small>Orientaciones 2024–2026</small></span></a><a href="https://drive.google.com/drive/folders/1g2bZ5IQXTkmT4PnQV_mGKMwUenra7xB6" target="_blank" rel="noreferrer"><IconDownload width={20} /><span><b>Formatos</b><small>Consulta y descarga los formatos del programa</small></span></a><a href="https://drive.google.com/drive/folders/1ANQphRg7qNoqI2ClJvsOqSCBnOEvlid3" target="_blank" rel="noreferrer"><IconDownload width={20} /><span><b>Imágenes y logos</b><small>Recursos gráficos de Mediadores</small></span></a></div></div></section>
   </main></div>

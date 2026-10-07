@@ -13,3 +13,8 @@ src/assets/PROMOTORES/*.mp4
 src/assets/PROMOTORES/todo el equipo.png
 src/assets/infraestructura/fotos y videos
 src/assets/infraestructura/originales
+
+# Material audiovisual fuente; las copias publicadas viven en public/media
+src/assets/CORPOQUINDIO/MATERIAL
+src/assets/CORPOQUINDIO/MATERIAL/**
+src/assets/mediadores/*.mp4

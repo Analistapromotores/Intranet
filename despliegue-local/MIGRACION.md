@@ -31,17 +31,25 @@ docker network create proxy_net
 # Unir el GLPI que está corriendo a proxy_net con el alias «glpi», en caliente (no reinicia nada)
 docker network connect --alias glpi proxy_net glpi-glpi-1
 
-# Proxy: compose y .env (la plantilla de GLPI ya está)
+# Proxy: compose, .env y plantilla de GLPI corregida
 cp ~/intranet/despliegue-local/proxy/docker-compose.yml ~/proxy/
 cp ~/intranet/despliegue-local/proxy/.env.example ~/proxy/.env   # si no existe ya
-nano ~/proxy/.env     # NGINX_IMAGE y NGINX_CLIENT_MAX_BODY_SIZE: mismos valores que el .env de GLPI
+nano ~/proxy/.env     # NGINX_IMAGE y NGINX_CLIENT_MAX_BODY_SIZE: mismos valores que ~/glpi/.env
+cp ~/proxy/nginx/templates/glpi.conf.template ~/glpi-proxy-glpi.conf.template.bak
+cp ~/intranet/despliegue-local/proxy/nginx/templates/glpi.conf.template ~/proxy/nginx/templates/
 ```
 
-Certificados de GLPI: deben estar donde los busca `glpi.conf.template`:
+La plantilla corregida es la misma que había en `~/proxy`, con dos cambios: `proxy_pass` usa
+`resolver 127.0.0.11` + variable (nginx arranca aunque GLPI esté apagado y no da 502 cuando el
+contenedor de GLPI se recrea con otra IP) y se quitó el `X-Forwarded-Proto` duplicado.
+
+Certificados de GLPI: el nginx actual los lee de `~/glpi/nginx/certs/`; el proxy, de `~/proxy/nginx/certs/glpi/`:
 
 ```bash
-grep -n ssl_certificate ~/proxy/nginx/templates/glpi.conf.template
-ls -l ~/proxy/nginx/certs/glpi/          # copiarlos desde el nginx actual de GLPI si faltan
+grep -n ssl_certificate ~/glpi/nginx/templates/glpi.conf.template   # ruta que usa hoy
+mkdir -p ~/proxy/nginx/certs/glpi
+cp ~/glpi/nginx/certs/glpi/{fullchain,privkey}.pem ~/proxy/nginx/certs/glpi/   # ajustar si la ruta es otra
+ls -l ~/proxy/nginx/certs/glpi/
 ```
 
 Validar la configuración **sin ocupar los puertos** (no toca el nginx actual):
@@ -52,6 +60,9 @@ docker compose run --rm --no-deps --entrypoint /bin/sh nginx -c 'for f in /etc/n
 ```
 
 Debe terminar en `test is successful`. Si falla, corregir antes de seguir.
+
+Después de la fase 3, la renovación del certificado de GLPI (si es manual) también se copia a
+`~/proxy/nginx/certs/glpi/` en lugar de `~/glpi/nginx/certs/`.
 
 ## Fase 1 — Corte de GLPI al proxy (segundos de corte)
 
@@ -92,7 +103,8 @@ cp ~/intranet/despliegue-local/glpi/docker-compose.yml ~/glpi/docker-compose.yml
 cd ~/glpi && docker compose up -d --remove-orphans   # recrea glpi en proxy_net y borra glpi-nginx-1
 ```
 
-A partir de aquí el proxy ya no depende de la conexión en caliente de la fase 0.
+A partir de aquí el proxy ya no depende de la conexión en caliente de la fase 0. Gracias a la
+resolución dinámica de la plantilla, no hace falta reiniciar nginx tras recrear GLPI.
 Vuelta atrás: restaurar `docker-compose.yml.con-nginx.bak`, `docker compose up -d` en `~/glpi`
 tras `docker compose down` en `~/proxy`.
 

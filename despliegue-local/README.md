@@ -19,6 +19,7 @@ despliegue-local/
 ├── proxy/                        ← copiar a ~/proxy en el servidor
 │   ├── docker-compose.yml        ← nginx: único que publica 80/443
 │   ├── .env.example
+│   ├── certbot/renovar-certificados.sh  ← renovación: muestra el TXT y hace el resto
 │   └── nginx/templates/
 │       ├── glpi.conf.template    ← GLPI con resolución dinámica
 │       └── intranet.conf.template

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "dev:api": "node --watch-path=server server/index.js",
+    "dev:api": "node --env-file-if-exists=.env --watch-path=server server/index.js",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",

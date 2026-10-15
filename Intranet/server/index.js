@@ -5,12 +5,14 @@ import compression from 'compression'
 import crypto from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
-import { DATA_DIR, PROD, ROOT } from './config.js'
-import { dbListo, deleteBlob, readBlob, readJson, saveBlob, usaPostgres, writeJson } from './store.js'
+import { DATA_DIR, MAIL, PROD, ROOT } from './config.js'
+import { dbListo, deleteBlob, readBlob, readJson, saveBlob, update, usaPostgres, writeJson } from './store.js'
 import { solicitudesRouter } from './solicitudes/routes.js'
 import { salasRouter } from './salas/routes.js'
 import { noticiasRouter } from './noticias/routes.js'
 import { tiRouter, programarResumenDiario } from './ti/routes.js'
+import { canalCorreo } from './solicitudes/mailer.js'
+import { correoCuentaHoja, hojaActiva } from './solicitudes/sheets.js'
 import { cabeceras, errorGlobal, firmaDeImagen, forzarHttps, limitador, mismoOrigen } from './seguridad.js'
 
 const PEOPLE_FILE = path.join(DATA_DIR, 'people.json')
@@ -172,13 +174,20 @@ const publicView = (p) => ({
 })
 const adminView = (p) => ({ ...publicView(p), year: p.year, published: p.published, updatedAt: p.updatedAt })
 
+/* Cuántos proxies hay delante del servidor (TRUST_PROXY). Con un solo nginx propio: 1 (por defecto en producción).
+   Si se confía en más saltos de los reales, un visitante puede falsear su IP con X-Forwarded-For y saltarse los límites. */
+function saltosDeProxy() {
+  const v = String(process.env.TRUST_PROXY ?? '').trim()
+  if (v === '') return PROD ? 1 : false
+  return /^\d+$/.test(v) ? Number(v) : v
+}
+
 /* ---------- App ---------- */
 const app = express()
 app.disable('x-powered-by')
-/* En Railway, X-Forwarded-For llega como «cliente, proxy-de-borde» y el proxy de borde cambia entre peticiones.
-   Confiando en 2 saltos, req.ip es la IP real del cliente (y no se puede falsificar desde fuera). Sin esto los
-   límites por IP verían un valor distinto en cada petición y nunca se activarían. En local no hay proxy: se usa la conexión directa. */
-app.set('trust proxy', PROD ? 2 : false)
+/* Detrás de nginx, X-Forwarded-For trae la IP real del cliente; sin confiar en el proxy, los límites por IP
+   verían siempre la IP del servidor nginx y bloquearían a toda la oficina junta. En local no hay proxy: se usa la conexión directa. */
+app.set('trust proxy', saltosDeProxy())
 app.use(forzarHttps)
 app.use(cabeceras)
 app.use(compression())
@@ -261,23 +270,21 @@ api.post('/birthdays/:id/wishes', async (req, res) => {
     message: clean(req.body?.message, 160),
     createdAt: new Date().toISOString(),
   }
-  const wishes = await readJson(WISHES_FILE, [])
-  wishes.push(wish)
-  await writeJson(WISHES_FILE, wishes)
-  res.status(201).json({ id: wish.id, key: wish.key, count: wishCount(wishes, person.id, y) })
+  const count = await update(WISHES_FILE, [], (wishes) => { wishes.push(wish); return wishCount(wishes, person.id, y) })
+  res.status(201).json({ id: wish.id, key: wish.key, count })
 })
 
 /* Quien felicitó puede añadir o cambiar su mensaje con la llave que recibió. */
 api.patch('/birthdays/:id/wishes/:wid', limitador({ ventana: 10 * 60e3, max: 40 }), async (req, res) => {
-  const wishes = await readJson(WISHES_FILE, [])
-  const wish = wishes.find((w) => w.id === req.params.wid && w.personId === req.params.id)
   const key = String(req.body?.key || '')
-  if (!wish || key.length !== wish.key.length || !crypto.timingSafeEqual(Buffer.from(key), Buffer.from(wish.key))) {
-    return res.status(403).json({ error: 'No se pudo actualizar la felicitación.' })
-  }
-  wish.name = clean(req.body?.name, 40)
-  wish.message = clean(req.body?.message, 160)
-  await writeJson(WISHES_FILE, wishes)
+  const wish = await update(WISHES_FILE, [], (wishes) => {
+    const w = wishes.find((x) => x.id === req.params.wid && x.personId === req.params.id)
+    if (!w || key.length !== w.key.length || !crypto.timingSafeEqual(Buffer.from(key), Buffer.from(w.key))) return null
+    w.name = clean(req.body?.name, 40)
+    w.message = clean(req.body?.message, 160)
+    return w
+  })
+  if (!wish) return res.status(403).json({ error: 'No se pudo actualizar la felicitación.' })
   res.json(wishView(wish))
 })
 
@@ -358,59 +365,61 @@ api.post('/admin/users', requireAuth, requireAdmin, async (req, res) => {
   const fields = {}
   if (!USERNAME_RE.test(username)) fields.username = 'Usa de 3 a 32 letras, números, punto, guion o guion bajo.'
   if (name.length < 3) fields.name = 'Escribe el nombre completo.'
-  if (password.length < 8) fields.password = 'La contraseña debe tener al menos 8 caracteres.'
+  if (password.length < 8 || password.length > 200) fields.password = 'La contraseña debe tener entre 8 y 200 caracteres.'
   if (Object.keys(fields).length) return res.status(400).json({ error: 'Revisa los campos marcados.', fields })
-  const users = await readJson(USERS_FILE, [])
-  if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) {
-    return res.status(409).json({ error: 'Ese usuario ya existe.', fields: { username: 'Ese usuario ya existe.' } })
-  }
   const user = { username, name, role, password: hashPassword(password) }
-  users.push(user)
-  await writeJson(USERS_FILE, users)
+  const creado = await update(USERS_FILE, [], (users) => {
+    if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) return false
+    users.push(user)
+    return true
+  })
+  if (!creado) return res.status(409).json({ error: 'Ese usuario ya existe.', fields: { username: 'Ese usuario ya existe.' } })
   res.status(201).json(userView(user))
 })
 
 api.patch('/admin/users/:username', requireAuth, requireAdmin, async (req, res) => {
-  const users = await readJson(USERS_FILE, [])
-  const user = users.find((u) => u.username === req.params.username)
-  if (!user) return res.status(404).json({ error: 'El usuario ya no existe.' })
-  if (req.body?.name !== undefined) {
-    const name = clean(req.body.name, 80)
-    if (name.length < 3) return res.status(400).json({ error: 'Escribe el nombre completo.' })
-    user.name = name
+  const cambios = req.body || {}
+  const nombre = cambios.name !== undefined ? clean(cambios.name, 80) : null
+  if (nombre !== null && nombre.length < 3) return res.status(400).json({ error: 'Escribe el nombre completo.' })
+  if (cambios.role !== undefined && !ROLES.includes(cambios.role)) return res.status(400).json({ error: 'Rol no válido.' })
+  if (cambios.password) {
+    const largo = String(cambios.password).length
+    if (largo < 8 || largo > 200) return res.status(400).json({ error: 'La contraseña debe tener entre 8 y 200 caracteres.' })
   }
-  if (req.body?.role !== undefined) {
-    if (!ROLES.includes(req.body.role)) return res.status(400).json({ error: 'Rol no válido.' })
-    if (req.body.role !== rolDe(user) && esUltimoAdmin(users, user)) return res.status(400).json({ error: 'Debe quedar al menos un administrador.' })
-    user.role = req.body.role
-  }
-  if (req.body?.password) {
-    if (String(req.body.password).length < 8) return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres.' })
-    user.password = hashPassword(String(req.body.password))
-  }
-  await writeJson(USERS_FILE, users)
-  res.json(userView(user))
+  const r = await update(USERS_FILE, [], (users) => {
+    const user = users.find((u) => u.username === req.params.username)
+    if (!user) return { status: 404, error: 'El usuario ya no existe.' }
+    if (cambios.role !== undefined && cambios.role !== rolDe(user) && esUltimoAdmin(users, user)) return { status: 400, error: 'Debe quedar al menos un administrador.' }
+    if (nombre !== null) user.name = nombre
+    if (cambios.role !== undefined) user.role = cambios.role
+    if (cambios.password) user.password = hashPassword(String(cambios.password))
+    return { user }
+  })
+  if (r.error) return res.status(r.status).json({ error: r.error })
+  res.json(userView(r.user))
 })
 
 api.delete('/admin/users/:username', requireAuth, requireAdmin, async (req, res) => {
-  const users = await readJson(USERS_FILE, [])
-  const idx = users.findIndex((u) => u.username === req.params.username)
-  if (idx === -1) return res.status(404).json({ error: 'El usuario ya no existe.' })
-  if (users[idx].username === req.user.username) return res.status(400).json({ error: 'No puedes eliminar tu propio usuario.' })
-  if (esUltimoAdmin(users, users[idx])) return res.status(400).json({ error: 'Debe quedar al menos un administrador.' })
-  users.splice(idx, 1)
-  await writeJson(USERS_FILE, users)
+  const r = await update(USERS_FILE, [], (users) => {
+    const idx = users.findIndex((u) => u.username === req.params.username)
+    if (idx === -1) return { status: 404, error: 'El usuario ya no existe.' }
+    if (users[idx].username === req.user.username) return { status: 400, error: 'No puedes eliminar tu propio usuario.' }
+    if (esUltimoAdmin(users, users[idx])) return { status: 400, error: 'Debe quedar al menos un administrador.' }
+    users.splice(idx, 1)
+    return {}
+  })
+  if (r.error) return res.status(r.status).json({ error: r.error })
   res.json({ ok: true })
 })
 
 api.put('/auth/password', requireAuth, async (req, res) => {
   const { current, next: nueva } = req.body || {}
-  if (!checkPassword(String(current || ''), req.user.password)) return res.status(400).json({ error: 'La contraseña actual no coincide.' })
-  if (String(nueva || '').length < 8) return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 8 caracteres.' })
-  const users = await readJson(USERS_FILE, [])
-  const u = users.find((x) => x.username === req.user.username)
-  u.password = hashPassword(String(nueva))
-  await writeJson(USERS_FILE, users)
+  if (!checkPassword(String(current || '').slice(0, 200), req.user.password)) return res.status(400).json({ error: 'La contraseña actual no coincide.' })
+  if (String(nueva || '').length < 8 || String(nueva).length > 200) return res.status(400).json({ error: 'La nueva contraseña debe tener entre 8 y 200 caracteres.' })
+  await update(USERS_FILE, [], (users) => {
+    const u = users.find((x) => x.username === req.user.username)
+    if (u) u.password = hashPassword(String(nueva))
+  })
   res.json({ ok: true })
 })
 
@@ -429,11 +438,13 @@ api.get('/admin/people/:id/wishes', requireAuth, async (req, res) => {
 })
 
 api.delete('/admin/wishes/:wid', requireAuth, async (req, res) => {
-  const wishes = await readJson(WISHES_FILE, [])
-  const idx = wishes.findIndex((w) => w.id === req.params.wid)
-  if (idx === -1) return res.status(404).json({ error: 'La felicitación ya no existe.' })
-  wishes.splice(idx, 1)
-  await writeJson(WISHES_FILE, wishes)
+  const hubo = await update(WISHES_FILE, [], (wishes) => {
+    const idx = wishes.findIndex((w) => w.id === req.params.wid)
+    if (idx === -1) return false
+    wishes.splice(idx, 1)
+    return true
+  })
+  if (!hubo) return res.status(404).json({ error: 'La felicitación ya no existe.' })
   res.json({ ok: true })
 })
 
@@ -443,9 +454,7 @@ api.post('/admin/people', requireAuth, async (req, res) => {
   try {
     const photo = req.body.photo ? await savePhoto(req.body.photo) : null
     const person = { id: crypto.randomUUID(), ...value, photo, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
-    const people = await readJson(PEOPLE_FILE, [])
-    people.push(person)
-    await writeJson(PEOPLE_FILE, people)
+    await update(PEOPLE_FILE, [], (people) => { people.push(person) })
     res.status(201).json(adminView(person))
   } catch (e) {
     res.status(400).json({ error: e.message })
@@ -453,22 +462,24 @@ api.post('/admin/people', requireAuth, async (req, res) => {
 })
 
 api.put('/admin/people/:id', requireAuth, async (req, res) => {
-  const people = await readJson(PEOPLE_FILE, [])
-  const person = people.find((p) => p.id === req.params.id)
-  if (!person) return res.status(404).json({ error: 'La persona ya no existe.' })
   const { errors, value } = parsePerson(req.body)
   if (Object.keys(errors).length) return res.status(400).json({ error: 'Revisa los campos marcados.', fields: errors })
   try {
-    if (req.body.photo) {
-      const photo = await savePhoto(req.body.photo)
-      await removePhoto(person.photo)
-      person.photo = photo
-    } else if (req.body.removePhoto) {
-      await removePhoto(person.photo)
-      person.photo = null
+    const nueva = req.body.photo ? await savePhoto(req.body.photo) : null
+    let fotoVieja = null
+    const person = await update(PEOPLE_FILE, [], (people) => {
+      const p = people.find((x) => x.id === req.params.id)
+      if (!p) return null
+      if (nueva) { fotoVieja = p.photo; p.photo = nueva }
+      else if (req.body.removePhoto) { fotoVieja = p.photo; p.photo = null }
+      Object.assign(p, value, { updatedAt: new Date().toISOString() })
+      return p
+    })
+    if (!person) {
+      await removePhoto(nueva)
+      return res.status(404).json({ error: 'La persona ya no existe.' })
     }
-    Object.assign(person, value, { updatedAt: new Date().toISOString() })
-    await writeJson(PEOPLE_FILE, people)
+    await removePhoto(fotoVieja)
     res.json(adminView(person))
   } catch (e) {
     res.status(400).json({ error: e.message })
@@ -476,44 +487,45 @@ api.put('/admin/people/:id', requireAuth, async (req, res) => {
 })
 
 api.patch('/admin/people/:id/published', requireAuth, async (req, res) => {
-  const people = await readJson(PEOPLE_FILE, [])
-  const person = people.find((p) => p.id === req.params.id)
+  const person = await update(PEOPLE_FILE, [], (people) => {
+    const p = people.find((x) => x.id === req.params.id)
+    if (!p) return null
+    p.published = Boolean(req.body?.published)
+    p.updatedAt = new Date().toISOString()
+    return p
+  })
   if (!person) return res.status(404).json({ error: 'La persona ya no existe.' })
-  person.published = Boolean(req.body?.published)
-  person.updatedAt = new Date().toISOString()
-  await writeJson(PEOPLE_FILE, people)
   res.json(adminView(person))
 })
 
 api.delete('/admin/people/:id', requireAuth, async (req, res) => {
-  const people = await readJson(PEOPLE_FILE, [])
-  const idx = people.findIndex((p) => p.id === req.params.id)
-  if (idx === -1) return res.status(404).json({ error: 'La persona ya no existe.' })
-  const [gone] = people.splice(idx, 1)
+  const gone = await update(PEOPLE_FILE, [], (people) => {
+    const idx = people.findIndex((p) => p.id === req.params.id)
+    return idx === -1 ? null : people.splice(idx, 1)[0]
+  })
+  if (!gone) return res.status(404).json({ error: 'La persona ya no existe.' })
   await removePhoto(gone.photo)
-  await writeJson(PEOPLE_FILE, people)
-  const wishes = await readJson(WISHES_FILE, [])
-  await writeJson(WISHES_FILE, wishes.filter((w) => w.personId !== gone.id))
+  await update(WISHES_FILE, [], (wishes) => { const resto = wishes.filter((w) => w.personId !== gone.id); wishes.length = 0; wishes.push(...resto) })
   res.json({ ok: true })
 })
 
 /* Carga masiva: filas ya interpretadas desde un CSV en el navegador. */
 api.post('/admin/import', requireAuth, async (req, res) => {
   const rows = Array.isArray(req.body?.rows) ? req.body.rows.slice(0, 2000) : []
-  const people = await readJson(PEOPLE_FILE, [])
   const key = (p) => `${p.name.toLowerCase()}|${p.month}|${p.day}`
-  const seen = new Set(people.map(key))
   const result = { added: 0, skipped: 0, errors: [] }
-  rows.forEach((row, i) => {
-    const { errors, value } = parsePerson({ ...row, published: row.published !== false && row.published !== 'no' })
-    if (Object.keys(errors).length) return result.errors.push({ row: i + 2, error: Object.values(errors).join(' ') })
-    if (seen.has(key(value))) return result.skipped++
-    seen.add(key(value))
-    const now = new Date().toISOString()
-    people.push({ id: crypto.randomUUID(), ...value, photo: null, createdAt: now, updatedAt: now })
-    result.added++
+  await update(PEOPLE_FILE, [], (people) => {
+    const seen = new Set(people.map(key))
+    rows.forEach((row, i) => {
+      const { errors, value } = parsePerson({ ...(row && typeof row === 'object' ? row : {}), published: row?.published !== false && row?.published !== 'no' })
+      if (Object.keys(errors).length) return result.errors.push({ row: i + 2, error: Object.values(errors).join(' ') })
+      if (seen.has(key(value))) return result.skipped++
+      seen.add(key(value))
+      const now = new Date().toISOString()
+      people.push({ id: crypto.randomUUID(), ...value, photo: null, createdAt: now, updatedAt: now })
+      result.added++
+    })
   })
-  await writeJson(PEOPLE_FILE, people)
   res.json(result)
 })
 
@@ -567,5 +579,12 @@ app.use(errorGlobal)
 process.on('unhandledRejection', (e) => console.error('[error] promesa sin manejar:', e?.stack || e))
 
 await ensureUsers()
+if (PROD) {
+  if (!process.env.SESSION_SECRET) console.warn('[config] Falta SESSION_SECRET: las sesiones se cierran en cada reinicio y no funcionan con varias instancias.')
+  if (!usaPostgres) console.warn('[config] Falta DATABASE_URL: los datos se guardan en archivos y se pierden en cada despliegue si no hay volumen.')
+  if (MAIL.modo !== 'produccion') console.warn(`[config] MAIL_MODE=${MAIL.modo}: todos los correos van a ${MAIL.pruebas}. Define MAIL_MODE=produccion para enviar a los destinatarios reales.`)
+  if (hojaActiva) console.log(`[hoja] Las solicitudes se registran en Google Sheets (hoja compartida con ${correoCuentaHoja}).`)
+  else if (!canalCorreo || canalCorreo === 'simulado') console.warn('[config] Sin SHEET_ID, Gmail ni SMTP configurado: las solicitudes NO se envían, solo se guardan en la bandeja del sistema.')
+}
 programarResumenDiario()
 app.listen(PORT, () => console.log(`[intranet] http://localhost:${PORT} · datos en ${usaPostgres ? 'PostgreSQL' : DATA_DIR}`))

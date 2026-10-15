@@ -4,7 +4,7 @@ import { TIPOS, formatoFecha, formatoPesos } from '../../shared/solicitudes.js'
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 
-function resumen(sol) {
+export function resumen(sol) {
   const d = sol.datos
   const base = [['Solicitud No.', sol.numero], ['Tipo', TIPOS[sol.tipo].nombre], ['Fecha de registro', new Date(sol.creada).toLocaleString('es-CO', { timeZone: 'America/Bogota' })]]
   if (sol.tipo === 'informe_ingreso') {

@@ -35,7 +35,8 @@ export function SolicitudCard({ s, abierta = false }) {
               </li>
             ))}
           </ol>
-          {s.correo && <p className="sv-muted">Correo {s.correo.estado === 'enviado' ? 'enviado' : s.correo.estado === 'simulado' ? 'registrado en modo de pruebas' : 'pendiente de reenvío'} a {s.correo.to}.</p>}
+          {s.correo && s.correo.estado === 'enviado' && s.correo.canal === 'hoja' && <p className="sv-muted">Solicitud registrada para el equipo de gestión.</p>}
+          {s.correo && s.correo.canal !== 'hoja' && <p className="sv-muted">Correo {s.correo.estado === 'enviado' ? 'enviado' : s.correo.estado === 'simulado' ? 'registrado' : 'pendiente de reenvío'} a {s.correo.to}.</p>}
         </div>
       )}
     </article>

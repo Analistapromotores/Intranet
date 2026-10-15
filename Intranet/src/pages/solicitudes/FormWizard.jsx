@@ -24,7 +24,7 @@ export default function FormWizard({ form, steps, labels, review, correoSolicita
   const ultimo = paso === todos.length - 1
 
   useEffect(() => {
-    api.config().then((c) => setDestino({ correo: c.destino[form.tipo], modo: c.modoCorreo, smtp: c.smtp })).catch(() => {})
+    api.config().then((c) => setDestino({ correo: c.destino[form.tipo], modo: c.modoCorreo, smtp: c.smtp, hoja: c.canal === 'hoja' })).catch(() => {})
   }, [form.tipo])
 
   const irA = (i) => {
@@ -102,8 +102,9 @@ export default function FormWizard({ form, steps, labels, review, correoSolicita
                       <b>¿Qué pasa al enviar?</b>
                       <p>
                         {tipo.documento ? 'Se genera el formato oficial en Excel, se ' : 'Se '}
-                        envía un correo con el asunto «{tipo.asunto}» a <b>{destino?.correo || 'gerencia'}</b>
-                        {destino?.modo === 'pruebas' && <> (correo de pruebas)</>} y la solicitud queda registrada con un número para su seguimiento.
+                        {destino?.hoja
+                          ? <>registra la solicitud «{tipo.asunto}» para el equipo de gestión</>
+                          : <>envía un correo con el asunto «{tipo.asunto}» a <b>{destino?.correo || 'gerencia'}</b>{destino?.modo === 'pruebas' && <> (correo de pruebas)</>}</>} y la solicitud queda registrada con un número para su seguimiento.
                       </p>
                     </div>
                   </div>
@@ -126,7 +127,7 @@ export default function FormWizard({ form, steps, labels, review, correoSolicita
             <p>Vas a enviar <b>{tipo.nombre}</b>. Después de enviarla no podrás editarla desde la intranet.</p>
             <ul>
               {tipo.documento && <li>Se generará el formato oficial en Excel.</li>}
-              <li>Se enviará un correo a <b>{destino?.correo || 'gerencia'}</b>.</li>
+              <li>{destino?.hoja ? 'Quedará registrada para el equipo de gestión.' : <>Se enviará un correo a <b>{destino?.correo || 'gerencia'}</b>.</>}</li>
               <li>Recibirás un número para consultar el estado.</li>
             </ul>
             {errorEnvio && <p className="sv-alert sv-alert--error" role="alert">{errorEnvio}</p>}
@@ -164,15 +165,12 @@ function Exito({ resultado }) {
           <div><dt>Tipo</dt><dd>{tipo.nombre}</dd></div>
           <div><dt>Fecha</dt><dd>{new Date(resultado.creada).toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' })}</dd></div>
           <div><dt>Estado</dt><dd><StatusBadge estado={resultado.estado} /></dd></div>
-          <div><dt>Correo de destino</dt><dd>{correo?.to || '—'}</dd></div>
+          <div><dt>{correo?.canal === 'hoja' ? 'Registrada en' : 'Correo de destino'}</dt><dd>{correo?.to || '—'}</dd></div>
         </dl>
       </div>
 
-      {correo?.estado === 'simulado' && (
-        <p className="sv-callout sv-callout--warn"><IconInfo width={20} height={20} /> <span><b>Modo de pruebas:</b> el servidor de correo aún no está configurado, así que el correo quedó guardado en el sistema y no se envió.</span></p>
-      )}
       {correo?.estado === 'error' && (
-        <p className="sv-callout sv-callout--error"><IconInfo width={20} height={20} /> <span>La solicitud quedó registrada, pero el correo no se pudo enviar. El equipo de gestión lo reenviará.</span></p>
+        <p className="sv-callout sv-callout--error"><IconInfo width={20} height={20} /> <span>La solicitud quedó registrada, pero el registro no se pudo completar. El equipo de gestión lo reintentará.</span></p>
       )}
       {resultado.aviso && <p className="sv-callout sv-callout--warn"><IconInfo width={20} height={20} /> <span>{resultado.aviso}</span></p>}
 

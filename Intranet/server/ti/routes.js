@@ -5,6 +5,7 @@ import crypto from 'node:crypto'
 import { MAIL } from '../config.js'
 import { dataPath, readJson, update, writeJson } from '../store.js'
 import { enviar } from '../solicitudes/mailer.js'
+import { hojaActiva, registrarFila } from '../solicitudes/sheets.js'
 
 const CORREOS = dataPath('ti-correos.json')
 const LINEAS = dataPath('ti-lineas.json')
@@ -181,19 +182,36 @@ function componerResumen(c) {
 
 const destinoTi = () => (MAIL.modo === 'produccion' ? process.env.EMAIL_TI || MAIL.produccion : MAIL.pruebas)
 
+async function anotarEnHoja(c, cuerpo) {
+  const fecha = new Date().toISOString()
+  try {
+    await registrarFila(
+      'Alertas TI',
+      ['Fecha y hora', 'Fecha (Colombia)', 'Líneas vencidas', 'Líneas por vencer', 'Correos inactivos', 'Detalle'],
+      [fecha, c.hoy, c.vencidas.length, c.porVencer.length, c.inactivos.length, cuerpo.text],
+    )
+    return { estado: 'enviado', to: 'Hoja de solicitudes (Google Sheets)', fecha, canal: 'hoja' }
+  } catch (e) {
+    return { estado: 'error', to: 'Hoja de solicitudes (Google Sheets)', fecha, canal: 'hoja', detalle: e.message }
+  }
+}
+
 export async function enviarResumen({ forzar = false } = {}) {
   const c = await calcular()
   if (!c.vencidas.length && !c.porVencer.length && !c.inactivos.length) return { estado: 'sin_alertas' }
   if (!forzar && (!c.config.correoAuto || c.config.ultimoResumen === c.hoy)) return { estado: 'omitido' }
   const cuerpo = componerResumen(c)
-  const r = await enviar({
+  /* Con hoja de Google configurada, el resumen se anota en la pestaña «Alertas TI» en vez de enviarse por correo. */
+  const r = hojaActiva ? await anotarEnHoja(c, cuerpo) : await enviar({
     to: destinoTi(),
     subject: `Alertas de TI · ${c.vencidas.length + c.porVencer.length} línea(s) y ${c.inactivos.length} correo(s)`,
     text: `Resumen de alertas de TI (${c.hoy}):\n\n${cuerpo.text}\n`,
     html: `<div style="font-family:Segoe UI,Arial,sans-serif"><h2>Alertas de TI · ${c.hoy}</h2>${cuerpo.html}</div>`,
     id: 'ti-alertas',
   })
-  await update(CONFIG, {}, (d) => { d.ultimoResumen = c.hoy })
+  /* Solo se da por enviado el resumen del día si el correo salió (o quedó simulado); si falló, se reintenta en la próxima revisión. */
+  if (r.estado === 'enviado' || r.estado === 'simulado') await update(CONFIG, {}, (d) => { d.ultimoResumen = c.hoy })
+  else console.warn(`[ti] el resumen diario no se envió: ${r.detalle || r.estado}`)
   return r
 }
 

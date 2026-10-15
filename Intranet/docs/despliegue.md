@@ -1,5 +1,7 @@
 # Despliegue
 
+> **Servidor propio:** la intranet ya no se publica en Railway. Para subir cambios al servidor de la empresa sigue [entrega-servidor-propio.md](entrega-servidor-propio.md); lo que aquí se cuenta de Railway es histórico.
+
 Esta guía explica **dónde está la intranet, cómo publicar un cambio, cómo reiniciarla y qué configuración usa**.
 Diagrama editable: [diagramas/arquitectura.excalidraw](diagramas/arquitectura.excalidraw).
 

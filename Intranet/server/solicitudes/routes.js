@@ -5,9 +5,10 @@ import { MAIL, URL_GLPI, destinatario } from '../config.js'
 import { dataPath, readBlob, readJson, saveBlob, update } from '../store.js'
 import { ESTADOS, TIPOS, validar } from '../../shared/solicitudes.js'
 import { GENERADORES } from './documents.js'
-import { componerCorreo } from './email.js'
+import { componerCorreo, resumen } from './email.js'
 import { limitador } from '../seguridad.js'
 import { enviar, smtpActivo } from './mailer.js'
+import { actualizarCelda, hojaActiva, registrarFila } from './sheets.js'
 
 const FILE = dataPath('solicitudes.json')
 
@@ -35,7 +36,7 @@ const vistaPublica = (s) => ({
   estado: s.estado,
   creada: s.creada,
   actualizada: s.actualizada,
-  correo: s.correo ? { estado: s.correo.estado, to: s.correo.to, fecha: s.correo.fecha } : null,
+  correo: s.correo ? { estado: s.correo.estado, to: s.correo.to, fecha: s.correo.fecha, canal: s.correo.canal } : null,
   historial: s.historial.map(({ estado, fecha, comentario }) => ({ estado, fecha, comentario })),
 })
 
@@ -45,7 +46,31 @@ const vistaGestion = (s) => {
   return { ...vistaPublica(s), solicitante: solicitanteDe(s), correoSolicitante: correoDe(s), datos, archivo: Boolean(s.archivo), correo: s.correo, historial: s.historial }
 }
 
-/* Genera documento y correo; guarda el resultado en la solicitud. */
+/* ---------- Registro en Google Sheets (reemplaza al correo cuando hay hoja configurada) ---------- */
+const PESTANA = { informe_ingreso: 'Informe de Ingreso', orden_servicio: 'Orden de Servicio', prestamo_equipos: 'Prestamo de equipos' }
+const COL_ESTADO = 1
+
+function filaHoja(sol) {
+  const datos = resumen(sol).filter(([k]) => k !== 'Solicitud No.' && k !== 'Tipo')
+  const mensaje = sol.datos.mensajeCorreo || ''
+  return {
+    encabezados: ['Solicitud No.', 'Estado', 'Mensaje del solicitante', 'Correo del solicitante', ...datos.map(([k]) => k), 'Formato Excel'],
+    fila: [sol.numero, ESTADOS[sol.estado]?.label || sol.estado, mensaje, correoDe(sol), ...datos.map(([, v]) => v), TIPOS[sol.tipo].documento ? 'Se descarga desde Gestión de solicitudes' : ''],
+  }
+}
+
+async function registrarEnHoja(sol) {
+  const fecha = new Date().toISOString()
+  try {
+    const { encabezados, fila } = filaHoja(sol)
+    await registrarFila(PESTANA[sol.tipo], encabezados, fila)
+    return { estado: 'enviado', to: 'Hoja de solicitudes (Google Sheets)', fecha, canal: 'hoja' }
+  } catch (e) {
+    return { estado: 'error', to: 'Hoja de solicitudes (Google Sheets)', fecha, canal: 'hoja', detalle: e.message }
+  }
+}
+
+/* Genera documento y registro (hoja o correo); guarda el resultado en la solicitud. */
 async function procesar(id) {
   const items = (await readJson(FILE, VACIO)).items
   const sol = items.find((s) => s.id === id)
@@ -61,8 +86,9 @@ async function procesar(id) {
     attachments.push({ filename: archivo.nombre, content: buffer, contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
   }
 
-  const to = destinatario(sol.tipo)
-  const correo = await enviar({ id: sol.numero, to, replyTo: correoDe(sol), attachments, ...componerCorreo(sol, { modo: MAIL.modo }) })
+  const correo = hojaActiva
+    ? await registrarEnHoja(sol)
+    : await enviar({ id: sol.numero, to: destinatario(sol.tipo), replyTo: correoDe(sol), attachments, ...componerCorreo(sol, { modo: MAIL.modo }) })
 
   return update(FILE, VACIO, (db) => {
     const s = db.items.find((x) => x.id === id)
@@ -87,7 +113,7 @@ export function solicitudesRouter({ requireAuth }) {
   const r = express.Router()
 
   r.get('/solicitudes/config', (_req, res) => {
-    res.json({ glpiUrl: URL_GLPI, modoCorreo: MAIL.modo, destino: { informe_ingreso: destinatario('informe_ingreso'), orden_servicio: destinatario('orden_servicio'), prestamo_equipos: destinatario('prestamo_equipos') }, smtp: smtpActivo })
+    res.json({ glpiUrl: URL_GLPI, canal: hojaActiva ? 'hoja' : 'correo', modoCorreo: MAIL.modo, destino: { informe_ingreso: destinatario('informe_ingreso'), orden_servicio: destinatario('orden_servicio'), prestamo_equipos: destinatario('prestamo_equipos') }, smtp: smtpActivo })
   })
 
   /* Registrar una solicitud */
@@ -181,6 +207,7 @@ export function solicitudesRouter({ requireAuth }) {
       return s
     })
     if (!sol) return res.status(404).json({ error: 'La solicitud no existe.' })
+    if (hojaActiva) actualizarCelda(PESTANA[sol.tipo], sol.numero, COL_ESTADO, ESTADOS[estado].label).catch((e) => console.warn('[hoja] no se actualizó el estado:', e.message))
     res.json(vistaGestion(sol))
   })
 

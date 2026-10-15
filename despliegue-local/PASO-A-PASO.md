@@ -88,7 +88,6 @@ docker network inspect proxy_net --format '{{range .Containers}}{{.Name}} {{end}
 # Compose y plantilla de GLPI corregida (resolución dinámica)
 cp ~/intranet/despliegue-local/proxy/docker-compose.yml ~/proxy/
 cp ~/intranet/despliegue-local/proxy/nginx/templates/glpi.conf.template ~/proxy/nginx/templates/
-mkdir -p ~/proxy/certbot/www     # reto HTTP de Let's Encrypt (ver CERTIFICADOS-AUTOMATICOS.md)
 
 # .env del proxy (si ya existe ~/proxy/.env, solo revisarlo)
 [ -f ~/proxy/.env ] || cp ~/intranet/despliegue-local/proxy/.env.example ~/proxy/.env
@@ -283,9 +282,15 @@ cd ~/intranet && git pull
 cd despliegue-local/intranet && docker compose up -d --build
 ```
 
-**Certificados:** para que se renueven solos (sin el reto DNS manual cada 90 días), seguir
-[`CERTIFICADOS-AUTOMATICOS.md`](CERTIFICADOS-AUTOMATICOS.md). Ambos certificados viven en
-`~/proxy/nginx/certs/` (ya no en `~/glpi/nginx/certs/`).
+**Renovar certificados (~cada 90 días).** Ahora ambos viven en `~/proxy/nginx/certs/`:
+
+```bash
+sudo certbot certonly --manual --preferred-challenges dns -d intranet.gestionyservicios.com.co
+sudo cp /etc/letsencrypt/live/intranet.gestionyservicios.com.co/{fullchain,privkey}.pem ~/proxy/nginx/certs/intranet/
+# GLPI: igual, copiando a ~/proxy/nginx/certs/glpi/  (ya NO a ~/glpi/nginx/certs/)
+sudo chown -R $(whoami):$(whoami) ~/proxy/nginx/certs
+cd ~/proxy && docker compose restart nginx
+```
 
 **Respaldo de la base de la intranet**
 

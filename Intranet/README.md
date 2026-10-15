@@ -11,6 +11,7 @@ Pasaportes), formularios de Solicitudes, reserva de salas, ausentismo laboral y 
 | **Este README** | Levantar el entorno, variables y estructura del proyecto |
 | [docs/erd.md](docs/erd.md) | Modelo de datos y relaciones entre entidades |
 | [docs/reglas-de-negocio.md](docs/reglas-de-negocio.md) | Reglas que no son obvias al leer el código |
+| [docs/entrega-servidor-propio.md](docs/entrega-servidor-propio.md) | Pasos para subir cambios al servidor propio: build, variables, nginx, solicitudes en Sheets y lista de comprobación |
 | [docs/despliegue.md](docs/despliegue.md) | Dónde está, cómo desplegar y reiniciar, dominios, puertos y servicios |
 | [docs/usuarios-y-permisos.md](docs/usuarios-y-permisos.md) | Roles, permisos, reglas de acceso y flujo de la información |
 

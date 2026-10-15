@@ -78,7 +78,7 @@ export function validarAusentismo(d) {
     if (fin < ini) e.fechaFin = 'El fin no puede ser anterior al inicio.'
   }
   if (!t(d.empresa)) e.empresa = 'Escribe la empresa usuaria.'
-  const cols = Array.isArray(d.colaboradores) ? d.colaboradores : []
+  const cols = (Array.isArray(d.colaboradores) ? d.colaboradores : []).map((c) => (c && typeof c === 'object' ? c : {}))
   if (!cols.length) e.colaboradores = 'Agrega al menos un colaborador.'
   if (cols.length > MAX_COLABORADORES) e.colaboradores = `Máximo ${MAX_COLABORADORES} colaboradores por formato.`
   cols.forEach((c, i) => {

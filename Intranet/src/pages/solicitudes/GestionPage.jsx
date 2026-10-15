@@ -191,7 +191,7 @@ function Detalle({ s, onClose, onChange }) {
     try {
       const r = await api.reenviar(s.id)
       onChange(r)
-      setMsg(r.correo?.estado === 'error' ? `No se pudo enviar: ${r.correo.detalle}` : 'Documento regenerado y correo procesado.')
+      setMsg(r.correo?.estado === 'error' ? `No se pudo enviar: ${r.correo.detalle}` : 'Documento regenerado y solicitud registrada de nuevo.')
     } catch (e) {
       setMsg(e.message)
     } finally {
@@ -214,7 +214,7 @@ function Detalle({ s, onClose, onChange }) {
         {s.correo && (
           <p className={`sv-callout sv-callout--${s.correo.estado === 'enviado' ? 'ok' : s.correo.estado === 'error' ? 'error' : 'warn'}`}>
             <IconMail width={18} height={18} />
-            <span>Correo {CORREO[s.correo.estado]?.[0].toLowerCase()} a <b>{s.correo.to}</b> · {fechaCorta(s.correo.fecha)}{s.correo.detalle ? ` · ${s.correo.detalle}` : ''}</span>
+            <span>{s.correo.canal === 'hoja' ? 'Registro' : 'Correo'} {CORREO[s.correo.estado]?.[0].toLowerCase()} {s.correo.canal === 'hoja' ? 'en' : 'a'} <b>{s.correo.to}</b> · {fechaCorta(s.correo.fecha)}{s.correo.detalle ? ` · ${s.correo.detalle}` : ''}</span>
           </p>
         )}
 

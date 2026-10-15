@@ -117,8 +117,15 @@ const r = {
   dineroReq: (v) => (v === '' || v === null || v === undefined ? 'Este campo es obligatorio.' : null),
   positivo: (v) => (Number(v) > 0 ? null : 'Debe ser mayor que cero.'),
   entero: (v) => (texto(v) === '' || (Number.isInteger(Number(v)) && Number(v) > 0) ? null : 'Escribe un número entero mayor que cero.'),
-  firma: (v) => (/^data:image\/png;base64,/.test(String(v || '')) ? null : 'Firma en el recuadro para continuar.'),
+  firma: (v) => {
+    const m = /^data:image\/png;base64,([A-Za-z0-9+/]+={0,2})$/.exec(String(v || ''))
+    /* Cabecera PNG real (iVBORw0KGgo = 89 50 4E 47 0D 0A 1A 0A) y tamaño razonable: la firma se incrusta en el Excel. */
+    return m && m[1].startsWith('iVBORw0KGgo') && m[1].length < 700_000 ? null : 'Firma en el recuadro para continuar.'
+  },
 }
+
+/* Lista de objetos: cualquier otra cosa (null, texto, números) se vuelve {} y falla la validación del campo, en vez de romper el servidor. */
+const objetos = (v) => (Array.isArray(v) ? v : []).map((x) => (x && typeof x === 'object' ? x : {}))
 
 function check(errors, path, value, ...rules) {
   for (const rule of rules) {
@@ -149,7 +156,7 @@ function validarInforme(d) {
   check(e, 'fechaIngreso', d.fechaIngreso, r.req(), r.fecha)
   check(e, 'salario', d.salario, r.dineroReq, r.dinero, r.positivo)
   check(e, 'auxilioTransporte', d.auxilioTransporte, r.dineroReq, r.dinero)
-  const ben = Array.isArray(d.beneficios) ? d.beneficios : []
+  const ben = objetos(d.beneficios)
   if (ben.length > MAX_BENEFICIOS) e.beneficios = `Máximo ${MAX_BENEFICIOS} beneficios (espacio del formato).`
   ben.forEach((b, i) => {
     check(e, `beneficios.${i}.descripcion`, b.descripcion, r.req(), r.max(80))
@@ -216,7 +223,7 @@ function validarPrestamo(d) {
   check(e, 'celular', d.celular, r.req(), r.tel)
   check(e, 'correo', d.correo, r.req('Lo usamos para que puedas consultar tu solicitud.'), r.email)
   check(e, 'area', d.area, r.req(), r.max(80))
-  const items = Array.isArray(d.equipos) ? d.equipos : []
+  const items = objetos(d.equipos)
   if (!items.length) e.equipos = 'Agrega al menos un equipo o elemento.'
   if (items.length > MAX_EQUIPOS) e.equipos = `Máximo ${MAX_EQUIPOS} elementos por solicitud.`
   items.forEach((it, i) => {

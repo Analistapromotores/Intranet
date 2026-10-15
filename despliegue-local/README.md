@@ -13,12 +13,14 @@ proxy compartido por fases, con vuelta atrás, y luego publica la intranet. La s
 despliegue-local/
 ├── info.md                       ← arquitectura y reglas (leer primero)
 ├── PASO-A-PASO.md                ← pasos para el servidor actual
+├── CERTIFICADOS-AUTOMATICOS.md   ← renovación automática de los certificados
 ├── intranet/                     ← se usa desde el repo clonado en ~/intranet
 │   ├── docker-compose.yml        ← app (alias «intranet», :3001) + Postgres (intranet-db)
 │   └── .env.example
 ├── proxy/                        ← copiar a ~/proxy en el servidor
 │   ├── docker-compose.yml        ← nginx: único que publica 80/443
 │   ├── .env.example
+│   ├── certbot/proxy-nginx-deploy-hook.sh  ← copia el certificado renovado y recarga nginx
 │   └── nginx/templates/
 │       ├── glpi.conf.template    ← GLPI con resolución dinámica
 │       └── intranet.conf.template

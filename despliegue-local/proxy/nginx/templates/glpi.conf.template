@@ -1,0 +1,55 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Plantilla Nginx para GLPI
+# Las variables ${GLPI_DOMAIN} y ${NGINX_CLIENT_MAX_BODY_SIZE} son reemplazadas
+# en tiempo de inicio por envsubst (ver entrypoint en docker-compose.yml).
+# Las variables de nginx ($host, $remote_addr, etc.) NO se tocan.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Redirige todo el tráfico HTTP → HTTPS
+server {
+    listen 80;
+    server_name ${GLPI_DOMAIN};
+    return 301 https://$host$request_uri;
+}
+
+# Servidor HTTPS principal
+server {
+    listen 443 ssl;
+    server_name ${GLPI_DOMAIN};
+
+    # ── Certificados SSL ──────────────────────────────────────────────────────
+    ssl_certificate     /etc/nginx/certs/glpi/fullchain.pem;
+    ssl_certificate_key /etc/nginx/certs/glpi/privkey.pem;
+
+    # ── Protocolos y cifrados seguros ─────────────────────────────────────────
+    ssl_protocols             TLSv1.2 TLSv1.3;
+    ssl_ciphers               ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
+    ssl_prefer_server_ciphers off;
+    ssl_session_cache         shared:SSL:10m;
+    ssl_session_timeout       1d;
+
+    # ── Cabeceras de seguridad ────────────────────────────────────────────────
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Frame-Options           SAMEORIGIN;
+    add_header X-Content-Type-Options    nosniff;
+
+    # ── Límite de subida de archivos (debe coincidir con php.ini) ─────────────
+    client_max_body_size ${NGINX_CLIENT_MAX_BODY_SIZE};
+
+    # ── Proxy hacia el contenedor GLPI (alias «glpi» en proxy_net) ────────────
+    # Resolución dinámica con el DNS interno de Docker: nginx arranca aunque GLPI
+    # esté apagado (y la intranet sigue funcionando), y si el contenedor de GLPI
+    # se recrea con otra IP no hay que reiniciar nginx.
+    resolver 127.0.0.11 valid=30s;
+    set $glpi_upstream http://glpi:80;
+
+    location / {
+        proxy_pass         $glpi_upstream;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto https;
+        proxy_set_header   X-Forwarded-Port  443;
+        proxy_read_timeout 300s;
+    }
+}

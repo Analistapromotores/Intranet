@@ -19,7 +19,9 @@ despliegue-local/
 ├── proxy/                        ← copiar a ~/proxy en el servidor
 │   ├── docker-compose.yml        ← nginx: único que publica 80/443
 │   ├── .env.example
-│   └── nginx/templates/intranet.conf.template
+│   └── nginx/templates/
+│       ├── glpi.conf.template    ← GLPI con resolución dinámica
+│       └── intranet.conf.template
 └── glpi/                         ← referencia del compose de ~/glpi (sin nginx propio)
     └── docker-compose.yml
 ```
@@ -34,7 +36,6 @@ docker network create proxy_net
 cp -r ~/intranet/despliegue-local/proxy/. ~/proxy/
 cd ~/proxy && cp .env.example .env     # ajustar NGINX_IMAGE / NGINX_CLIENT_MAX_BODY_SIZE como en GLPI
 #    Certificados en ~/proxy/nginx/certs/intranet/{fullchain,privkey}.pem (ver info.md)
-#    La plantilla de GLPI (glpi.conf.template) también debe estar en ~/proxy/nginx/templates/
 
 # 3. GLPI: quitarle su nginx y unirlo a proxy_net (ver glpi/docker-compose.yml)
 cd ~/glpi && docker compose up -d

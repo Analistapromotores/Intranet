@@ -2,7 +2,7 @@
    Se arma con los mismos datos que pintan las páginas, así que cuando se agrega
    un proyecto, un documento o un enlace, la búsqueda lo encuentra sin tocar nada más. */
 import { navItems } from './navItems.js'
-import { projects } from './projects.js'
+import { EMPRESAS, projects } from './projects.js'
 import { RECURSOS as MCB_RECURSOS, SECCIONES as MCB_SECCIONES, PROJECT as MCB } from '../pages/promotores/data.js'
 import {
   DOCUMENTOS as QE_DOCS,
@@ -43,7 +43,7 @@ EXTENSIONES.forEach((e) =>
 
 /* --- proyectos --- */
 projects.filter((p) => !p.oculto).forEach((p) => {
-  add({ id: `proy-${p.id}`, tipo: 'proyecto', titulo: p.name, detalle: p.desc, contexto: 'Nuestros proyectos', href: p.href || '#inicio' })
+  add({ id: `proy-${p.id}`, tipo: 'proyecto', titulo: p.name, detalle: p.desc, contexto: `${EMPRESAS.find((e) => e.id === p.empresa)?.name || 'Nuestros proyectos'} · Proyecto`, href: p.href || '#inicio' })
   if (p.docsHref) {
     add({ id: `proy-${p.id}-docs`, tipo: 'seccion', titulo: `Documentos de ${p.name}`, contexto: p.name, href: p.docsHref })
   }

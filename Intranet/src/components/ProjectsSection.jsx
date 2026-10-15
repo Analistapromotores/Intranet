@@ -1,66 +1,64 @@
-import { useState } from 'react'
-import { projects as todos } from '../data/projects.js'
-
-const projects = todos.filter((p) => !p.oculto)
+import { EMPRESAS, projects as todos } from '../data/projects.js'
 import SectionTitle from './SectionTitle.jsx'
 import { IconArrowRight, IconDownload, IconFolders } from './Icons.jsx'
 
-const PREVIEW = 4
+const projects = todos.filter((p) => !p.oculto)
+
+/* Los proyectos se agrupan por la empresa que los ejecuta. */
+const grupos = EMPRESAS
+  .map((e) => ({ ...e, proyectos: projects.filter((p) => p.empresa === e.id) }))
+  .filter((g) => g.proyectos.length)
 
 export default function ProjectsSection() {
-  const [expanded, setExpanded] = useState(false)
-  const visible = expanded ? projects : projects.slice(0, PREVIEW)
-  const hasMore = projects.length > PREVIEW
-
   return (
     <section className="projects" id="proyectos" aria-labelledby="projects-title">
-      <SectionTitle
-        icon={IconFolders}
-        action={
-          hasMore
-            ? {
-                label: expanded ? 'Ver menos' : 'Ver todos los proyectos',
-                onClick: () => setExpanded((v) => !v),
-                expanded,
-                chevron: true,
-              }
-            : undefined
-        }
-      >
+      <SectionTitle icon={IconFolders}>
         <span id="projects-title">Nuestros proyectos</span>
       </SectionTitle>
 
-      <div className="projects__grid">
-        {visible.map((p) => (
-          <article key={p.id} className="proj card">
-            <div className="proj__head">
-              {p.logo ? (
-                <div className="proj__logo">
-                  <img src={p.logo} alt={p.name} />
-                </div>
-              ) : (
-                <div className="proj__mono" style={{ background: p.color }}>
-                  {p.monogram}
-                </div>
-              )}
-              <h3 className="proj__name">{p.name}</h3>
+      {grupos.map((g) => (
+        <div key={g.id} className="empresa" aria-labelledby={`empresa-${g.id}`}>
+          <header className="empresa__head">
+            <span className="empresa__logo"><img src={g.logo} alt="" /></span>
+            <div>
+              <h3 id={`empresa-${g.id}`} className="empresa__name">{g.name}</h3>
+              <p className="empresa__desc">{g.desc}</p>
             </div>
+          </header>
 
-            <p className="proj__desc">{p.desc}</p>
+          <div className="projects__grid">
+            {g.proyectos.map((p) => (
+              <article key={p.id} className="proj card">
+                <div className="proj__head">
+                  {p.logo ? (
+                    <div className="proj__logo">
+                      <img src={p.logo} alt={p.name} />
+                    </div>
+                  ) : (
+                    <div className="proj__mono" style={{ background: p.color }}>
+                      {p.monogram}
+                    </div>
+                  )}
+                  <h4 className="proj__name">{p.name}</h4>
+                </div>
 
-            <div className="proj__actions">
-              <a className="btn btn--primary" href={p.href || `#${p.id}`}>
-                Ver proyecto
-                <IconArrowRight width={16} height={16} />
-              </a>
-              <a className="btn btn--ghost" href={p.docsHref || `#${p.id}-formatos`}>
-                <IconDownload width={16} height={16} />
-                Descargar formatos
-              </a>
-            </div>
-          </article>
-        ))}
-      </div>
+                <p className="proj__desc">{p.desc}</p>
+
+                <div className="proj__actions">
+                  <a className="btn btn--primary" href={p.href || `#${p.id}`}>
+                    Ver proyecto
+                    <IconArrowRight width={16} height={16} />
+                  </a>
+                  <a className="btn btn--ghost" href={p.docsHref || `#${p.id}-formatos`}>
+                    <IconDownload width={16} height={16} />
+                    Descargar formatos
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      ))}
     </section>
   )
 }

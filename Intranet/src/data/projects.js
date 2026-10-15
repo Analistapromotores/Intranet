@@ -8,25 +8,9 @@ import promotores from '../assets/promotores.png'
 import infraestructura from '../assets/infraestructura/logo.webp'
 import quindioEmprendedor from '../assets/CORPOQUINDIO/quindio_emprendedor.png'
 
-/* Las iniciativas corporativas. `logo` con la marca; si no, `monogram` + `color`.
-   `href` / `docsHref` permiten enlazar a una vista interna del proyecto. */
-export const projects = [
-  {
-    id: 'gys',
-    name: 'Gestión y Servicios',
-    logo: gys,
-    href: '#gys',
-    docsHref: '#gys-formatos',
-    desc: 'Apoyo integral en talento humano para la operación y los proyectos del grupo.',
-  },
-  {
-    id: 'corpoquindio',
-    name: 'Quindío Emprendedor',
-    logo: quindioEmprendedor,
-    desc: 'UT Corpo Quindío: fortalecimiento de 600 unidades productivas en los 12 municipios del Quindío.',
-    href: '#corpoquindio',
-    docsHref: '#corpoquindio-documentos',
-  },
+/* Las empresas del grupo y los proyectos que ejecuta cada una (campo `empresa` de cada proyecto).
+   Gestión y Servicios es la empresa de esta intranet; Corpopaís y Corpores ejecutan un proyecto cada una. */
+export const EMPRESAS = [
   {
     id: 'corpopais',
     name: 'Corpopaís',
@@ -35,13 +19,42 @@ export const projects = [
   },
   {
     id: 'corpores',
-    oculto: true,
     name: 'Corpores',
     logo: corpores,
     desc: 'Corporación Enlaces Sociales: gestión comunitaria y acompañamiento social.',
   },
   {
+    id: 'gys',
+    name: 'Gestión y Servicios',
+    logo: gys,
+    desc: 'Apoyo integral en talento humano para la operación y los proyectos del grupo.',
+  },
+]
+
+/* Los proyectos. `logo` con la marca; si no, `monogram` + `color`.
+   `href` / `docsHref` permiten enlazar a una vista interna del proyecto. */
+export const projects = [
+  {
+    id: 'gys',
+    empresa: 'gys',
+    name: 'Gestión y Servicios',
+    logo: gys,
+    href: '#gys',
+    docsHref: '#gys-formatos',
+    desc: 'Apoyo integral en talento humano para la operación y los proyectos del grupo.',
+  },
+  {
+    id: 'corpoquindio',
+    empresa: 'corpopais',
+    name: 'Quindío Emprendedor',
+    logo: quindioEmprendedor,
+    desc: 'UT Corpo Quindío: fortalecimiento de 600 unidades productivas en los 12 municipios del Quindío.',
+    href: '#corpoquindio',
+    docsHref: '#corpoquindio-documentos',
+  },
+  {
     id: 'mediadores',
+    empresa: 'gys',
     name: 'Mediadores de Convivencia',
     logo: mediadores,
     href: '#mediadores',
@@ -50,6 +63,7 @@ export const projects = [
   },
   {
     id: 'pasaportes',
+    empresa: 'corpores',
     name: 'UT Gestión Pasaportes',
     logo: pasaportes,
     href: '#pasaportes',
@@ -57,6 +71,7 @@ export const projects = [
   },
   {
     id: 'valleinn',
+    empresa: 'gys',
     oculto: true,
     name: 'Fondo ValleINN',
     logo: valleinn,
@@ -64,6 +79,7 @@ export const projects = [
   },
   {
     id: 'promotores',
+    empresa: 'gys',
     name: 'Promotores Mi Cali Bella',
     logo: promotores,
     desc: 'Residuos Cero: pedagogía, prevención y control en el manejo de residuos sólidos en Santiago de Cali.',
@@ -72,6 +88,7 @@ export const projects = [
   },
   {
     id: 'infraestructura',
+    empresa: 'gys',
     name: 'Infraestructura',
     logo: infraestructura,
     href: '#infraestructura',

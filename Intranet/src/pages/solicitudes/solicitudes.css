@@ -446,3 +446,24 @@
 /* La búsqueda ahora es un solo campo (cédula o correo) más el botón. */
 .sv-lookup { grid-template-columns: minmax(0, 1fr) auto; }
 .sv-result .sv-reqs { margin-top: 10px; }
+
+/* ---------- Soporte IT: ingreso al GLPI y manual ---------- */
+.sv-login { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 14px 0 12px; }
+.sv-login__card { padding: 20px 22px; border: 1px solid var(--sv-line, #e3e9f2); border-radius: 16px; background: #fff; display: flex; flex-direction: column; gap: 8px; }
+.sv-login__card p { margin: 0; }
+.sv-login__tag { align-self: flex-start; font-size: 12px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: #073b82; background: #e8f0fb; padding: 4px 10px; border-radius: 999px; }
+.sv-login__ej { padding-top: 8px; border-top: 1px dashed #d4deee; color: #52627d; }
+.sv-login code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; background: #f1f5fb; padding: 2px 7px; border-radius: 6px; color: #102a56; }
+.sv-cards3--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sv-h3 { margin: 26px 0 10px; font-size: 17px; font-weight: 800; }
+.sv-list { margin: 8px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 5px; }
+.sv-estados { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.sv-estados li { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 1px solid #e3e9f2; border-radius: 12px; background: #fff; }
+.sv-estados span { font-size: 14px; color: #52627d; }
+.sv-faq { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.sv-faq details { border: 1px solid #e3e9f2; border-radius: 12px; background: #fff; padding: 12px 16px; }
+.sv-faq summary { cursor: pointer; font-weight: 700; }
+.sv-faq p { margin: 8px 0 0; color: #52627d; }
+@media (max-width: 720px) {
+  .sv-login, .sv-cards3--2, .sv-estados { grid-template-columns: 1fr; }
+}

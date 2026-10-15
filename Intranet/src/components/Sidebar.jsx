@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { navItems } from '../data/navItems.js'
 import {
   IconMenu,
@@ -55,9 +55,10 @@ export default function Sidebar({ layout, onLayoutChange, activeId = 'inicio' })
 
           <nav className="side__nav">
             <ul className="side__list">
-              {navItems.filter((item) => item.menu !== false && (!item.roles || item.roles.includes(user?.role))).map(({ id, label, href, Icon, external, plataforma }) => (
+              {navItems.filter((item) => item.menu !== false && (!item.roles || item.roles.includes(user?.role))).map(({ id, label, href, Icon, external, plataforma, grupo }, i, lista) => (
+                <Fragment key={id}>
+                {grupo && grupo !== lista[i - 1]?.grupo && <li className="side__group" role="presentation">{grupo}</li>}
                 <li
-                  key={id}
                   className={plataforma ? 'side__item side__item--plat' : 'side__item'}
                   onMouseEnter={plataforma ? (e) => ubicarAviso(e) : undefined}
                   onFocus={plataforma ? (e) => ubicarAviso(e) : undefined}
@@ -92,6 +93,7 @@ export default function Sidebar({ layout, onLayoutChange, activeId = 'inicio' })
                     </a>
                   )}
                 </li>
+                </Fragment>
               ))}
             </ul>
           </nav>

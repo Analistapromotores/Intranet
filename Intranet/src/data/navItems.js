@@ -29,13 +29,16 @@ export const navItems = [
   /* `menu: false`: el GLPI ya tiene su botón al pie del menú, aquí solo va en los accesos. */
   { id: 'glpi', label: 'GLPI', href: GLPI_URL, Icon: IconHeadset, accent: 'blue', external: true, menu: false },
 
-  /* Proyectos: quedan en el menú, fuera de la fila de accesos rápidos. */
-  { id: 'gys', label: 'G&S', href: '#gys', Icon: IconStar, accent: 'red', quickAccess: false },
-  { id: 'promotores', label: 'Promotores', href: '#promotores', Icon: IconMegaphone, accent: 'red', quickAccess: false, plataforma: PLATAFORMAS.promotores },
-  { id: 'corpoquindio', label: 'Corpoquindío', href: '#corpoquindio', Icon: IconMountain, accent: 'red', quickAccess: false, plataforma: PLATAFORMAS.corpoquindio },
-  { id: 'mediadores', label: 'Mediadores', href: '#mediadores', Icon: IconUser, accent: 'blue', quickAccess: false },
-  { id: 'pasaportes', label: 'Pasaportes', href: '#pasaportes', Icon: IconPassport, accent: 'blue', quickAccess: false },
-  { id: 'infraestructura', label: 'Infraestructura', href: '#infraestructura', Icon: IconCone, accent: 'blue', quickAccess: false },
+  /* Proyectos agrupados por la empresa que los ejecuta (`grupo`): el menú lateral pinta un encabezado por empresa.
+     Quedan en el menú, fuera de la fila de accesos rápidos. */
+  { id: 'corpoquindio', grupo: 'Corpopaís', label: 'Quindío Emprendedor', href: '#corpoquindio', Icon: IconMountain, accent: 'red', quickAccess: false, plataforma: PLATAFORMAS.corpoquindio },
+
+  { id: 'pasaportes', grupo: 'Corpores', label: 'Pasaportes', href: '#pasaportes', Icon: IconPassport, accent: 'blue', quickAccess: false },
+
+  { id: 'gys', grupo: 'Gestión y Servicios', label: 'G&S', href: '#gys', Icon: IconStar, accent: 'red', quickAccess: false },
+  { id: 'promotores', grupo: 'Gestión y Servicios', label: 'Promotores', href: '#promotores', Icon: IconMegaphone, accent: 'red', quickAccess: false, plataforma: PLATAFORMAS.promotores },
+  { id: 'mediadores', grupo: 'Gestión y Servicios', label: 'Mediadores', href: '#mediadores', Icon: IconUser, accent: 'blue', quickAccess: false },
+  { id: 'infraestructura', grupo: 'Gestión y Servicios', label: 'Infraestructura', href: '#infraestructura', Icon: IconCone, accent: 'blue', quickAccess: false },
 
   /* Directorio: siempre de último en el menú. */
   /* Solo para el rol TI (y admin): alertas y seguimiento. */

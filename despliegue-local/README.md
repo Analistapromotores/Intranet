@@ -6,13 +6,13 @@ y el código de la raíz no se tocan; el compose de aquí reutiliza ese mismo `D
 
 La arquitectura y las reglas están en [`info.md`](info.md).
 
-**Servidor actual (GLPI con su propio nginx): seguir [`MIGRACION.md`](MIGRACION.md)**, que pasa GLPI al
-proxy compartido por fases y con vuelta atrás. La sección «Puesta en marcha» es para una instalación desde cero.
+**Servidor actual (GLPI con su propio nginx): seguir [`PASO-A-PASO.md`](PASO-A-PASO.md)**, que pasa GLPI al
+proxy compartido por fases, con vuelta atrás, y luego publica la intranet. La sección «Puesta en marcha» es para una instalación desde cero.
 
 ```
 despliegue-local/
 ├── info.md                       ← arquitectura y reglas (leer primero)
-├── MIGRACION.md                  ← pasos para el servidor actual
+├── PASO-A-PASO.md                ← pasos para el servidor actual
 ├── intranet/                     ← se usa desde el repo clonado en ~/intranet
 │   ├── docker-compose.yml        ← app (alias «intranet», :3001) + Postgres (intranet-db)
 │   └── .env.example

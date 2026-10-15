@@ -35,3 +35,9 @@ Intranet/src/assets/infraestructura/fotos y videos/
 # La intranet usa las copias optimizadas que viven en public/media.
 Intranet/src/assets/CORPOQUINDIO/MATERIAL/
 Intranet/src/assets/mediadores/*.mp4
+
+# --- Agentes / IA (nunca se versiona) ---
+.agents/
+.claude/
+skills-lock.json
+**/skills-lock.json

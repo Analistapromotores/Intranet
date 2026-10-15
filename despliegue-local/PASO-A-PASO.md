@@ -282,15 +282,34 @@ cd ~/intranet && git pull
 cd despliegue-local/intranet && docker compose up -d --build
 ```
 
-**Renovar certificados (~cada 90 días).** Ahora ambos viven en `~/proxy/nginx/certs/`:
+**Renovar certificados (~cada 60–80 días).** El script hace todo y solo muestra el TXT que hay que
+crear en Colombia Hosting. No necesita abrir puertos.
 
 ```bash
-sudo certbot certonly --manual --preferred-challenges dns -d intranet.gestionyservicios.com.co
-sudo cp /etc/letsencrypt/live/intranet.gestionyservicios.com.co/{fullchain,privkey}.pem ~/proxy/nginx/certs/intranet/
-# GLPI: igual, copiando a ~/proxy/nginx/certs/glpi/  (ya NO a ~/glpi/nginx/certs/)
-sudo chown -R $(whoami):$(whoami) ~/proxy/nginx/certs
-cd ~/proxy && docker compose restart nginx
+sudo ~/intranet/despliegue-local/proxy/certbot/renovar-certificados.sh estado   # días que le quedan a cada uno
+sudo ~/intranet/despliegue-local/proxy/certbot/renovar-certificados.sh          # renueva los que vencen en < 30 días
 ```
+
+Por cada certificado que toca renovar muestra un recuadro así:
+
+```
+│    Tipo:    TXT
+│    Nombre:  _acme-challenge.intranet
+│    Valor:   gfj9Xq...Rg85nM
+│    TTL:     300
+```
+
+Se crea (o se actualiza) ese registro y se deja la terminal abierta: el script detecta solo cuándo el
+registro ya está publicado, valida con Let's Encrypt, copia el certificado a
+`~/proxy/nginx/certs/<sitio>/` y recarga nginx sin corte. Si GLPI e Intranet vencen a la vez, muestra un
+TXT para cada uno, uno después del otro.
+
+Otras opciones: `intranet` o `glpi` (solo uno), `--forzar` (renovar aunque no venza pronto),
+`--prueba` (ensayo contra el entorno de pruebas de Let's Encrypt; requiere crear el TXT igual, no cambia
+ningún certificado).
+
+> Let's Encrypt ya no envía correos de aviso de vencimiento: conviene un recordatorio en el calendario
+> o revisar `estado` cada mes.
 
 **Respaldo de la base de la intranet**
 

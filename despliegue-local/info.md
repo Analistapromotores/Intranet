@@ -141,13 +141,10 @@ networks:
 
 - DNS: registro `intranet` en Colombia Hosting, misma IP que `glpi`. No se necesita regla
   nueva en el router.
-- Let's Encrypt con certbot manual (reto DNS); renovación manual cada ~90 días:
-  ```bash
-  sudo certbot certonly --manual --preferred-challenges dns -d intranet.gestionyservicios.com.co
-  sudo cp /etc/letsencrypt/live/intranet.gestionyservicios.com.co/{fullchain,privkey}.pem ~/proxy/nginx/certs/intranet/
-  sudo chown -R $(whoami):$(whoami) ~/proxy/nginx/certs/intranet
-  cd ~/proxy && docker compose restart nginx
-  ```
+- Let's Encrypt con reto DNS (no se abren puertos para validar). Renovación con
+  `proxy/certbot/renovar-certificados.sh` (con `sudo`): muestra el TXT a crear en Colombia Hosting,
+  espera a que se publique, copia a `~/proxy/nginx/certs/<sitio>/` y hace `nginx -s reload`.
+  `... renovar-certificados.sh estado` muestra los días restantes.
 
 ## Comandos
 

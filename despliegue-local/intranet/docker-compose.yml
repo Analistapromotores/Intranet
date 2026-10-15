@@ -1,0 +1,69 @@
+# Intranet de GyS — despliegue en el servidor interno (junto a GLPI, detrás del nginx de ~/proxy).
+# No publica puertos: todo entra por nginx a través de la red externa proxy_net (alias «intranet», puerto 3001).
+#
+# Uso (desde esta carpeta):  cp .env.example .env   # y completar
+#                            docker compose up -d --build
+#
+# Construye con el mismo Dockerfile de la raíz del repo que usa Railway (no se modifica).
+
+name: intranet
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: intranet-app
+    container_name: intranet-app
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      TRUST_PROXY: 1          # un solo proxy delante (nginx de ~/proxy)
+      DATA_DIR: /data
+      DATABASE_URL: postgres://intranet:${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env}@intranet-db:5432/intranet
+    volumes:
+      - intranet_data:/data
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      interna: {}
+      proxy:
+        aliases:
+          - intranet          # nombre que usa nginx en proxy_pass; no renombrar
+
+  db:
+    image: postgres:16-alpine
+    container_name: intranet-db   # host de la BD; nunca «db» (choca con el MySQL de GLPI)
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: intranet
+      POSTGRES_USER: intranet
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Define POSTGRES_PASSWORD en .env}
+    volumes:
+      - intranet_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U intranet -d intranet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - interna
+
+volumes:
+  intranet_data:
+  intranet_pg:
+
+networks:
+  interna: {}          # solo app <-> db
+  proxy:
+    external: true
+    name: proxy_net    # compartida con el nginx de ~/proxy

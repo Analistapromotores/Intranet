@@ -3,7 +3,15 @@
 server {
     listen 80;
     server_name ${INTRANET_DOMAIN};
-    return 301 https://$host$request_uri;
+
+    # Reto HTTP de Let's Encrypt: certbot (en el host) deja aquí los archivos de verificación.
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
 }
 
 server {

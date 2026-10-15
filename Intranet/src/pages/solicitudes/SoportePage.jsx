@@ -23,6 +23,39 @@ const PASOS = [
   ['Haz seguimiento', 'Consulta el estado y responde si Tecnología te pide más información.'],
 ]
 
+const MANUAL_URL = 'https://docs.google.com/document/d/1EBCRATOr5Sr9Ma3qogEs01JJN6G_kR4QwSZG1jdtul4/edit?tab=t.0'
+
+const TIPOS_CASO = [
+  ['Incidencia', 'Una falla que afecta el funcionamiento normal de un servicio, equipo o aplicación y que hay que restablecer.', ['No puedo acceder al correo institucional.', 'El computador no enciende.', 'La impresora no imprime.', 'No hay conexión a Internet.']],
+  ['Requerimiento', 'Una solicitud de servicio, acceso, configuración o recurso que no es una falla, sino una necesidad tuya.', ['Crear un usuario o una cuenta de correo.', 'Acceso a una aplicación.', 'Instalar un nuevo software.', 'Solicitar o configurar un equipo.']],
+]
+
+const ESTADOS_TICKET = [
+  ['Nuevo', 'La solicitud quedó registrada y espera asignación.'],
+  ['Asignado', 'Ya la tiene un analista responsable.'],
+  ['En proceso', 'Tecnología está trabajando en la solución.'],
+  ['Pendiente', 'Se detuvo de forma temporal: falta información tuya, una autorización o una actividad externa.'],
+  ['Resuelto', 'El analista considera que quedó solucionado y espera tu validación.'],
+  ['Cerrado', 'Finalizó después de validar que la solución fue satisfactoria.'],
+]
+
+const BUENAS_PRACTICAS = [
+  'Registra un solo ticket por cada incidente y evita duplicados.',
+  'Usa títulos claros: «No puedo ingresar al correo institucional», no «Ayuda» ni «No sirve».',
+  'Cuenta qué pasó, cuándo empezó, qué hacías, qué mensaje de error salió y cómo te afecta.',
+  'Adjunta capturas de pantalla o archivos que sirvan de evidencia.',
+  'Responde pronto cuando el analista pida más información: si no, el ticket queda en pendiente.',
+  'Consulta el estado de tu ticket antes de crear uno nuevo y valida la solución antes de cerrarlo.',
+]
+
+const PREGUNTAS = [
+  ['¿Cómo conozco el estado de mi solicitud?', 'Entra a Soporte > Tickets: ahí ves el estado y las personas asignadas.'],
+  ['¿Puedo agregar información después de crear el ticket?', 'Sí. Entra al ticket y registra un seguimiento con comentarios o nuevos archivos, por ejemplo una evidencia que olvidaste adjuntar.'],
+  ['¿Qué hago si el problema vuelve a presentarse?', 'Si el ticket sigue abierto, cuéntalo dentro del mismo. Si ya estaba cerrado, registra uno nuevo indicando que es una recurrencia.'],
+  ['¿Puedo reabrir un ticket cerrado?', 'Depende de las políticas de la organización: Tecnología puede reabrirlo o pedirte registrar uno nuevo.'],
+  ['No puedo ingresar a GLPI, ¿qué hago?', 'Escribe a sistemas@gestionyservicios.com.co para validar tus credenciales o restablecer el acceso.'],
+]
+
 const SEGURIDAD = [
   [IconMail, 'Cuidado con correos electrónicos sospechosos', 'No hagas clic en enlaces ni descargues archivos adjuntos de correos electrónicos desconocidos o sospechosos, ya que pueden contener malware.'],
   [IconCloud, 'Respaldo de datos', 'Realiza copias de seguridad periódicas de tus archivos importantes en un lugar seguro, como Google Drive u otros servicios de almacenamiento en la nube autorizados.'],
@@ -36,6 +69,7 @@ const HERRAMIENTAS = [
 ]
 
 const RECURSOS = [
+  [IconBook, 'Manual de uso del GLPI', 'Guía completa para crear, consultar y cerrar tus tickets de soporte (versión 1.0).', MANUAL_URL],
   [IconShield, 'Políticas de uso de los recursos tecnológicos', 'Lineamientos para el uso adecuado de equipos, cuentas y servicios.', 'https://drive.google.com/file/d/1imFTmPuhi5k2yC6FAjM0zzNDvWgnZInO/view?usp=sharing'],
   [IconBook, 'Inducción de sistemas', 'Material de inducción sobre las herramientas tecnológicas de la empresa.', 'https://drive.google.com/file/d/1YvlFcrx_2uw7u91hFbCTouwo530BV8_9/view?usp=sharing'],
 ]
@@ -85,6 +119,25 @@ export default function SoportePage() {
           </figure>
         </section>
 
+        {/* Cómo ingresar */}
+        <section className="sv-block" aria-labelledby="sv-ingreso">
+          <p className="sv-eyebrow">Acceso</p>
+          <h2 id="sv-ingreso" className="sv-h2">Cómo ingresar a GLPI</h2>
+          <div className="sv-login">
+            <article className="sv-login__card">
+              <span className="sv-login__tag">Usuario</span>
+              <p>La primera letra de tu nombre seguida de tu primer apellido, todo en minúsculas.</p>
+              <p className="sv-login__ej">Si te llamas <b>Juan Cardenas</b>, tu usuario será <code>jcardenas</code></p>
+            </article>
+            <article className="sv-login__card">
+              <span className="sv-login__tag">Contraseña temporal</span>
+              <p><code>Gestion</code> + los últimos cuatro dígitos de tu cédula.</p>
+              <p className="sv-login__ej">Si tu documento termina en <b>7956</b>, tu contraseña será <code>Gestion7956</code></p>
+            </article>
+          </div>
+          <p className="sv-muted">¿No puedes ingresar? Escribe a <a className="sv-link" href="mailto:sistemas@gestionyservicios.com.co">sistemas@gestionyservicios.com.co</a> y Tecnología valida tus credenciales o restablece el acceso.</p>
+        </section>
+
         <section className="sv-block" aria-labelledby="sv-benef">
           <p className="sv-eyebrow">¿Para qué sirve?</p>
           <h2 id="sv-benef" className="sv-h2">GLPI es la plataforma oficial para tus solicitudes e incidentes tecnológicos</h2>
@@ -111,6 +164,47 @@ export default function SoportePage() {
               </li>
             ))}
           </ol>
+        </section>
+
+        {/* Manual de uso del GLPI */}
+        <section className="sv-block" aria-labelledby="sv-manual">
+          <p className="sv-eyebrow">Manual de uso</p>
+          <h2 id="sv-manual" className="sv-h2">Cómo crear y seguir un ticket</h2>
+          <p className="sv-muted">Crea el ticket desde la pantalla principal o en <b>Soporte &gt; Crear caso</b>. Escribe un título claro, describe lo que ocurre, adjunta evidencia y elige el tipo de caso y la categoría; luego pulsa <b>Agregar</b> para guardarlo.</p>
+
+          <div className="sv-cards3 sv-cards3--2">
+            {TIPOS_CASO.map(([t, x, ejemplos]) => (
+              <article key={t} className="sv-tip">
+                <h3>{t}</h3>
+                <p>{x}</p>
+                <ul className="sv-list">{ejemplos.map((e) => <li key={e}>{e}</li>)}</ul>
+              </article>
+            ))}
+          </div>
+
+          <h3 className="sv-h3">Estados de un ticket</h3>
+          <ol className="sv-estados">
+            {ESTADOS_TICKET.map(([t, x]) => (
+              <li key={t}><b>{t}</b><span>{x}</span></li>
+            ))}
+          </ol>
+
+          <h3 className="sv-h3">Buenas prácticas</h3>
+          <ul className="sv-list">{BUENAS_PRACTICAS.map((b) => <li key={b}>{b}</li>)}</ul>
+
+          <h3 className="sv-h3">Preguntas frecuentes</h3>
+          <div className="sv-faq">
+            {PREGUNTAS.map(([q, a]) => (
+              <details key={q}><summary>{q}</summary><p>{a}</p></details>
+            ))}
+          </div>
+
+          <p>
+            <a className="sv-btn" href={MANUAL_URL} target="_blank" rel="noopener noreferrer">
+              <IconBook width={18} height={18} /> Abrir el manual completo <IconExternal width={16} height={16} />
+              <span className="sv-sr">(se abre en una pestaña nueva)</span>
+            </a>
+          </p>
         </section>
 
         <section className="sv-block" aria-labelledby="sv-cambia">

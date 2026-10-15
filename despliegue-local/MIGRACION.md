@@ -61,7 +61,7 @@ docker compose run --rm --no-deps --entrypoint /bin/sh nginx -c 'for f in /etc/n
 
 Debe terminar en `test is successful`. Si falla, corregir antes de seguir.
 
-Después de la fase 3, la renovación del certificado de GLPI (si es manual) también se copia a
+Desde la fase 1, la renovación del certificado de GLPI (si es manual) también se copia a
 `~/proxy/nginx/certs/glpi/` en lugar de `~/glpi/nginx/certs/`.
 
 ## Fase 1 — Corte de GLPI al proxy (segundos de corte)

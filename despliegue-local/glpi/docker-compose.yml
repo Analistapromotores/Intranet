@@ -1,0 +1,70 @@
+name: glpi
+
+# GLPI ya no trae su propio nginx: el proxy inverso vive en ~/proxy
+# y llega a este contenedor por la red externa proxy_net (nombre «glpi», puerto 80).
+
+services:
+
+  # ─── Base de datos MySQL ────────────────────────────────────────────────────
+  db:
+    image: "${MYSQL_IMAGE}"
+    restart: unless-stopped
+    volumes:
+      - ./data/db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${GLPI_DB_NAME}
+      MYSQL_USER: ${GLPI_DB_USER}
+      MYSQL_PASSWORD: ${GLPI_DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - glpi_net          # solo glpi <-> db; la BD no se expone al proxy
+
+  # ─── Aplicación GLPI ────────────────────────────────────────────────────────
+  glpi:
+    build:
+      context: .
+      args:
+        GLPI_VERSION: ${GLPI_VERSION}
+    restart: unless-stopped
+    volumes:
+      - ./data/config:/var/glpi/config
+      - ./data/files:/var/glpi/files
+      - ./data/logs:/var/glpi/logs
+      - ./data/marketplace:/var/glpi/marketplace
+      - ./data/plugins:/var/www/glpi/plugins
+      - ./branding/logos:/var/www/glpi/public/pics/logos:ro
+      - ./php/custom.ini:/usr/local/etc/php/conf.d/99-custom.ini:ro
+    environment:
+      GLPI_DB_HOST: ${GLPI_DB_HOST}
+      GLPI_DB_PORT: ${GLPI_DB_PORT}
+      GLPI_DB_NAME: ${GLPI_DB_NAME}
+      GLPI_DB_USER: ${GLPI_DB_USER}
+      GLPI_DB_PASSWORD: ${GLPI_DB_PASSWORD}
+      GLPI_SKIP_AUTOINSTALL: ${GLPI_SKIP_AUTOINSTALL}
+      GLPI_SKIP_AUTOUPDATE: ${GLPI_SKIP_AUTOUPDATE}
+      GLPI_CRONTAB_ENABLED: ${GLPI_CRONTAB_ENABLED}
+      HTTPS: ${HTTPS}
+      HTTP_X_FORWARDED_PROTO: ${HTTP_X_FORWARDED_PROTO}
+    expose:
+      - "80"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      glpi_net: {}
+      proxy_net:
+        aliases:
+          - glpi          # nombre que usa el proxy en proxy_pass
+
+networks:
+  glpi_net:
+    driver: bridge
+  # Red del proxy (~/proxy). Se crea una sola vez:  docker network create proxy_net
+  proxy_net:
+    external: true

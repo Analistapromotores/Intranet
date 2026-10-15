@@ -1,0 +1,43 @@
+# Proxy inverso único del servidor (glpi, intranet, ...).
+# Es el ÚNICO servicio que publica 80/443 en el host.
+# Cada aplicación vive en su propio proyecto y se une a la red externa proxy_net.
+#
+# Uso (desde ~/proxy):  docker compose up -d
+# Tras cambiar una plantilla o un certificado:  docker compose restart nginx
+
+name: proxy
+
+services:
+  nginx:
+    image: "${NGINX_IMAGE}"
+    restart: unless-stopped
+    # Procesa TODAS las plantillas *.conf.template sustituyendo solo las
+    # variables listadas. El doble $$ en docker-compose se convierte en $ literal
+    # dentro del contenedor, así envsubst no toca las variables propias de nginx
+    # ($host, $remote_addr, ...).
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        for f in /etc/nginx/templates/*.conf.template; do
+          envsubst '$$GLPI_DOMAIN $$INTRANET_DOMAIN $$NGINX_CLIENT_MAX_BODY_SIZE' \
+            < "$$f" > /etc/nginx/conf.d/$$(basename "$$f" .template)
+        done \
+        && exec nginx -g 'daemon off;'
+    environment:
+      GLPI_DOMAIN: ${GLPI_DOMAIN}
+      INTRANET_DOMAIN: ${INTRANET_DOMAIN}
+      NGINX_CLIENT_MAX_BODY_SIZE: ${NGINX_CLIENT_MAX_BODY_SIZE}
+    ports:
+      - "${NGINX_HTTP_PORT}:80"
+      - "${NGINX_HTTPS_PORT}:443"
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    networks:
+      - proxy_net
+
+networks:
+  # Se crea una sola vez a mano:  docker network create proxy_net
+  proxy_net:
+    external: true

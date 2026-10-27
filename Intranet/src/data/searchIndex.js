@@ -29,6 +29,10 @@ navItems.filter((n) => !n.roles).forEach(({ id, label, href, external }) =>
   add({ id: `nav-${id}`, tipo: 'acceso', titulo: label, contexto: 'Intranet', href, externo: external }),
 )
 
+/* --- manual de usuario de Solicitudes --- */
+add({ id: 'manual-solicitudes', tipo: 'documento', titulo: 'Manual de usuario: Solicitudes', detalle: 'Cómo pedir personal, préstamo de equipos, reserva de salas y ausentismo (permisos), paso a paso.', contexto: 'Solicitudes', href: '#solicitudes-manual', externo: false })
+add({ id: 'manual-ausentismo', tipo: 'seccion', titulo: 'Cómo sacar un permiso de ausentismo', detalle: 'Formato FT-OP-76 y envío por correo con anexos.', contexto: 'Manual de usuario', href: '#solicitudes-manual', externo: false })
+
 /* --- extensiones internas --- */
 EXTENSIONES.forEach((e) =>
   add({

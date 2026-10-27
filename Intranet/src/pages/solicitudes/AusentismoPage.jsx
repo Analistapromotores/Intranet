@@ -3,8 +3,9 @@ import { createPortal } from 'react-dom'
 import { MAX_COLABORADORES, MOTIVOS, validarAusentismo } from '../../../shared/salas.js'
 import { hoyISO } from '../../../shared/solicitudes.js'
 import { MARCA } from './brand.js'
+import { CORREO_AUSENTISMO } from './manual.js'
 import { PageHeader, Section } from './ui.jsx'
-import { IconAlert, IconDownload, IconEye, IconPlus, IconPrinter, IconTrash, IconUserClock, IconX } from './icons.jsx'
+import { IconAlert, IconBook, IconDownload, IconEye, IconMail, IconPlus, IconPrinter, IconTrash, IconUserClock, IconX } from './icons.jsx'
 import './ausentismo.css'
 
 /* Ausentismo laboral (FT-OP-76): se diligencia aquí, se revisa en vista previa
@@ -82,6 +83,14 @@ export default function AusentismoPage() {
 
       <div className="sv-wrap sv-page au-layout">
         <div className="au-form">
+          <div className="sv-callout sv-callout--info au-correo" role="note">
+            <IconMail width={20} height={20} />
+            <div>
+              <b>Este trámite termina por correo</b>
+              <p>Diligencia el formato, descárgalo o imprímelo y fírmalo. Luego envíalo con tus anexos (soportes) a <a className="sv-link" href={`mailto:${CORREO_AUSENTISMO}`}>{CORREO_AUSENTISMO}</a>. La intranet no lo envía por ti.</p>
+              <p><a className="sv-link" href="#solicitudes-manual"><IconBook width={14} height={14} /> Ver el manual paso a paso</a></p>
+            </div>
+          </div>
           <Section number="1" title="Datos de la solicitud">
             <div className="sv-grid">
               <Campo label="Fecha de solicitud" error={err('fechaSolicitud')}>

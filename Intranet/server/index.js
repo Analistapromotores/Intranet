@@ -195,6 +195,8 @@ app.use(compression())
 /* Tamaño máximo del cuerpo según el tipo de ruta: solo donde llegan imágenes se admiten cuerpos grandes. */
 app.use(['/api/admin/noticias', '/api/admin/people', '/api/admin/import'], express.json({ limit: '25mb' }))
 app.use('/api/ti', express.json({ limit: '5mb' }))
+/* Ausentismo e incapacidades llevan archivos anexos en base64: hasta 15 MB de archivos (≈ 20 MB de texto). */
+app.use(['/api/solicitudes/ausentismo', '/api/solicitudes/incapacidad'], express.json({ limit: '22mb' }))
 app.use(['/api/solicitudes', '/api/documentos'], express.json({ limit: '2mb' }))
 app.use(express.json({ limit: '1mb' }))
 app.use('/api', mismoOrigen)

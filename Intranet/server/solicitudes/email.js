@@ -1,6 +1,8 @@
 /* Contenido de los correos: primero el mensaje que escribió el solicitante,
    luego un resumen automático para identificar la solicitud de un vistazo. */
 import { TIPOS, formatoFecha, formatoPesos } from '../../shared/solicitudes.js'
+import { MOTIVOS } from '../../shared/salas.js'
+import { CASOS_INCAPACIDAD } from '../../shared/incapacidades.js'
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 
@@ -33,6 +35,37 @@ export function resumen(sol) {
       ['Solicitante', `${d.solicitanteNombre} · ${d.solicitanteCargo} · ${d.correo}`],
     ]
   }
+  const adjuntos = (d.anexos || []).map((a) => a.nombre).join(', ') || '—'
+  const enlaces = (d.enlaces || []).join('\n') || '—'
+  if (sol.tipo === 'ausentismo') {
+    return [
+      ...base,
+      ['Enviado por', `${d.solicitanteNombre} · ${d.correo}`],
+      ['Motivo', MOTIVOS.find(([k]) => k === d.motivo)?.[1] || d.motivo],
+      ['Descripción', d.descripcion],
+      ['¿Tiene soporte?', d.soporte === 'si' ? 'Sí' : 'No'],
+      ['Desde', `${formatoFecha(d.fechaInicio)} ${d.horaInicio || ''}`.trim()],
+      ['Hasta', `${formatoFecha(d.fechaFin)} ${d.horaFin || ''}`.trim()],
+      ['Empresa usuaria', d.empresa],
+      ['Colaboradores', (d.colaboradores || []).map((c) => `${c.nombre} (C.C. ${c.identificacion}) · ${c.cargo}`).join('\n')],
+      ['Jefe inmediato', d.jefe],
+      ['Observaciones', d.observaciones || '—'],
+      ['Anexos', adjuntos],
+      ['Enlaces', enlaces],
+    ]
+  }
+  if (sol.tipo === 'incapacidad') {
+    return [
+      ...base,
+      ['Tipo', CASOS_INCAPACIDAD.find((c) => c.id === d.caso)?.titulo || d.caso],
+      ['Nombre', d.nombre],
+      ['Cédula', d.identificacion],
+      ['Correo', d.correo],
+      ['Teléfono', d.telefono || '—'],
+      ['Anexos', adjuntos],
+      ['Enlaces', enlaces],
+    ]
+  }
   return [
     ...base,
     ['Solicitante', `${d.nombre} · ${d.cargo}`],
@@ -49,9 +82,15 @@ export function resumen(sol) {
 export function componerCorreo(sol, { modo }) {
   const tipo = TIPOS[sol.tipo]
   const filas = resumen(sol)
-  const mensaje = sol.datos.mensajeCorreo || `Se registró una nueva solicitud de préstamo de equipos en la intranet.`
+  /* Incapacidades: asunto y mensaje los escribe la persona. Ausentismo: asunto automático con el nombre y la fecha. */
+  const mensaje = sol.tipo === 'incapacidad' ? sol.datos.cuerpo
+    : sol.tipo === 'ausentismo' ? `Se envía el formato de ausentismo laboral (FT-OP-76) con los anexos correspondientes.\n\n${sol.datos.observaciones || ''}`.trim()
+      : sol.datos.mensajeCorreo || `Se registró una nueva solicitud de préstamo de equipos en la intranet.`
   const prefijo = modo === 'produccion' ? '' : '[PRUEBA] '
-  const subject = `${prefijo}${tipo.asunto} · ${sol.numero}`
+  const asunto = sol.tipo === 'incapacidad' ? sol.datos.asunto
+    : sol.tipo === 'ausentismo' ? `Ausentismo laboral – ${sol.datos.colaboradores?.[0]?.nombre || sol.datos.solicitanteNombre} – ${formatoFecha(sol.datos.fechaInicio)}`
+      : tipo.asunto
+  const subject = `${prefijo}${asunto} · ${sol.numero}`
 
   const text = [
     mensaje,
@@ -60,6 +99,7 @@ export function componerCorreo(sol, { modo }) {
     ...filas.map(([k, v]) => `${k}: ${v}`),
     '',
     tipo.documento ? 'Se adjunta el formato generado automáticamente.' : '',
+    sol.datos.anexos?.length ? `Se adjuntan ${sol.datos.anexos.length} archivo(s) anexo(s).` : '',
     'Mensaje generado por la Intranet de Gestión y Servicios.',
   ].join('\n')
 
@@ -74,9 +114,10 @@ export function componerCorreo(sol, { modo }) {
     <tr><td style="padding:24px 26px;font-size:15px;line-height:1.6;white-space:pre-wrap">${esc(mensaje)}</td></tr>
     <tr><td style="padding:0 26px 24px">
       <table role="presentation" width="100%" style="border-collapse:collapse;font-size:14px">
-        ${filas.map(([k, v]) => `<tr><td style="padding:8px 10px;border-top:1px solid #e3e9f2;color:#52627d;width:42%">${esc(k)}</td><td style="padding:8px 10px;border-top:1px solid #e3e9f2;font-weight:600">${esc(v)}</td></tr>`).join('')}
+        ${filas.map(([k, v]) => `<tr><td style="padding:8px 10px;border-top:1px solid #e3e9f2;color:#52627d;width:42%">${esc(k)}</td><td style="padding:8px 10px;border-top:1px solid #e3e9f2;font-weight:600;white-space:pre-wrap">${esc(v)}</td></tr>`).join('')}
       </table>
       ${tipo.documento ? '<p style="font-size:13px;color:#52627d;margin:18px 0 0">Se adjunta el formato en Excel generado automáticamente.</p>' : ''}
+      ${sol.datos.anexos?.length ? `<p style="font-size:13px;color:#52627d;margin:10px 0 0">Se adjuntan ${sol.datos.anexos.length} archivo(s) anexo(s).</p>` : ''}
     </td></tr>
     <tr><td style="background:#f4f7fb;padding:14px 26px;font-size:12px;color:#6b7a92">Mensaje generado por la Intranet de Gestión y Servicios.</td></tr>
   </table></body></html>`

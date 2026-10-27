@@ -81,6 +81,13 @@ delegación. Hay dos opciones; si no se configura ninguna, las solicitudes se gu
 `EMAIL_PRODUCCION`, `EMAIL_PRESTAMOS`, `EMAIL_TI` y `MAIL_MODE=produccion`. Si `SHEET_ID` está definido, la hoja tiene
 prioridad y no se envía correo.
 
+**Ausentismo e incapacidades.** Estos dos formularios siempre envían un correo al buzón de Talento Humano
+(`incapacidadesgys@gestionyservicios.com.co`, o el de `EMAIL_INCAPACIDADES`) con el Excel del formato (ausentismo) y los
+archivos anexos, aunque `SHEET_ID` esté definido (la hoja solo se usa para anotar además la solicitud). Hasta que se configure Gmail
+o SMTP, el correo no sale: queda guardado como `.eml` en el sistema y la solicitud se registra igual con su número.
+Las pestañas nuevas de la hoja son «Ausentismo» e «Incapacidades». Los anexos (hasta 5 archivos de 5 MB, PDF, imagen, Word o Excel)
+se guardan con la solicitud y se descargan desde Gestión de solicitudes. nginx debe permitir cuerpos de al menos 22 MB.
+
 ## 5. Lista de comprobación tras subir
 
 - [ ] `GET /api/health` responde `{"ok":true,"db":"postgres"}`.

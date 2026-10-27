@@ -5,6 +5,7 @@
 import ExcelJS from 'exceljs'
 import path from 'node:path'
 import { ROOT } from '../config.js'
+import { excelAusentismo } from '../salas/routes.js'
 import { MAX_BENEFICIOS, N_COMPETENCIAS, N_DOCUMENTOS, N_FUNCIONES, PORCENTAJES, SERVICIOS } from '../../shared/solicitudes.js'
 
 const TEMPLATES = path.join(ROOT, 'server', 'templates')
@@ -121,6 +122,7 @@ export async function ordenServicio(sol) {
 }
 
 export const GENERADORES = {
+  ausentismo: { fn: (sol) => excelAusentismo(sol.datos), nombre: (s) => `FT-OP-76 Ausentismo ${s.numero}.xlsx` },
   informe_ingreso: { fn: informeIngreso, nombre: (s) => `FT-OP-10 Informe de Ingreso ${s.numero}.xlsx` },
   orden_servicio: { fn: ordenServicio, nombre: (s) => `FT-OP-03 Orden de Servicio ${s.numero}.xlsx` },
 }

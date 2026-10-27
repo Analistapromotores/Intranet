@@ -8,15 +8,14 @@ import GestionPage from './GestionPage.jsx'
 import SalasPage from './SalasPage.jsx'
 import AusentismoPage from './AusentismoPage.jsx'
 import IncapacidadesPage from './IncapacidadesPage.jsx'
-import ManualPage from './ManualPage.jsx'
 import { PageHeader } from './ui.jsx'
 import { FOTOS, MARCA } from './brand.js'
-import { IconArrowRight, IconBook, IconCheckCircle, IconClipboard, IconCalendarPlus, IconClock, IconHeadset, IconMedical, IconUserClock, IconLaptop, IconList, IconLock, IconSearch, IconSend, IconUserCheck, IconUserSearch } from './icons.jsx'
+import { IconArrowRight, IconCheckCircle, IconClipboard, IconCalendarPlus, IconClock, IconHeadset, IconMedical, IconUserClock, IconLaptop, IconList, IconLock, IconSearch, IconSend, IconUserCheck, IconUserSearch } from './icons.jsx'
 import './solicitudes.css'
 import './brand.css'
 
 /* Centro de servicios internos. Rutas por hash:
-   #solicitudes · -personal · -personal-ingreso · -personal-orden · -soporte · -prestamo · -consulta · -gestion · -manual */
+   #solicitudes · -personal · -personal-ingreso · -personal-orden · -soporte · -prestamo · -consulta · -gestion */
 export default function SolicitudesPage({ hash }) {
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'auto' }) }, [hash])
 
@@ -31,7 +30,6 @@ export default function SolicitudesPage({ hash }) {
     case 'solicitudes-salas': return <SalasPage />
     case 'solicitudes-ausentismo': return <AusentismoPage />
     case 'solicitudes-incapacidades': return <IncapacidadesPage />
-    case 'solicitudes-manual': return <ManualPage />
     default: return <Inicio />
   }
 }
@@ -83,8 +81,8 @@ const SERVICIOS = [
     icon: IconUserClock,
     tone: 'blue',
     title: 'Ausentismo laboral',
-    text: 'Diligencia el formato FT-OP-76, descárgalo o imprímelo, fírmalo y envíalo por correo con tus anexos.',
-    meta: 'Formato FT-OP-76 · Se envía por correo',
+    text: 'Diligencia el formato FT-OP-76, anexa tus soportes y envíalo a Talento Humano.',
+    meta: 'Formato FT-OP-76 · Envío por correo con anexos',
     cta: 'Diligenciar formato',
   },
   {
@@ -93,9 +91,9 @@ const SERVICIOS = [
     icon: IconMedical,
     tone: 'teal',
     title: 'Incapacidades',
-    text: 'Conoce la documentación que necesitas para cada tipo de incapacidad o licencia y a dónde enviarla.',
+    text: 'Elige el tipo de incapacidad o licencia, redacta tu correo y envíalo con tus documentos a Talento Humano.',
     meta: 'General, laboral, tránsito, maternidad y paternidad',
-    cta: 'Ver requisitos',
+    cta: 'Enviar incapacidad',
   },
 ]
 
@@ -110,7 +108,6 @@ function Inicio() {
         photo={FOTOS.equipoBanner}
       >
         <a className="sv-btn sv-btn--light" href="#solicitudes-consulta"><IconList width={18} height={18} /> Mis solicitudes</a>
-        <a className="sv-btn sv-btn--light" href="#solicitudes-manual"><IconBook width={18} height={18} /> Manual de usuario</a>
       </PageHeader>
 
       <div className="sv-wrap sv-page">

@@ -3,6 +3,8 @@
 /* Salas disponibles. Para agregar una, suma un objeto aquí (id único y color). */
 export const SALAS = [
   { id: 'piso2', nombre: 'Sala piso 2', piso: 'Piso 2', color: '#b3121c' },
+  { id: 'piso3', nombre: 'Sala piso 3', piso: 'Piso 3', color: '#073b82' },
+  { id: 'otra', nombre: 'Otra sala', piso: 'Otro espacio', color: '#1f8f4d' },
 ]
 
 /* Horario en que se pueden reservar las salas. */

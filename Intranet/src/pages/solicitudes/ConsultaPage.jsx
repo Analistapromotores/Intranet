@@ -89,9 +89,9 @@ export default function ConsultaPage() {
             <div className="sv-field">
               <label className="sv-label" htmlFor="sv-dato">Número de cédula o correo</label>
               <input id="sv-dato" className="sv-input" value={dato} onChange={(e) => setDato(e.target.value)} placeholder="Ej. 1130456789 o nombre@gestionyservicios.com.co" autoComplete="off" aria-describedby="sv-dato-ayuda" />
-              <small id="sv-dato-ayuda" className="sv-muted">Usa cualquiera de los dos: el correo con el que registraste la solicitud o la cédula que escribiste en ella.</small>
             </div>
             <button type="submit" className="sv-btn" disabled={buscando}>{buscando ? <><span className="sv-spinner" aria-hidden="true" /> Buscando…</> : <><IconSearch width={18} height={18} /> Consultar</>}</button>
+            <small id="sv-dato-ayuda" className="sv-muted sv-lookup__help">Usa cualquiera de los dos: el correo con el que registraste la solicitud o la cédula que escribiste en ella.</small>
           </form>
           {error && <p className="sv-alert sv-alert--error" role="alert">{error}</p>}
           {resultados && (

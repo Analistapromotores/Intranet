@@ -52,7 +52,7 @@ const fechaExcel = (iso) => {
 }
 const fechaTexto = (iso) => { const [y, m, d] = String(iso).split('-'); return `${d}/${m}/${y}` }
 
-async function excelAusentismo(d) {
+export async function excelAusentismo(d) {
   const wb = new ExcelJS.Workbook()
   await wb.xlsx.readFile(path.join(ROOT, 'server', 'templates', 'ausentismo.xlsx'))
   const ws = wb.worksheets[0]

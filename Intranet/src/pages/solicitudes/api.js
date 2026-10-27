@@ -39,4 +39,5 @@ export const api = {
   cambiarEstado: (id, estado, comentario) => request(`/admin/solicitudes/${id}/estado`, { method: 'PATCH', body: { estado, comentario } }),
   reenviar: (id) => request(`/admin/solicitudes/${id}/reenviar`, { method: 'POST' }),
   archivoUrl: (id) => `/api/admin/solicitudes/${id}/archivo`,
+  anexoUrl: (id, n) => `/api/admin/solicitudes/${id}/anexos/${n}`,
 }

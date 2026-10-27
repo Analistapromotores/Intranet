@@ -39,7 +39,8 @@ export function useSolicitudForm(tipo, inicial, claveBorrador) {
     const t = setTimeout(() => {
       try {
         const fecha = new Date().toISOString()
-        localStorage.setItem(claveBorrador, JSON.stringify({ datos, fecha }))
+        /* Los archivos anexos no se guardan en el borrador (pesan mucho): hay que volver a anexarlos. */
+        localStorage.setItem(claveBorrador, JSON.stringify({ datos: { ...datos, anexos: [] }, fecha }))
         setGuardado(fecha)
       } catch {
         /* sin almacenamiento: el borrador no se conserva */

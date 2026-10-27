@@ -4,7 +4,7 @@ import FormWizard from './FormWizard.jsx'
 import { useSolicitudForm } from './form.js'
 import { FOTOS } from './brand.js'
 import { DigitsField, FormAside, PageHeader, Review, Section, SelectField, TextArea, TextField } from './ui.jsx'
-import { IconAlert, IconLaptop, IconPlus, IconTrash } from './icons.jsx'
+import { IconLaptop, IconPlus, IconTrash } from './icons.jsx'
 
 const nuevo = () => ({
   nombre: '', cargo: '', documento: '', celular: '', correo: '', area: '',
@@ -107,17 +107,7 @@ export default function PrestamoPage() {
         photo={FOTOS.prestamo}
       />
       <div className="sv-wrap sv-page">
-        <aside className="sv-notice" aria-labelledby="sv-notice-title">
-          <span className="sv-notice__icon"><IconAlert width={24} height={24} /></span>
-          <div>
-            <h2 id="sv-notice-title">Solicitud de préstamo de equipos tecnológicos</h2>
-            <p>Se informa que los equipos tecnológicos que sean prestados son de <b>exclusiva responsabilidad del usuario receptor</b>.</p>
-            <p>Estos equipos no pueden ser reasignados a otro usuario ni trasladados a otro lugar sin la autorización correspondiente.</p>
-            <p>Al finalizar el período de préstamo, es obligatorio devolver los equipos al área de TI para su revisión y registro.</p>
-            <p>Además, el préstamo de equipos está sujeto a la disponibilidad de los mismos.</p>
-          </div>
-        </aside>
-        <FormWizard form={form} steps={steps} labels={LABELS} review={review} correoSolicitante={(x) => x.correo} volverHref="#solicitudes" aside={<FormAside title="Antes de pedir" tips={['Tu documento y número de celular', 'Las fechas de uso y de devolución', 'Detalles técnicos: programas, HDMI, cables…', 'Recuerda: el préstamo depende de la disponibilidad']} photo={FOTOS.soporte} note="El área de TI revisa y registra cada equipo al entregarlo y al recibirlo." />} />
+        <FormWizard form={form} steps={steps} labels={LABELS} review={review} correoSolicitante={(x) => x.correo} volverHref="#solicitudes" aside={<FormAside title="Antes de pedir" tips={['Tu documento y número de celular', 'Las fechas de uso y de devolución', 'Detalles técnicos: programas, HDMI, cables…']} photo={FOTOS.soporte} note="El área de TI revisa y registra cada equipo al entregarlo y al recibirlo." />} />
       </div>
     </div>
   )

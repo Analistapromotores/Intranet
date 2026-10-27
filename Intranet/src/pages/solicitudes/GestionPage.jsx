@@ -146,7 +146,7 @@ function filas(s) {
   const v = (x) => (typeof x === 'number' && x > 999 ? formatoPesos(x) : /^\d{4}-\d{2}-\d{2}$/.test(String(x)) ? formatoFecha(x) : x)
   const out = []
   for (const [k, x] of Object.entries(d)) {
-    if (k === 'mensajeCorreo') continue
+    if (k === 'mensajeCorreo' || k === 'anexos' || k === 'cuerpo') continue
     if (Array.isArray(x)) {
       const items = x.map((it) => (typeof it === 'object' ? Object.values(it).filter(Boolean).map(v).join(' · ') : it)).filter(Boolean)
       if (items.length) out.push([k, items.join(' | ')])
@@ -162,7 +162,7 @@ const ETIQUETAS = {
   telefono: 'Teléfono', direccion: 'Dirección', correo: 'Correo', auxilioTransporte: 'Auxilio de transporte', solicitanteNombre: 'Solicitante',
   solicitanteCargo: 'Cargo del solicitante', solicitanteCorreo: 'Correo del solicitante', responsableNombre: 'Responsable de contratación',
   responsableCargo: 'Cargo del responsable', justificacion: 'Justificación', ciudadSede: 'Ciudad o sede', tipoContratacion: 'Tipo de contratación',
-  formacion: 'Formación', documento: 'Documento', area: 'Área', fechaRequerida: 'Fecha requerida', fechaDevolucion: 'Fecha de devolución', observacion: 'Observación',
+  formacion: 'Formación', documento: 'Documento', area: 'Área', fechaRequerida: 'Fecha requerida', solicitanteDocumento: 'Cédula del solicitante', caso: 'Tipo', asunto: 'Asunto', enlaces: 'Enlaces', fechaDevolucion: 'Fecha de devolución', observacion: 'Observación',
 }
 const LEGIBLE = (k) => ETIQUETAS[k] || k.replace(/([A-Z])/g, ' $1').toLowerCase().replace(/^./, (c) => c.toUpperCase())
 
@@ -222,7 +222,13 @@ function Detalle({ s, onClose, onChange }) {
           <section>
             <h3>Datos de la solicitud</h3>
             <dl className="sv-kv">{filas(s).map(([k, x]) => <div key={k}><dt>{LEGIBLE(k)}</dt><dd>{String(x)}</dd></div>)}</dl>
-            {s.datos.mensajeCorreo && <><h3>Mensaje del correo</h3><p className="sv-pre sv-msg">{s.datos.mensajeCorreo}</p></>}
+            {(s.datos.mensajeCorreo || s.datos.cuerpo) && <><h3>Mensaje del correo</h3><p className="sv-pre sv-msg">{s.datos.mensajeCorreo || s.datos.cuerpo}</p></>}
+            {s.datos.anexos?.length > 0 && (
+              <>
+                <h3>Anexos</h3>
+                <ul className="sv-list">{s.datos.anexos.map((a, i) => <li key={a.nombre + i}><a className="sv-link" href={api.anexoUrl(s.id, i)}>{a.nombre}</a> <small className="sv-muted">({Math.max(1, Math.round(a.tamano / 1024))} KB)</small></li>)}</ul>
+              </>
+            )}
           </section>
           <aside>
             <h3>Cambiar estado</h3>

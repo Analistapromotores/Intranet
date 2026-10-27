@@ -34,7 +34,27 @@ export const TIPOS = {
     asunto: 'Solicitud de Préstamo de Equipos',
     documento: false,
   },
+  /* Los dos siguientes se envían al buzón de incapacidades (con anexos) y quedan registrados con su número. */
+  ausentismo: {
+    prefijo: 'AU',
+    nombre: 'Ausentismo laboral',
+    categoria: 'Talento humano',
+    asunto: 'Ausentismo laboral (FT-OP-76)',
+    documento: true,
+    anexos: true,
+  },
+  incapacidad: {
+    prefijo: 'IN',
+    nombre: 'Incapacidad o licencia',
+    categoria: 'Talento humano',
+    asunto: 'Incapacidad o licencia',
+    documento: false,
+    anexos: true,
+  },
 }
+
+import { validarAusentismo } from './salas.js'
+import { CASOS_INCAPACIDAD, validarAnexos } from './incapacidades.js'
 
 export const PERIODICIDADES = ['Mensual', 'Quincenal', 'Semanal', 'Anual', 'Única', 'Otro']
 
@@ -165,6 +185,7 @@ function validarInforme(d) {
     if (b.periodicidad === 'Otro') check(e, `beneficios.${i}.periodicidadOtra`, b.periodicidadOtra, r.req('Especifica la periodicidad.'), r.max(30))
   })
   check(e, 'solicitanteNombre', d.solicitanteNombre, r.req(), r.min(5), r.max(90))
+  check(e, 'solicitanteDocumento', d.solicitanteDocumento, r.req('Lo usamos para que puedas consultar tu solicitud.'), r.doc)
   check(e, 'solicitanteCargo', d.solicitanteCargo, r.req(), r.max(80))
   check(e, 'solicitanteCorreo', d.solicitanteCorreo, r.req('Lo usamos para que puedas consultar tu solicitud.'), r.email)
   check(e, 'firma', d.firma, r.firma)
@@ -208,6 +229,7 @@ function validarOrden(d) {
   if (total !== 100) e.porcentajes = `Los porcentajes deben sumar 100 %. Ahora suman ${total} %.`
   check(e, 'observaciones', d.observaciones, r.max(600))
   check(e, 'solicitanteNombre', d.solicitanteNombre, r.req(), r.min(5), r.max(90))
+  check(e, 'solicitanteDocumento', d.solicitanteDocumento, r.req('Lo usamos para que puedas consultar tu solicitud.'), r.doc)
   check(e, 'solicitanteCargo', d.solicitanteCargo, r.req(), r.max(80))
   check(e, 'firma', d.firma, r.firma)
   comunes(e, d)
@@ -238,7 +260,32 @@ function validarPrestamo(d) {
   return e
 }
 
+/* ---------- Ausentismo laboral (FT-OP-76) ---------- */
+function validarAusentismoSolicitud(d) {
+  const e = validarAusentismo(d)
+  check(e, 'solicitanteNombre', d.solicitanteNombre, r.req('Escribe tu nombre.'), r.min(5), r.max(90))
+  check(e, 'correo', d.correo, r.req('Lo usamos para que puedas consultar tu solicitud.'), r.email)
+  validarAnexos(d, e)
+  return e
+}
+
+/* ---------- Incapacidades y licencias ---------- */
+function validarIncapacidad(d) {
+  const e = {}
+  if (!CASOS_INCAPACIDAD.some((c) => c.id === d.caso)) e.caso = 'Elige el tipo de incapacidad o licencia.'
+  check(e, 'nombre', d.nombre, r.req(), r.min(5), r.max(90))
+  check(e, 'identificacion', d.identificacion, r.req('Escribe tu número de cédula.'), r.doc)
+  check(e, 'correo', d.correo, r.req('Lo usamos para que puedas consultar tu solicitud.'), r.email)
+  check(e, 'telefono', d.telefono, r.tel)
+  check(e, 'asunto', d.asunto, r.req('Escribe el asunto del correo.'), r.min(5), r.max(150))
+  check(e, 'cuerpo', d.cuerpo, r.req('Escribe el mensaje del correo.'), r.min(10), r.max(5000))
+  validarAnexos(d, e)
+  return e
+}
+
 export const VALIDADORES = {
+  ausentismo: validarAusentismoSolicitud,
+  incapacidad: validarIncapacidad,
   informe_ingreso: validarInforme,
   orden_servicio: validarOrden,
   prestamo_equipos: validarPrestamo,

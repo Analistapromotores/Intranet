@@ -13,7 +13,7 @@ const nuevo = () => ({
   competencias: Array(N_COMPETENCIAS).fill(''), documentos: Array(N_DOCUMENTOS).fill(''), funciones: Array(N_FUNCIONES).fill(''),
   servicios: Object.fromEntries(SERVICIOS.map(([k]) => [k, false])),
   porcentajes: { estudios: '', pruebas: '', experiencia: '', entrevista: '' },
-  observaciones: '', solicitanteNombre: '', solicitanteCargo: '', firma: '',
+  observaciones: '', solicitanteNombre: '', solicitanteDocumento: '', solicitanteCargo: '', firma: '',
   mensajeCorreo: '',
 })
 
@@ -22,7 +22,7 @@ const LABELS = {
   cargo: 'Nombre del cargo', ciudadSede: 'Ciudad o sede', cantidad: 'Cantidad requerida', salario: 'Salario', tipoContratacion: 'Tipo de contratación', tipoContratacionOtro: 'Otro tipo de contratación', adicionales: 'Adicionales al salario',
   horario: 'Horario o jornada', formacion: 'Formación académica', experiencia: 'Experiencia requerida', habilidades: 'Habilidades requeridas',
   competencias: 'Competencia', documentos: 'Documento adicional', funciones: 'Responsabilidad', porcentajes: 'Porcentajes de evaluación',
-  observaciones: 'Observaciones', solicitanteNombre: 'Nombre del solicitante', solicitanteCargo: 'Cargo del solicitante', firma: 'Firma', mensajeCorreo: 'Mensaje del correo',
+  observaciones: 'Observaciones', solicitanteNombre: 'Nombre del solicitante', solicitanteDocumento: 'Tu número de cédula', solicitanteCargo: 'Cargo del solicitante', firma: 'Firma', mensajeCorreo: 'Mensaje del correo',
 }
 
 /* Lista de campos cortos numerados (competencias, documentos, funciones). */
@@ -146,7 +146,7 @@ export default function OrdenForm() {
     {
       id: 'firma',
       title: 'Observaciones y firma',
-      campos: ['observaciones', 'solicitanteNombre', 'solicitanteCargo', 'firma'],
+      campos: ['observaciones', 'solicitanteNombre', 'solicitanteDocumento', 'solicitanteCargo', 'firma'],
       render: () => (
         <>
           <Section number="10" title="Observaciones" description="Información adicional a tener en cuenta (opcional).">
@@ -155,6 +155,7 @@ export default function OrdenForm() {
           <Section number="11" title="Solicitante" description="Quien diligencia y firma la orden.">
             <div className="sv-grid">
               <TextField form={form} path="solicitanteNombre" label="Nombre del solicitante" required autoComplete="name" />
+              <DigitsField form={form} path="solicitanteDocumento" label="Tu número de cédula" required hint="Con tu cédula o tu correo podrás consultar el estado." />
               <TextField form={form} path="solicitanteCargo" label="Cargo del solicitante" required autoComplete="organization-title" />
               <SignaturePad form={form} path="firma" label="Firma del solicitante" required />
               <div className="sv-field sv-col-2">

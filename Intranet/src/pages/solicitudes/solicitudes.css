@@ -467,3 +467,7 @@
 @media (max-width: 720px) {
   .sv-login, .sv-cards3--2, .sv-estados { grid-template-columns: 1fr; }
 }
+
+.sv-lookup { align-items: end; }
+.sv-lookup .sv-btn { height: 46px; }
+.sv-lookup__help { grid-column: 1 / -1; margin-top: -4px; }

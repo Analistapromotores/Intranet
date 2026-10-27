@@ -14,6 +14,8 @@ export const MAIL = {
   produccion: process.env.EMAIL_PRODUCCION || 'gerenciaadmin@gestionyservicios.com.co',
   /* Préstamos de equipos: en producción los recibe TI. */
   prestamos: process.env.EMAIL_PRESTAMOS || process.env.EMAIL_PRODUCCION || 'gerenciaadmin@gestionyservicios.com.co',
+  /* Incapacidades, licencias y ausentismo: en producción los recibe Talento Humano. */
+  incapacidades: process.env.EMAIL_INCAPACIDADES || 'incapacidadesgys@gestionyservicios.com.co',
   from: process.env.MAIL_FROM || 'Intranet Gestión y Servicios <no-responder@gestionyservicios.com.co>',
   smtp: process.env.SMTP_HOST
     ? {
@@ -28,6 +30,7 @@ export const MAIL = {
 /* Destinatario según el tipo de solicitud y el modo. */
 export function destinatario(tipo) {
   if (MAIL.modo !== 'produccion') return MAIL.pruebas
+  if (tipo === 'ausentismo' || tipo === 'incapacidad') return MAIL.incapacidades
   return tipo === 'prestamo_equipos' ? MAIL.prestamos : MAIL.produccion
 }
 

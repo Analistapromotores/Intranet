@@ -1,11 +1,14 @@
 import { cloneElement, isValidElement, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { MAX_COLABORADORES, MOTIVOS, validarAusentismo } from '../../../shared/salas.js'
-import { hoyISO } from '../../../shared/solicitudes.js'
+import { hoyISO, validar } from '../../../shared/solicitudes.js'
+import { CORREO_INCAPACIDADES } from '../../../shared/incapacidades.js'
+import { ApiError, api } from './api.js'
+import { recordarSolicitud } from './form.js'
+import { AnexosEditor, Enviado } from './anexos.jsx'
 import { MARCA } from './brand.js'
-import { CORREO_AUSENTISMO } from './manual.js'
 import { PageHeader, Section } from './ui.jsx'
-import { IconAlert, IconBook, IconDownload, IconEye, IconMail, IconPlus, IconPrinter, IconTrash, IconUserClock, IconX } from './icons.jsx'
+import { IconAlert, IconDownload, IconEye, IconPlus, IconPrinter, IconSend, IconTrash, IconUserClock, IconX } from './icons.jsx'
 import './ausentismo.css'
 
 /* Ausentismo laboral (FT-OP-76): se diligencia aquí, se revisa en vista previa
@@ -17,8 +20,9 @@ const nuevo = () => ({
   fechaInicio: '', horaInicio: '', fechaFin: '', horaFin: '',
   empresa: 'Gestión y Servicios', colaboradores: [{ nombre: '', identificacion: '', cargo: '' }],
   observaciones: '', jefe: '',
+  solicitanteNombre: '', correo: '', anexos: [], enlaces: [],
 })
-const leer = () => { try { return { ...nuevo(), ...JSON.parse(localStorage.getItem(CLAVE) || '{}'), fechaSolicitud: hoyISO() } } catch { return nuevo() } }
+const leer = () => { try { return { ...nuevo(), ...JSON.parse(localStorage.getItem(CLAVE) || '{}'), fechaSolicitud: hoyISO(), anexos: [] } } catch { return nuevo() } }
 const fecha = (iso) => (iso ? iso.split('-').reverse().join('/') : '')
 const hora12 = (h) => { if (!h) return ''; const [a, b] = h.split(':').map(Number); return `${((a + 11) % 12) + 1}:${String(b).padStart(2, '0')} ${a < 12 ? 'a. m.' : 'p. m.'}` }
 
@@ -28,26 +32,46 @@ export default function AusentismoPage() {
   const [vista, setVista] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  const errores = useMemo(() => validarAusentismo(d), [d])
-  const hayErrores = Object.keys(errores).length > 0
+  const errores = useMemo(() => validar('ausentismo', d), [d])
+  const erroresFormato = useMemo(() => validarAusentismo(d), [d])
+  const hayErrores = Object.keys(erroresFormato).length > 0
+  const [enviando, setEnviando] = useState(false)
+  const [resultado, setResultado] = useState(null)
   const err = (k) => tocados[k] && errores[k]
 
-  useEffect(() => { try { localStorage.setItem(CLAVE, JSON.stringify(d)) } catch { /* sin almacenamiento */ } }, [d])
+  useEffect(() => { try { localStorage.setItem(CLAVE, JSON.stringify({ ...d, anexos: [] })) } catch { /* sin almacenamiento */ } }, [d])
 
   const set = (k, v) => setD((x) => ({ ...x, [k]: v }))
   const toque = (k) => setTocados((x) => ({ ...x, [k]: true }))
   const setCol = (i, k, v) => setD((x) => ({ ...x, colaboradores: x.colaboradores.map((c, j) => (j === i ? { ...c, [k]: v } : c)) }))
-  const tocarTodo = () => setTocados(Object.fromEntries(Object.keys(errores).map((k) => [k, true])))
+  const tocarTodo = (e = erroresFormato) => setTocados(Object.fromEntries(Object.keys(e).map((k) => [k, true])))
 
-  function revisar() {
-    tocarTodo()
-    if (hayErrores) {
+  function revisar(conEnvio = false) {
+    tocarTodo(conEnvio ? errores : erroresFormato)
+    if (conEnvio ? Object.keys(errores).length : hayErrores) {
       setError('Revisa los campos marcados antes de continuar.')
-      requestAnimationFrame(() => document.querySelector('.au .has-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))
+      requestAnimationFrame(() => document.querySelector('.au .has-error, .au .sv-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))
       return false
     }
     setError('')
     return true
+  }
+
+  async function enviar() {
+    if (!revisar(true)) return
+    setEnviando(true)
+    try {
+      const r = await api.enviar('ausentismo', d)
+      recordarSolicitud(r.numero, d.correo)
+      try { localStorage.removeItem(CLAVE) } catch { /* sin almacenamiento */ }
+      setResultado(r)
+      requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: 'smooth' }))
+    } catch (e) {
+      setError(e.message)
+      if (e instanceof ApiError && Object.keys(e.fields).length) setTocados((x) => ({ ...x, ...Object.fromEntries(Object.keys(e.fields).map((k) => [k, true])) }))
+    } finally {
+      setEnviando(false)
+    }
   }
 
   async function descargar() {
@@ -81,16 +105,11 @@ export default function AusentismoPage() {
         icon={IconUserClock}
       />
 
+      {resultado ? (
+        <div className="sv-wrap sv-page"><Enviado resultado={resultado} destino={CORREO_INCAPACIDADES} /></div>
+      ) : (
       <div className="sv-wrap sv-page au-layout">
         <div className="au-form">
-          <div className="sv-callout sv-callout--info au-correo" role="note">
-            <IconMail width={20} height={20} />
-            <div>
-              <b>Este trámite termina por correo</b>
-              <p>Diligencia el formato, descárgalo o imprímelo y fírmalo. Luego envíalo con tus anexos (soportes) a <a className="sv-link" href={`mailto:${CORREO_AUSENTISMO}`}>{CORREO_AUSENTISMO}</a>. La intranet no lo envía por ti.</p>
-              <p><a className="sv-link" href="#solicitudes-manual"><IconBook width={14} height={14} /> Ver el manual paso a paso</a></p>
-            </div>
-          </div>
           <Section number="1" title="Datos de la solicitud">
             <div className="sv-grid">
               <Campo label="Fecha de solicitud" error={err('fechaSolicitud')}>
@@ -192,14 +211,38 @@ export default function AusentismoPage() {
             </div>
           </Section>
 
+          <Section number="6" title="Quién lo envía" description="Con tu correo podrás consultar el estado en «Mis solicitudes».">
+            <div className="sv-grid">
+              <Campo label="Tu nombre" error={err('solicitanteNombre')}>
+                <input className="sv-input" autoComplete="name" value={d.solicitanteNombre} onChange={(e) => set('solicitanteNombre', e.target.value)} onBlur={() => toque('solicitanteNombre')} />
+              </Campo>
+              <Campo label="Tu correo electrónico" error={err('correo')}>
+                <input className="sv-input" type="email" autoComplete="email" value={d.correo} onChange={(e) => set('correo', e.target.value)} onBlur={() => toque('correo')} />
+              </Campo>
+            </div>
+          </Section>
+
+          <Section number="7" title="Anexos" description="Los soportes del ausentismo: archivos o enlaces (opcional).">
+            <AnexosEditor
+              anexos={d.anexos}
+              enlaces={d.enlaces}
+              onChange={({ anexos, enlaces }) => setD((x) => ({ ...x, anexos, enlaces }))}
+              error={errores.anexos}
+              errorEnlaces={errores.enlaces}
+            />
+          </Section>
+
           {error && <p className="sv-alert sv-alert--error" role="alert">{error}</p>}
           <div className="au-actions">
             <button type="button" className="sv-btn sv-btn--ghost" onClick={() => { if (window.confirm('¿Limpiar el formulario?')) { setD(nuevo()); setTocados({}); setError('') } }}>Limpiar</button>
             <button type="button" className="sv-btn sv-btn--ghost" onClick={() => { if (revisar()) setVista(true) }}><IconEye width={18} height={18} /> Vista previa</button>
-            <button type="button" className="sv-btn" onClick={descargar} disabled={busy}><IconDownload width={18} height={18} /> {busy ? 'Generando…' : 'Descargar Excel'}</button>
+            <button type="button" className="sv-btn sv-btn--ghost" onClick={descargar} disabled={busy}><IconDownload width={18} height={18} /> {busy ? 'Generando…' : 'Descargar Excel'}</button>
+            <button type="button" className="sv-btn" onClick={enviar} disabled={enviando}>{enviando ? <><span className="sv-spinner" aria-hidden="true" /> Enviando…</> : <><IconSend width={18} height={18} /> Enviar a Talento Humano</>}</button>
           </div>
+          <p className="sv-hint">Se envía a {CORREO_INCAPACIDADES} con el formato FT-OP-76 en Excel y tus anexos.</p>
         </div>
       </div>
+      )}
 
       {vista && <Vista d={d} onClose={() => setVista(false)} onDescargar={descargar} busy={busy} />}
     </div>

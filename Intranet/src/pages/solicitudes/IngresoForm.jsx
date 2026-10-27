@@ -10,7 +10,7 @@ const nuevo = () => ({
   fechaSolicitud: hoyISO(),
   nombre: '', identificacion: '', centroCosto: '', cargo: '', telefono: '', barrio: '', correo: '', direccion: '', fechaIngreso: '',
   salario: '', auxilioTransporte: '', beneficios: [],
-  solicitanteNombre: '', solicitanteCargo: '', solicitanteCorreo: '', firma: '',
+  solicitanteNombre: '', solicitanteDocumento: '', solicitanteCargo: '', solicitanteCorreo: '', firma: '',
   responsableNombre: '', responsableCargo: '',
   mensajeCorreo: '',
 })
@@ -19,7 +19,7 @@ const LABELS = {
   fechaSolicitud: 'Fecha de solicitud', nombre: 'Nombres y apellidos', identificacion: 'Identificación', centroCosto: 'Centro de costo', cargo: 'Cargo',
   telefono: 'Teléfono', barrio: 'Barrio', correo: 'Correo electrónico', direccion: 'Dirección', fechaIngreso: 'Fecha probable de ingreso',
   salario: 'Salario a pagar', auxilioTransporte: 'Auxilio de transporte', beneficios: 'Beneficio adicional',
-  solicitanteNombre: 'Nombre del solicitante', solicitanteCargo: 'Cargo del solicitante', solicitanteCorreo: 'Tu correo electrónico', firma: 'Firma',
+  solicitanteNombre: 'Nombre del solicitante', solicitanteDocumento: 'Tu número de cédula', solicitanteCargo: 'Cargo del solicitante', solicitanteCorreo: 'Tu correo electrónico', firma: 'Firma',
   responsableNombre: 'Responsable de contratación', responsableCargo: 'Cargo del responsable', mensajeCorreo: 'Mensaje del correo',
 }
 
@@ -98,12 +98,13 @@ export default function IngresoForm() {
     {
       id: 'autorizacion',
       title: 'Autorización y responsable',
-      campos: ['solicitanteNombre', 'solicitanteCargo', 'solicitanteCorreo', 'firma', 'responsableNombre', 'responsableCargo'],
+      campos: ['solicitanteNombre', 'solicitanteDocumento', 'solicitanteCargo', 'solicitanteCorreo', 'firma', 'responsableNombre', 'responsableCargo'],
       render: () => (
         <>
           <Section number="5" title="Autorización de contratación" description="Datos de quien diligencia y firma esta solicitud.">
             <div className="sv-grid">
               <TextField form={form} path="solicitanteNombre" label="Nombre del solicitante" required autoComplete="name" />
+              <DigitsField form={form} path="solicitanteDocumento" label="Tu número de cédula" required hint="Con tu cédula o tu correo podrás consultar el estado." />
               <TextField form={form} path="solicitanteCargo" label="Cargo del solicitante" required autoComplete="organization-title" />
               <TextField form={form} path="solicitanteCorreo" label="Tu correo electrónico" type="email" required autoComplete="email" hint="Con este correo y el número de solicitud podrás consultar el estado." className="sv-col-2" />
               <SignaturePad form={form} path="firma" label="Firma del solicitante" required />
